@@ -1,6 +1,7 @@
 # keep the build context small and never bake secrets into the image
 **/node_modules
 **/.venv
+**/.venv-orv
 **/__pycache__
 **/.pytest_cache
 frontend/dist

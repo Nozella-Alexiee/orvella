@@ -1,0 +1,171 @@
+/* =====================================================================
+   ORVELLA · tokens.css  (sumber kebenaran untuk warna, tipe, bentuk, gerak)
+   Tema: Terang "Ceria hangat" (default) · Malam (gelap)
+   Pola tema: :root = terang lengkap; gelap didefinisikan ulang di
+   @media (prefers-color-scheme: dark) :root:not([data-theme=light])
+   dan di :root[data-theme=dark]. Komponen hanya membaca token.
+   ===================================================================== */
+:root {
+  color-scheme: light;
+
+  /* ---- Netral hangat ---- */
+  --bg:          #FDF4E3;   /* susu hangat, latar halaman */
+  --bg-2:        #F6E8CC;   /* cekung / area sekunder */
+  --surface:     #FFFBF4;   /* kartu */
+  --surface-2:   #FFF3DE;   /* kartu berwarna lembut */
+  --line:        #EBDABB;
+  --line-strong: #D8C19A;
+  --ink:         #1E1C45;   /* nila tua, teks utama */
+  --ink-2:       #4A4770;   /* teks sekunder */
+  --ink-3:       #6A6588;   /* keterangan, meta */
+  --on-ink:      #FFF8EA;   /* teks di atas nila */
+
+  /* ---- Merek ---- */
+  --marigold:      #FFB224;  /* cahaya Orvi, aksen utama */
+  --marigold-deep: #EE8A00;
+  --marigold-soft: #FFE6AE;
+  --marigold-ink:  #7A4200;  /* teks di atas marigold-soft */
+  --lilac:         #7466EC;  /* cincin orbit default, aksen kedua */
+  --lilac-soft:    #E9E5FF;
+  --lilac-ink:     #4633C0;
+  --pip:           #EEE9FF;  /* bulan Pip */
+  --pip-shade:     #C8BDF4;
+
+  /* Tombol utama & fokus */
+  --btn-bg:   var(--ink);
+  --btn-ink:  var(--on-ink);
+  --btn-lip:  #0F0E2B;
+  --focus:    #7466EC;
+
+  /* ---- Fase belajar (dipakai di player) ---- */
+  --pahami-fill:  #3E9BF0; --pahami-soft:  #DDEEFE; --pahami-ink:  #0B5AA6; --pahami-line:  #A8D2FA;
+  --perkuat-fill: #1FB488; --perkuat-soft: #D3F3E6; --perkuat-ink: #0B6A4C; --perkuat-line: #97DDC3;
+  --kuis-fill:    #8D5CF6; --kuis-soft:    #ECE4FF; --kuis-ink:    #5A2BC7; --kuis-line:    #CBB8FB;
+  --uji-fill:     #FF6A55; --uji-soft:     #FFE1DA; --uji-ink:     #AE2A1B; --uji-line:     #FCB4A8;
+
+  /* ---- Semantik ---- */
+  --ok:      var(--perkuat-fill); --ok-soft:   var(--perkuat-soft); --ok-ink:   var(--perkuat-ink);
+  --bad:     var(--uji-fill);     --bad-soft:  var(--uji-soft);     --bad-ink:  var(--uji-ink);
+  --warn:    var(--marigold);     --warn-soft: var(--marigold-soft);--warn-ink: var(--marigold-ink);
+
+  /* ---- Bahasa (chip, sampul jalur, cincin & jejak Pip) ---- */
+  --lang-python: #3470C9;  --lang-python-2: #FFD447;
+  --lang-javascript: #EDC21B;
+  --lang-html: #EE5F2C;
+  --lang-css: #7A4FD6;
+  --lang-c: #4B7392;
+  --lang-cpp: #3353C3;
+  --lang-rust: #B4461C;
+  --lang-java: #D63B3B;
+  --lang-go: #10A0C4;
+  --lang-sql: #1F988A;
+  --lang-kotlin: #B13FCC;
+  --lang-php: #6C7CC2;
+
+  /* ---- Orvi ---- */
+  --orvi-hi:  #FFF3C9;
+  --orvi-mid: #FFC53D;
+  --orvi-lo:  #F28C00;
+  --orvi-face:#2A1F4E;
+  --orvi-cheek:#FF7E62;
+  --orvi-tint:#7466EC;     /* diganti per bahasa lewat Orvi.tint() */
+  --orvi-glow-op: .42;
+
+  /* ---- Tipografi ---- */
+  --font-display: 'Bricolage Grotesque', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-ui: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --t-hero: clamp(2.9rem, 1.6rem + 5.6vw, 6.4rem);
+  --t-h1:   clamp(2.3rem, 1.5rem + 3.4vw, 4rem);
+  --t-h2:   clamp(1.75rem, 1.3rem + 1.9vw, 2.7rem);
+  --t-h3:   clamp(1.3rem, 1.15rem + .6vw, 1.6rem);
+  --t-lg:   1.1875rem;
+  --t-md:   1rem;
+  --t-sm:   .875rem;
+  --t-xs:   .75rem;
+
+  /* ---- Ruang (kelipatan 4) ---- */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px; --s-5: 20px;
+  --s-6: 24px; --s-7: 32px; --s-8: 48px; --s-9: 64px; --s-10: 96px;
+  --gutter: clamp(16px, 4vw, 40px);
+  --maxw: 1200px;
+
+  /* ---- Bentuk ---- */
+  --r-xs: 8px; --r-sm: 12px; --r-md: 18px; --r-lg: 26px; --r-xl: 36px; --r-pill: 999px;
+
+  /* ---- Bayangan "clay" (lembut, hangat) ---- */
+  --sh-rgb: 94 62 16;
+  --shadow-1: 0 1px 2px rgb(var(--sh-rgb) / .10), 0 2px 6px -2px rgb(var(--sh-rgb) / .10);
+  --shadow-clay:
+    inset 0 1px 0 rgb(255 255 255 / .75),
+    inset 0 -3px 0 rgb(var(--sh-rgb) / .05),
+    0 2px 4px rgb(var(--sh-rgb) / .07),
+    0 14px 30px -12px rgb(var(--sh-rgb) / .22);
+  --shadow-pop: 0 24px 50px -18px rgb(var(--sh-rgb) / .35), 0 4px 10px rgb(var(--sh-rgb) / .08);
+  --glow-marigold: 0 0 0 6px rgb(255 178 36 / .18), 0 10px 30px -6px rgb(255 160 20 / .45);
+
+  /* ---- Kode (kartu kode selalu "papan tulis" nila di dua tema) ---- */
+  --code-bg: #1F1C47; --code-bg-2: #28255A; --code-line: #37336C; --code-ink: #F4EEFF; --code-dim: #9B95C4;
+  --syn-kw: #C9A5FF; --syn-str: #9BE7B4; --syn-num: #FFB86B; --syn-com: #8E88B5; --syn-fn: #8CC8FF;
+  --syn-type: #FF9DB5; --syn-tag: #FF9A76; --syn-attr: #FFD27A; --syn-punc: #CFC8EA;
+  --sheen: rgb(255 255 255 / .42);
+
+  /* ---- Gerak ---- */
+  --dur-1: 120ms; --dur-2: 220ms; --dur-3: 380ms; --dur-4: 640ms;
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --ease-inout: cubic-bezier(.65, 0, .35, 1);
+}
+
+/* ---------------------------- MALAM (gelap) ---------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #14132C; --bg-2: #0F0E23; --surface: #1D1B3D; --surface-2: #262350;
+    --line: #312E5E; --line-strong: #47437D;
+    --ink: #F8F1E4; --ink-2: #CAC3E2; --ink-3: #A29CC4; --on-ink: #1E1C45;
+    --marigold: #FFBC3B; --marigold-deep: #FFA41A; --marigold-soft: #3A2C17; --marigold-ink: #FFD27A;
+    --lilac: #9A8FFF; --lilac-soft: #2B2660; --lilac-ink: #C4BCFF;
+    --pip: #E6E0FF; --pip-shade: #A99BEA;
+    --btn-bg: var(--marigold); --btn-ink: #1E1C45; --btn-lip: #B96A00; --focus: #FFBC3B;
+    --pahami-fill: #57AAF5; --pahami-soft: #152D4D; --pahami-ink: #9CCDFF; --pahami-line: #24507F;
+    --perkuat-fill: #34C99A; --perkuat-soft: #103A31; --perkuat-ink: #86E6C4; --perkuat-line: #1C6552;
+    --kuis-fill: #A07BFF; --kuis-soft: #2A1F57; --kuis-ink: #CDB9FF; --kuis-line: #4B378F;
+    --uji-fill: #FF7D6A; --uji-soft: #44201E; --uji-ink: #FFB2A6; --uji-line: #7A3530;
+    --lang-javascript: #F2CD35; --lang-c: #6F97B8; --lang-cpp: #6B86F0; --lang-rust: #E07446;
+    --lang-python: #5A93E8; --lang-css: #9E7BF0; --lang-sql: #3BC0AE; --lang-php: #919EE0;
+    --orvi-face: #2A1F4E; --orvi-glow-op: .62;
+    --code-bg: #0E0D24; --code-bg-2: #1A1840; --code-line: #2C2960; --sheen: rgb(255 255 255 / .10);
+    --sh-rgb: 4 3 18;
+    --shadow-clay:
+      inset 0 1px 0 rgb(255 255 255 / .06),
+      inset 0 -3px 0 rgb(0 0 0 / .18),
+      0 2px 4px rgb(0 0 0 / .25),
+      0 16px 34px -12px rgb(0 0 0 / .55);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #14132C; --bg-2: #0F0E23; --surface: #1D1B3D; --surface-2: #262350;
+  --line: #312E5E; --line-strong: #47437D;
+  --ink: #F8F1E4; --ink-2: #CAC3E2; --ink-3: #A29CC4; --on-ink: #1E1C45;
+  --marigold: #FFBC3B; --marigold-deep: #FFA41A; --marigold-soft: #3A2C17; --marigold-ink: #FFD27A;
+  --lilac: #9A8FFF; --lilac-soft: #2B2660; --lilac-ink: #C4BCFF;
+  --pip: #E6E0FF; --pip-shade: #A99BEA;
+  --btn-bg: var(--marigold); --btn-ink: #1E1C45; --btn-lip: #B96A00; --focus: #FFBC3B;
+  --pahami-fill: #57AAF5; --pahami-soft: #152D4D; --pahami-ink: #9CCDFF; --pahami-line: #24507F;
+  --perkuat-fill: #34C99A; --perkuat-soft: #103A31; --perkuat-ink: #86E6C4; --perkuat-line: #1C6552;
+  --kuis-fill: #A07BFF; --kuis-soft: #2A1F57; --kuis-ink: #CDB9FF; --kuis-line: #4B378F;
+  --uji-fill: #FF7D6A; --uji-soft: #44201E; --uji-ink: #FFB2A6; --uji-line: #7A3530;
+  --lang-javascript: #F2CD35; --lang-c: #6F97B8; --lang-cpp: #6B86F0; --lang-rust: #E07446;
+  --lang-python: #5A93E8; --lang-css: #9E7BF0; --lang-sql: #3BC0AE; --lang-php: #919EE0;
+  --orvi-face: #2A1F4E; --orvi-glow-op: .62;
+  --code-bg: #0E0D24; --code-bg-2: #1A1840; --code-line: #2C2960; --sheen: rgb(255 255 255 / .10);
+  --sh-rgb: 4 3 18;
+  --shadow-clay:
+    inset 0 1px 0 rgb(255 255 255 / .06),
+    inset 0 -3px 0 rgb(0 0 0 / .18),
+    0 2px 4px rgb(0 0 0 / .25),
+    0 16px 34px -12px rgb(0 0 0 / .55);
+}

@@ -49,14 +49,14 @@ export default function UlanganPage() {
   useLockRedirect(error);
 
   const s = data?.session;
-  const key = s ? `gnosia-exam-${s.id}` : '';
+  const key = s ? `orvella-exam-${s.id}` : '';
 
   useEffect(() => {
     (async () => {
       try {
         const r = await api.post<StartRes>(`/api/chapters/${id}/ulangan/start`);
         offset.current = new Date(r.session.server_now).getTime() - Date.now();
-        const local = (await idbGet<{ answers: Record<string, unknown>; pending: string[] }>(`gnosia-exam-${r.session.id}`).catch(() => undefined)) || null;
+        const local = (await idbGet<{ answers: Record<string, unknown>; pending: string[] }>(`orvella-exam-${r.session.id}`).catch(() => undefined)) || null;
         setData(r);
         setAnswers({ ...r.session.answers, ...(local?.answers || {}) });
         setPending(new Set(local?.pending || []));

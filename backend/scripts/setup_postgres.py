@@ -2,7 +2,7 @@
 
     python scripts/setup_postgres.py
 
-Reads GNOSIA_DATABASE_URL (role, password, database) and GNOSIA_PG_SUPERUSER_PASSWORD,
+Reads ORVELLA_DATABASE_URL (role, password, database) and ORVELLA_PG_SUPERUSER_PASSWORD,
 connects as the `postgres` superuser, and creates the role plus `<db>` and `<db>_test`.
 Safe to run again: existing objects are kept and the role password is updated.
 """
@@ -29,11 +29,11 @@ def read_env() -> dict[str, str]:
 
 def main() -> int:
     env = read_env()
-    url = make_url(env["GNOSIA_DATABASE_URL"])
+    url = make_url(env["ORVELLA_DATABASE_URL"])
     if not url.drivername.startswith("postgresql"):
-        print("GNOSIA_DATABASE_URL bukan PostgreSQL; tidak ada yang perlu disiapkan.")
+        print("ORVELLA_DATABASE_URL bukan PostgreSQL; tidak ada yang perlu disiapkan.")
         return 0
-    su_pw = env.get("GNOSIA_PG_SUPERUSER_PASSWORD", "")
+    su_pw = env.get("ORVELLA_PG_SUPERUSER_PASSWORD", "")
     host, port = url.host or "localhost", url.port or 5432
     with psycopg.connect(host=host, port=port, user="postgres", password=su_pw, dbname="postgres", autocommit=True) as conn:
         exists = conn.execute("SELECT 1 FROM pg_roles WHERE rolname = %s", (url.username,)).fetchone()

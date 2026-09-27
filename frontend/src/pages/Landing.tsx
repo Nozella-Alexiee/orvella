@@ -178,7 +178,7 @@ export default function Landing() {
   const [bump, setBump] = useState(0);
   const icRef = useRef<HTMLSpanElement>(null);
   const root = useRef<HTMLDivElement>(null);
-  useEffect(() => { document.title = 'GNOSIA · Pahami dulu, baru ngoding'; const f = () => setScrolled(scrollY > 4); addEventListener('scroll', f, { passive: true }); return () => { removeEventListener('scroll', f); document.title = 'GNOSIA'; }; }, []);
+  useEffect(() => { document.title = 'Orvella · Pahami dulu, baru ngoding'; const f = () => setScrolled(scrollY > 4); addEventListener('scroll', f, { passive: true }); return () => { removeEventListener('scroll', f); document.title = 'Orvella'; }; }, []);
   useEffect(() => {
     const els = root.current!.querySelectorAll<HTMLElement>('[data-reveal]');
     const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } }), { threshold: .15 });
@@ -193,7 +193,7 @@ export default function Landing() {
     <div ref={root}>
       <style>{css}</style>
       <header className={cx('mnav', scrolled && 'is-scrolled')}><div className="lp">
-        <Link className="logo" to="/"><span className="logo-glyph" /><span className="logo-word">gnosia</span></Link>
+        <Link className="logo" to="/"><span className="logo-glyph" /><span className="logo-word">orvella</span></Link>
         <nav><a href="#cara">Cara belajar</a><a href="#beda">Bedanya</a><a href="#nosi">Nosi</a><a href="#sekolah">Untuk sekolah</a></nav>
         <div className="grow" />
         <button className="btn btn-ghost btn-icon" onClick={toggleTheme} aria-label="Ganti tema"><Icon name="sun-moon" /></button>
@@ -204,7 +204,7 @@ export default function Landing() {
           <div>
             <div className="eyebrow">Belajar ngoding · JavaScript untuk pemula</div>
             <h1 className="big-serif mt-4">Pahami dulu.<br /><em>Baru</em> ngoding.</h1>
-            <p className="lead-lg">Di GNOSIA, setiap konsep dijelaskan dengan animasi dan kode hidup, lalu diperkuat dengan latihan, diuji lewat kuis singkat, dan terakhir dibuktikan lewat ulangan atau challenge.</p>
+            <p className="lead-lg">Di Orvella, setiap konsep dijelaskan dengan animasi dan kode hidup, lalu diperkuat dengan latihan, diuji lewat kuis singkat, dan terakhir dibuktikan lewat ulangan atau challenge.</p>
             <div className="hero-phases">{ORDER.map((p, i) => <span key={p} className="phase-tag" data-phase={p}>{i + 1} · {p[0].toUpperCase() + p.slice(1)}</span>)}</div>
             <div className="row gap-3 mt-8 wrap"><Link className="btn btn-primary btn-xl btn-press" to={start}>{me ? 'Lanjut belajar' : 'Mulai Bab 1, gratis'}<Icon name="arrow-right" /></Link><a className="btn btn-ghost btn-xl" href="#cara">Lihat caranya</a></div>
             <p className="t-sm t-faint mt-4">Tanpa instalasi. Langsung di browser, juga di HP.</p>
@@ -213,7 +213,7 @@ export default function Landing() {
         </section>
 
         <section className="lp sec" id="cara">
-          <div className="eyebrow" data-reveal>Cara belajar di GNOSIA</div>
+          <div className="eyebrow" data-reveal>Cara belajar di Orvella</div>
           <h2 className="big-serif mt-3" data-reveal>Empat langkah, selalu berurutan.</h2>
           <p className="lead-lg" data-reveal>Kamu tidak dilempar ke soal sebelum paham. Kamu juga tidak diuji sebelum sempat berlatih.</p>
           <div className="story">
@@ -229,7 +229,7 @@ export default function Landing() {
           <h2 className="big-serif mt-3" data-reveal>Latihan tanpa fondasi itu menebak-nebak.</h2>
           <div className="vs">
             <div data-reveal><div className="t-label">Kebanyakan platform</div><div className="flow">{['Soal', 'Salah', 'Lihat jawaban', 'Lupa'].map((x, i) => <Fragment key={x}><span>{x}</span>{i < 3 && <Icon name="arrow-right" size={14} className="t-faint" />}</Fragment>)}</div><p className="t-sm t-muted mt-4">Praktik dulu tanpa pemahaman. Jawabannya bisa dihafal, tapi konsepnya tidak ikut.</p></div>
-            <div data-reveal style={{ borderColor: 'var(--pahami-line)' }}><div className="t-label" style={{ color: 'var(--pahami-ink)' }}>GNOSIA</div>
+            <div data-reveal style={{ borderColor: 'var(--pahami-line)' }}><div className="t-label" style={{ color: 'var(--pahami-ink)' }}>Orvella</div>
               <div className="flow">{ORDER.map((p, i) => <Fragment key={p}><span style={{ background: `var(--${p}-soft)`, color: `var(--${p}-ink)` }}>{p[0].toUpperCase() + p.slice(1)}</span>{i < 3 && <Icon name="arrow-right" size={14} className="t-faint" />}</Fragment>)}</div>
               <p className="t-sm t-muted mt-4">Fondasi dulu, lalu penguatan, lalu pembuktian. Setiap langkah menyiapkan langkah berikutnya.</p></div>
           </div>
@@ -263,7 +263,7 @@ export default function Landing() {
           <h2 className="big-serif" style={{ margin: '0 auto' }} data-reveal>Baris kode pertamamu tinggal <em>90 detik</em> lagi.</h2>
           <div className="row center gap-3 mt-8" data-reveal><Link className="btn btn-primary btn-xl btn-press" to={start}>{me ? 'Lanjut belajar' : 'Mulai gratis'}</Link>{!me && <Link className="btn btn-ghost btn-xl" to="/masuk">Sudah punya akun</Link>}</div>
         </section>
-        <footer className="lp foot"><div className="row between wrap gap-6"><Link className="logo" to="/"><span className="logo-glyph" /><span className="logo-word">gnosia</span></Link><div className="row gap-6 wrap"><a href="#cara">Cara belajar</a><a href="#sekolah">Sekolah</a></div><span className="t-faint">© {new Date().getFullYear()} GNOSIA</span></div></footer>
+        <footer className="lp foot"><div className="row between wrap gap-6"><Link className="logo" to="/"><span className="logo-glyph" /><span className="logo-word">orvella</span></Link><div className="row gap-6 wrap"><a href="#cara">Cara belajar</a><a href="#sekolah">Sekolah</a></div><span className="t-faint">© {new Date().getFullYear()} Orvella</span></div></footer>
       </main>
     </div>
   );

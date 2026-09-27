@@ -24,18 +24,18 @@ type Prefs = {
 };
 
 export const usePrefs = create<Prefs>((set, get) => ({
-  theme: (read('gnosia-theme') as ThemeChoice) || 'system',
+  theme: (read('orvella-theme') as ThemeChoice) || 'system',
   motion: motion(),
   sound: soundOn(),
-  nosi: read('gnosia-nosi') !== 'off',
-  setTheme: t => { write('gnosia-theme', t); applyTheme(t); set({ theme: t }); },
+  nosi: read('orvella-nosi') !== 'off',
+  setTheme: t => { write('orvella-theme', t); applyTheme(t); set({ theme: t }); },
   toggleTheme: () => {
     const cur = document.documentElement.dataset.theme === 'ink' ? 'ink' : 'paper';
     get().setTheme(cur === 'ink' ? 'paper' : 'ink');
   },
   setMotion: m => { setMotion(m); set({ motion: m }); },
   setSound: on => { setSound(on); set({ sound: on }); },
-  setNosi: on => { write('gnosia-nosi', on ? 'on' : 'off'); set({ nosi: on }); },
+  setNosi: on => { write('orvella-nosi', on ? 'on' : 'off'); set({ nosi: on }); },
 }));
 
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {

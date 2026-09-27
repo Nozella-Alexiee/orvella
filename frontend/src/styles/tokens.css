@@ -1,5 +1,5 @@
 ﻿/* =========================================================================
-   GNOSIA — Design Tokens  (v2.0 · "Soft Playful Intellect")
+   Orvella — Design Tokens  (v2.0 · "Soft Playful Intellect")
    Single source of truth. Components must reference SEMANTIC tokens only
    (never raw hex). Two first-class themes:
      • Paper  — light, default           → :root
@@ -62,7 +62,7 @@
   /* ---- Project accent (slate teal) ------------------------------------ */
   --mode-project: #2F6773;
 
-  /* ---- Code cards + syntax ("Gnosia Paper") --------------------------- */
+  /* ---- Code cards + syntax ("Orvella Paper") --------------------------- */
   --editor-bg: #FDFCFA;
   --editor-selection: #DCE0F2;
   --syn-text: #2A2925;

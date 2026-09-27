@@ -6,9 +6,9 @@ from pathlib import Path
 import pytest
 
 # A throwaway database per test session, seeded with the demo curriculum and class.
-# Set GNOSIA_TEST_DATABASE_URL to run the suite against PostgreSQL (the database is reset!).
-_tmp = Path(tempfile.mkdtemp(prefix="gnosia-test-"))
-os.environ["GNOSIA_DATABASE_URL"] = os.environ.get("GNOSIA_TEST_DATABASE_URL") or f"sqlite:///{(_tmp / 'test.db').as_posix()}"
+# Set ORVELLA_TEST_DATABASE_URL to run the suite against PostgreSQL (the database is reset!).
+_tmp = Path(tempfile.mkdtemp(prefix="orvella-test-"))
+os.environ["ORVELLA_DATABASE_URL"] = os.environ.get("ORVELLA_TEST_DATABASE_URL") or f"sqlite:///{(_tmp / 'test.db').as_posix()}"
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from fastapi.testclient import TestClient  # noqa: E402
@@ -18,7 +18,7 @@ from app.seed.seed import run as seed_run  # noqa: E402
 
 seed_run(reset=True)
 
-PASSWORD = "gnosia123"
+PASSWORD = "orvella123"
 
 
 @pytest.fixture()

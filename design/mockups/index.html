@@ -1,72 +1,134 @@
-<!doctype html>
-<html lang="id">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GNOSIA · Semua layar</title>
-<script>(function(){var q=new URLSearchParams(location.search).get('theme'),t=q;try{t=t||localStorage.getItem('gnosia-theme')}catch(e){}t=t||(matchMedia('(prefers-color-scheme: dark)').matches?'ink':'paper');document.documentElement.dataset.theme=t})()</script>
-<link rel="stylesheet" href="components.css">
+<title>Orvella Mockup</title>
+<meta name="description" content="Mockup desain Orvella (dulu GNOSIA), fase 1: identitas, maskot Orvi, komponen, dan landing page.">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=JetBrains+Mono:wght@400..800&display=swap">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
+<script>(function(){var q=new URLSearchParams(location.search),h=document.documentElement,g=function(k){try{return localStorage.getItem(k)}catch(e){return null}};var t=q.get('theme')||g('orv-theme');if(t==='light'||t==='dark')h.dataset.theme=t;var m=q.get('motion')||g('orv-motion');if(m==='full'||m==='calm'||m==='off')h.dataset.motion=m;})();</script>
 <style>
-  .ix { max-width: 1160px; margin: 0 auto; padding: 48px 32px 120px; }
-  .flow { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; margin-top: 16px; }
-  .scr { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 18px; border-radius: 18px; border: 1px solid var(--border); background: var(--surface); transition: border-color var(--dur-200), transform var(--dur-320) var(--spring-gentle); }
-  .scr:hover { border-color: var(--ph-line, var(--border-strong)); transform: translateY(-3px); }
-  .scr .num { font-family: var(--font-mono); font-size: 11px; color: var(--text-faint); }
-  .scr .nm { font-family: var(--font-serif); font-size: 22px; line-height: 1.15; }
-  .scr .star { position: absolute; top: 14px; right: 14px; }
-  .scr .states { font-size: 12px; color: var(--text-faint); }
-  .grp { margin-top: 56px; }
-  .grp h2 { font-family: var(--font-serif); font-weight: 400; font-size: 30px; margin: 0; }
-  .docs { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-top: 16px; }
-  .doc { display: flex; gap: 10px; align-items: center; padding: 14px 16px; border-radius: 14px; border: 1px dashed var(--border-strong); font-family: var(--font-mono); font-size: 13px; }
-  @media (max-width: 700px) { .ix { padding: 28px 16px 80px; } }
+  .hub-top { display: flex; align-items: center; gap: 14px; min-height: 68px; border-bottom: 1px solid var(--line); }
+  .hub-top .btn-icon { margin-left: auto; }
+  .hub-hero { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: clamp(20px, 4vw, 48px); align-items: center; padding-block: clamp(36px, 6vw, 72px) 28px; }
+  .hub-orvi { width: clamp(150px, 20vw, 230px); display: grid; place-items: center; }
+  .hub-hero h1 { font-size: clamp(2.4rem, 1.4rem + 3.6vw, 4.4rem); font-weight: 800; letter-spacing: -.04em; font-variation-settings: "wdth" 82; line-height: .95; }
+  .hub-hero h1 span { color: var(--marigold-deep); }
+  .hub-hero .lead { margin-top: 14px; }
+  .hub-phase { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .pages { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .pg { display: grid; text-decoration: none; color: var(--ink); border-radius: var(--r-lg); background: var(--surface); box-shadow: var(--shadow-clay); overflow: hidden; transition: transform var(--dur-3) var(--ease-spring); }
+  .pg:hover { transform: translateY(-4px); }
+  .pg img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; border-bottom: 1px solid var(--line); background: var(--bg-2); }
+  .pg-body { display: grid; gap: 6px; padding: 16px 18px 18px; }
+  .pg-body b { font-family: var(--font-display); font-size: 1.3rem; letter-spacing: -.02em; display: flex; align-items: center; gap: 8px; }
+  .pg-body b svg { width: 18px; height: 18px; color: var(--ink-3); transition: translate var(--dur-2); }
+  .pg:hover .pg-body b svg { translate: 4px 0; }
+  .pg-body p { font-size: .88rem; color: var(--ink-2); }
+  @media (max-width: 900px) { .pages { grid-template-columns: 1fr; max-width: 520px; } .hub-hero { grid-template-columns: 1fr; justify-items: start; } }
+  .hub-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-top: 40px; }
+  @media (max-width: 860px) { .hub-2 { grid-template-columns: 1fr; } }
+  .box { padding: 22px; border-radius: var(--r-lg); background: var(--bg-2); }
+  .box h2 { font-size: 1.4rem; margin-bottom: 14px; }
+  .dec { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+  .dec li { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 12px; font-size: .92rem; }
+  .dec li b { color: var(--ink-3); font-size: .74rem; letter-spacing: .1em; text-transform: uppercase; padding-top: 3px; }
+  @media (max-width: 480px) { .dec li { grid-template-columns: 1fr; gap: 2px; } }
+  .ask { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; counter-reset: q; }
+  .ask li { counter-increment: q; position: relative; padding-left: 38px; font-size: .95rem; line-height: 1.45; }
+  .ask li::before { content: counter(q); position: absolute; left: 0; top: -1px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--marigold); color: #1E1C45; font-weight: 800; font-size: .8rem; }
+  .road { margin-top: 40px; }
+  .road h2 { font-size: 1.6rem; margin-bottom: 16px; }
+  .road-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+  .road-list li { display: grid; gap: 8px; align-content: start; padding: 18px; border-radius: var(--r-lg); background: var(--surface); border: 1.5px solid var(--line); }
+  .road-list li.is-now { border-color: var(--marigold); box-shadow: var(--glow-marigold); }
+  .road-list .rn { font: 800 .74rem var(--font-ui); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+  .road-list b { font-family: var(--font-display); font-size: 1.2rem; letter-spacing: -.02em; line-height: 1.15; }
+  .road-list p { font-size: .84rem; color: var(--ink-2); }
+  @media (max-width: 960px) { .road-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 520px) { .road-list { grid-template-columns: 1fr; } }
+  .hub-foot { margin-block: 48px 90px; font-size: .86rem; color: var(--ink-3); display: flex; gap: 8px; align-items: center; }
+  .hub-foot svg { width: 16px; height: 16px; }
 </style>
-</head>
-<body>
-<main class="ix">
-  <div class="row between wrap gap-4">
-    <a class="logo" href="landing.html"><span class="logo-glyph"></span><span class="logo-word">gnosia</span></a>
-    <button class="btn btn-secondary btn-press" data-theme-toggle><i data-lucide="sun-moon"></i>Tema: <span data-theme-label></span></button>
+
+<header class="wrap hub-top">
+  <span class="logo"><span class="logo-mark" data-logo></span><span class="logo-word">Orvella</span></span>
+  <span class="small faint">Mockup desain</span>
+  <button class="btn btn-ghost btn-icon" id="themeBtn" type="button" aria-label="Ganti tema"><i data-lucide="moon"></i></button>
+</header>
+
+<main class="wrap">
+  <section class="hub-hero">
+    <div class="hub-orvi" id="hubOrvi"></div>
+    <div>
+      <span class="hub-phase"><span class="badge badge-warn">Fase 1 dari 4</span><span class="small faint">siap dicek</span></span>
+      <h1>GNOSIA sekarang <span>Orvella</span>.<br>Ini identitas dan maskot barunya.</h1>
+      <p class="lead">Namanya baru, tampilannya didesain ulang total, dan maskotnya diganti Orvi. Konsep 4 fase tetap. Fase ini menetapkan rasa dan wajahnya dulu, sebelum semua layar dibuat.</p>
+    </div>
+  </section>
+
+  <section class="pages" aria-label="Halaman fase 1">
+    <a class="pg" href="landing.html"><img src="thumbs/landing.jpg" alt="Cuplikan landing page Orvella" loading="lazy"><span class="pg-body"><b>Landing page <i data-lucide="arrow-right"></i></b><p>Etalase “hidup”: orbit 12 bahasa, memori yang bergerak di Python, C++, dan Rust, editor yang benar-benar mengompilasi, dan teaser Studio Mentor.</p></span></a>
+    <a class="pg" href="brand.html"><img src="thumbs/orvi.jpg" alt="Cuplikan lembar maskot Orvi" loading="lazy"><span class="pg-body"><b>Identitas &amp; Orvi <i data-lucide="arrow-right"></i></b><p>Nama, logo, warna, huruf, gaya bahasa, dan lembar maskot: 7 mood, perilaku Pip, anatomi, stiker, aturan pakai.</p></span></a>
+    <a class="pg" href="styleguide.html"><img src="thumbs/styleguide.jpg" alt="Cuplikan halaman komponen" loading="lazy"><span class="pg-body"><b>Komponen <i data-lucide="arrow-right"></i></b><p>Tombol empuk, kontrol, kartu jalur, cincin fase, koreografi benar/salah, kartu kode, dan tiga intensitas gerak.</p></span></a>
+  </section>
+
+  <div class="hub-2">
+    <section class="box">
+      <h2>Yang sudah diputuskan</h2>
+      <ul class="dec">
+        <li><b>Nama</b><span>Orvella, dari kata orbit. Cincin logo = cincin 4 fase.</span></li>
+        <li><b>Maskot</b><span>Orvi, bola cahaya marigold, dengan bulan kecil Pip sebagai “tangan”.</span></li>
+        <li><b>Gaya</b><span>Ceria hangat (krem, marigold, nila) dan mode Malam yang bercahaya.</span></li>
+        <li><b>Belajar</b><span>Tetap 4 fase per bab: Pahami, Perkuat, Kuis, Uji.</span></li>
+        <li><b>Bahasa</b><span>12 bahasa: Python, JavaScript, HTML, CSS, C, C++, Rust, Java, Go, SQL, Kotlin, PHP.</span></li>
+        <li><b>Mentor</b><span>Bisa menyusun materi sendiri lewat Studio berbasis blok (Fase 3).</span></li>
+      </ul>
+    </section>
+    <section class="box">
+      <h2>Tolong cek ini dulu</h2>
+      <ol class="ask">
+        <li>Orvi dan Pip sudah terasa pas sebagai maskot? Coba colek, seret, dan ganti mood-nya.</li>
+        <li>Warna dan huruf sudah “soft tapi bagus”? Cek juga mode Malam.</li>
+        <li>Landing sudah terasa hidup, atau masih kurang gerak di bagian tertentu?</li>
+        <li>Ada bahasa yang mau ditambah atau dibuang dari daftar 12?</li>
+      </ol>
+    </section>
   </div>
-  <h1 class="big-serif mt-8" style="font-size:56px">Semua layar <em>GNOSIA</em>.</h1>
-  <p class="t-lg t-muted mt-3" style="max-width:64ch;line-height:1.6">Mockup HTML interaktif untuk desain v2 “Jalan Pemahaman”: <b style="color:var(--pahami-ink)">Pahami</b> → <b style="color:var(--perkuat-ink)">Perkuat</b> → <b style="color:var(--kuis-ink)">Kuis</b> → <b style="color:var(--uji-ink)">Uji</b>. Tiap halaman punya tombol state di pojok (khusus mockup) dan navigasi alur di bawah.</p>
-  <div class="row gap-2 mt-6 wrap"><a class="btn btn-primary btn-lg btn-press" href="styleguide.html"><i data-lucide="palette"></i>Design system</a><a class="btn btn-secondary btn-lg btn-press" href="pahami.html"><i data-lucide="play"></i>Mulai dari lesson player</a></div>
 
-  <section class="grp"><div class="row between"><h2>Siswa · inti belajar</h2><span class="phase-tag">★ flagship</span></div>
-    <div class="flow">
-      <a class="scr" data-phase="pahami" href="pahami.html"><span class="star phase-tag">★</span><span class="num">06 · pahami.html</span><span class="nm">Pahami</span><span class="t-sm t-muted">7 scene beranimasi: token yang bisa diklik, angka yang bisa digeser, let vs const, selebrasi fase.</span><span class="states">?scene=1–7 · ?state=done</span></a>
-      <a class="scr" data-phase="perkuat" href="perkuat.html"><span class="star phase-tag">★</span><span class="num">07 · perkuat.html</span><span class="nm">Perkuat</span><span class="t-sm t-muted">7 tipe soal (pilih, lengkapi, tebak output, susun, bug, slider, pasangkan), adaptif, petunjuk bertingkat.</span><span class="states">q1 · q2 · q4 · q5 · q6 · q7 · done</span></a>
-      <a class="scr" data-phase="kuis" href="kuis.html"><span class="star phase-tag">★</span><span class="num">08 · kuis.html</span><span class="nm">Kuis</span><span class="t-sm t-muted">Ronde trivia 10 soal: hitung mundur, timer, combo, hasil, gerbang 70%, pembahasan.</span><span class="states">intro · play · pass · fail</span></a>
-      <a class="scr" data-phase="uji" href="ulangan.html"><span class="num">09 · ulangan.html</span><span class="nm">Uji · Ulangan</span><span class="t-sm t-muted">Countdown, navigasi soal, tandai, konfirmasi kirim, hasil 85.</span><span class="states">work · low · offline · result</span></a>
-      <a class="scr" data-phase="uji" href="challenge.html"><span class="star phase-tag">★</span><span class="num">10 · challenge.html</span><span class="nm">Uji · Challenge</span><span class="t-sm t-muted">Focus Coder: kode benar-benar dijalankan, robot penguji, baris error ditandai, bab selesai.</span><span class="states">attempt · start · solved</span></a>
-    </div></section>
+  <section class="road" aria-labelledby="road-t">
+    <h2 id="road-t">Rencana fase</h2>
+    <ol class="road-list">
+      <li class="is-now"><span class="rn">Fase 1 · sekarang</span><b>Identitas, Orvi, landing</b><p>Merek, maskot, komponen dasar, dan landing page.</p></li>
+      <li><span class="rn">Fase 2</span><b>Layar siswa</b><p>Onboarding, beranda, katalog & peta jalur, pemutar 4 fase multi-bahasa, playground, progres.</p></li>
+      <li><span class="rn">Fase 3</span><b>Studio mentor & admin</b><p>Editor materi berbasis blok, bank soal, kelas & tugas, review kode, runtime bahasa.</p></li>
+      <li><span class="rn">Fase 4</span><b>Rencana rebuild</b><p>Urutan membangun ulang kode GNOSIA jadi Orvella, termasuk runner multi-bahasa.</p></li>
+    </ol>
+  </section>
 
-  <section class="grp"><h2>Siswa · sekitar belajar</h2>
-    <div class="flow">
-      <a class="scr" href="landing.html"><span class="num">01 · landing.html</span><span class="nm">Landing</span><span class="t-sm t-muted">Demo mini-lesson yang bisa dimainkan, scrollytelling 4 fase, Nosi.</span></a>
-      <a class="scr" href="login.html"><span class="num">02 · login.html</span><span class="nm">Masuk &amp; onboarding</span><span class="t-sm t-muted">Masuk, daftar (error), tujuan, cek penempatan, target harian.</span><span class="states">login · register · goal · level · time</span></a>
-      <a class="scr" href="dashboard.html"><span class="num">03 · dashboard.html</span><span class="nm">Beranda</span><span class="t-sm t-muted">Lanjutkan dengan cincin fase, target, streak, kuis harian, perlu diulang, mentor.</span><span class="states">default · new · loading</span></a>
-      <a class="scr" href="peta.html"><span class="num">04 · peta.html</span><span class="nm">Peta belajar</span><span class="t-sm t-muted">Jalur berkelok, node bab dengan cincin, popover, bab terkunci.</span><span class="states">?pop=1</span></a>
-      <a class="scr" href="bab.html"><span class="num">05 · bab.html</span><span class="nm">Bab</span><span class="t-sm t-muted">4 kartu fase, yang akan dikuasai, catatan ringkas.</span></a>
-      <a class="scr" href="playground.html"><span class="num">11 · playground.html</span><span class="nm">Playground</span><span class="t-sm t-muted">Notebook sel yang bisa dijalankan, diagnostik Nosi, lampirkan bab.</span><span class="states">default · empty</span></a>
-      <a class="scr" href="proyek.html"><span class="num">12 · proyek.html</span><span class="nm">Proyek</span><span class="t-sm t-muted">Milestone, robot, diskusi mentor, komentar per baris, portofolio.</span><span class="states">work · waiting · feedback · portfolio</span></a>
-      <a class="scr" href="progress.html"><span class="num">13 · progress.html</span><span class="nm">Progres</span><span class="t-sm t-muted">Konstelasi konsep, tren, per bab per fase.</span></a>
-      <a class="scr" href="settings.html"><span class="num">14 · settings.html</span><span class="nm">Pengaturan</span><span class="t-sm t-muted">Tema, intensitas animasi (bisa dicoba), suara, Nosi, privasi.</span></a>
-    </div></section>
-
-  <section class="grp"><h2>Mentor &amp; Admin</h2>
-    <div class="flow">
-      <a class="scr" href="mentor.html"><span class="num">15 · mentor.html</span><span class="nm">Ringkasan kelas</span><span class="t-sm t-muted">“Perlu perhatian sekarang”, posisi kelas per fase, konsep tersulit.</span></a>
-      <a class="scr" href="siswa.html"><span class="num">16 · siswa.html</span><span class="nm">Detail siswa</span><span class="t-sm t-muted">Pola jawaban salah + diagnosis, review kode per baris, timeline.</span><span class="states">#review</span></a>
-      <a class="scr" href="admin.html"><span class="num">17 · admin.html</span><span class="nm">Admin</span><span class="t-sm t-muted">Konten yang perlu dicek dari data, distribusi fase, status konten.</span></a>
-      <a class="scr" href="builder.html"><span class="num">18 · builder.html</span><span class="nm">Builder</span><span class="t-sm t-muted">Editor scene + langkah animasi, soal Perkuat, bank Kuis, challenge, pratinjau langsung.</span><span class="states">scene · soal · kuis · challenge</span></a>
-    </div></section>
-
-  <section class="grp"><h2>Dokumen serah-terima</h2><p class="t-sm t-muted mt-2">Di folder <span class="t-mono">gnosia-design/</span>, satu tingkat di atas mockups.</p>
-    <div class="docs"><span class="doc"><i data-lucide="file-text" class="i-14"></i>README.md</span><span class="doc"><i data-lucide="file-text" class="i-14"></i>CONCEPT.md</span><span class="doc"><i data-lucide="file-text" class="i-14"></i>DESIGN-SYSTEM.md</span><span class="doc"><i data-lucide="file-text" class="i-14"></i>MOTION.md</span><span class="doc"><i data-lucide="file-text" class="i-14"></i>COMPONENTS.md</span><span class="doc"><i data-lucide="file-text" class="i-14"></i>INFORMATION-ARCHITECTURE.md</span><span class="doc"><i data-lucide="file-text" class="i-14"></i>SCREENS.md</span><span class="doc"><i data-lucide="file-text" class="i-14"></i>STATES.md</span><span class="doc"><i data-lucide="braces" class="i-14"></i>tokens.css · tokens.json</span></div></section>
+  <p class="hub-foot"><i data-lucide="sliders-horizontal"></i> Dok “Mockup” di kiri bawah: pindah halaman, ganti tema, atur gerak, dan nyalakan suara. Dok itu khusus mockup.</p>
 </main>
-<script src="vendor/lucide.min.js"></script>
-<script src="motion.js"></script>
-<script src="app.js"></script>
-</body>
-</html>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/MorphSVGPlugin.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<script>/* cadangan offline: pakai salinan lokal di vendor/ bila CDN tidak terjangkau */
+window.gsap||["gsap", "MorphSVGPlugin"].forEach(function(n){document.write('<script src="vendor/gsap/'+n+'.min.js"><\/script>')});
+window.lucide||document.write('<script src="vendor/lucide.min.js"><\/script>');
+window.confetti||document.write('<script src="vendor/confetti.browser.min.js"><\/script>');</script>
+<script src="js/fx.js"></script>
+<script src="js/sound.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/orvi.js"></script>
+<script>
+  (function () {
+    var o = Orvi.mount(document.getElementById('hubOrvi'), { size: 210, idle: true, idleMs: 40000, side: 'top' });
+    setTimeout(function () { o.say('Halo! Aku Orvi. Ini Pip, bulanku.', { ms: 3200 }); }, 900);
+    var tb = document.getElementById('themeBtn');
+    function sync() { tb.innerHTML = '<i data-lucide="' + (FX.isDark() ? 'sun' : 'moon') + '"></i>'; FX.icons(tb); }
+    tb.addEventListener('click', function () { FX.setTheme(FX.isDark() ? 'light' : 'dark'); sync(); });
+    sync();
+  })();
+</script>
+<script src="js/mock.js"></script>

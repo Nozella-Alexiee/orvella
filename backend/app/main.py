@@ -1,16 +1,18 @@
-"""GNOSIA API. In production it also serves the built frontend (frontend/dist) with an SPA fallback."""
+"""Orvella API. In production it also serves the built frontend (frontend/dist) with an SPA fallback."""
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from .config import settings
-from .db import Base, engine
+from .db import Base, _is_sqlite, engine
 from .routers import admin, auth, learner, mentor, player, workspace
 from .services.runner import RunnerUnavailable
 
-Base.metadata.create_all(engine)
+# PostgreSQL is managed by Alembic (python -m app.migrate). A local SQLite dev database is created on the fly.
+if _is_sqlite:
+    Base.metadata.create_all(engine)
 
-app = FastAPI(title="GNOSIA API", version="1.0.0")
+app = FastAPI(title="Orvella API", version="1.0.0")
 
 for r in (auth.router, learner.router, player.router, player.ws_router, workspace.router, mentor.router, admin.router):
     app.include_router(r)

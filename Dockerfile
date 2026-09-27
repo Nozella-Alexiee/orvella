@@ -1,4 +1,4 @@
-# GNOSIA — one image: FastAPI serves the API, the WebSocket and the built React app on port 8000.
+# Orvella — one image: FastAPI serves the API, the WebSocket and the built React app on port 8000.
 # Node.js is included at runtime because learner code runs in the Node sandbox (backend/runner/sandbox.mjs).
 
 # ---- 1. build the frontend ---------------------------------------------------------
@@ -31,12 +31,12 @@ COPY backend/ ./
 COPY --from=web /src/frontend/dist /app/frontend/dist
 
 # run as an unprivileged user
-RUN useradd --create-home --uid 10001 gnosia && chown -R gnosia /app
-USER gnosia
+RUN useradd --create-home --uid 10001 orvella && chown -R orvella /app
+USER orvella
 
 EXPOSE 8000
 HEALTHCHECK --interval=10s --timeout=3s --start-period=20s --retries=6 \
   CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=2)"
 
-# Create tables and seed the demo data on first start (skipped when the database already has data), then serve.
-CMD ["sh", "-c", "python -m app.seed && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips='*'"]
+# Migrate the schema, seed the demo data on first start (skipped when the database already has data), then serve.
+CMD ["sh", "-c", "python -m app.migrate && python -m app.seed && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips='*'"]

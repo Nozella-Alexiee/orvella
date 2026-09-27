@@ -17,7 +17,7 @@ const GOALS = [
   ['penasaran', 'sparkles', 'Penasaran saja', 'Coba dulu'],
 ] as const;
 const STEPS = ['tujuan', 'cek', 'waktu'] as const;
-const KEY = 'gnosia-onboarding';
+const KEY = 'orvella-onboarding';
 
 type Draft = { goal: string; placement: '' | 'a' | 'b' | 'c'; minutes: number };
 const load = (): Draft => { try { return { goal: 'sekolah', placement: '', minutes: 20, ...JSON.parse(sessionStorage.getItem(KEY) || '{}') }; } catch { return { goal: 'sekolah', placement: '', minutes: 20 }; } };

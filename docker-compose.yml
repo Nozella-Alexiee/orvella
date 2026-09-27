@@ -1,39 +1,39 @@
-# GNOSIA with Docker
+# Orvella with Docker
 #   docker compose up -d --build                     # app + PostgreSQL → http://localhost:8000
 #   docker compose --profile tunnel up -d --build    # + temporary public URL (https://….trycloudflare.com)
 # Secrets come from ./.env (created by scripts/tunnel.ps1 or scripts/tunnel.sh, see .env.example).
 
-name: gnosia
+name: orvella
 
 services:
   db:
     image: postgres:17-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: gnosia
-      POSTGRES_DB: gnosia
+      POSTGRES_USER: orvella
+      POSTGRES_DB: orvella
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?isi POSTGRES_PASSWORD di file .env}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U gnosia -d gnosia"]
+      test: ["CMD-SHELL", "pg_isready -U orvella -d orvella"]
       interval: 5s
       timeout: 3s
       retries: 20
 
   app:
     build: .
-    image: gnosia-app:latest
+    image: orvella-app:latest
     restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
     environment:
-      GNOSIA_DATABASE_URL: postgresql+psycopg://gnosia:${POSTGRES_PASSWORD}@db:5432/gnosia
-      GNOSIA_SECRET_KEY: ${SECRET_KEY:?isi SECRET_KEY di file .env}
-      GNOSIA_DEMO_PASSWORD: ${DEMO_PASSWORD:-}
+      ORVELLA_DATABASE_URL: postgresql+psycopg://orvella:${POSTGRES_PASSWORD}@db:5432/orvella
+      ORVELLA_SECRET_KEY: ${SECRET_KEY:?isi SECRET_KEY di file .env}
+      ORVELLA_DEMO_PASSWORD: ${DEMO_PASSWORD:-}
       # cookies only over HTTPS (the tunnel) — browsers still accept them on http://localhost
-      GNOSIA_COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      ORVELLA_COOKIE_SECURE: ${COOKIE_SECURE:-true}
     ports:
       - "${APP_PORT:-8000}:8000"
 

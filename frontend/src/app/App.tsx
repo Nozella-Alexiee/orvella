@@ -61,8 +61,8 @@ function SessionWatcher() {
       queryClient.setQueryData(['/api/me'], null);
       if (!/^\/(masuk|daftar)?$/.test(location.pathname)) nav(`/masuk?next=${encodeURIComponent(location.pathname)}`);
     };
-    addEventListener('gnosia:unauthorized', f);
-    return () => removeEventListener('gnosia:unauthorized', f);
+    addEventListener('orvella:unauthorized', f);
+    return () => removeEventListener('orvella:unauthorized', f);
   }, [nav]);
   return null;
 }

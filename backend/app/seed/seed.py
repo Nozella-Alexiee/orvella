@@ -298,7 +298,7 @@ def run(reset: bool = False) -> None:
         db.commit()
         print("Seed selesai.")
         cfg = json.loads((HERE / "users.json").read_text(encoding="utf-8"))
-        shown = "dari GNOSIA_DEMO_PASSWORD" if os.environ.get("GNOSIA_DEMO_PASSWORD") else cfg["password"]
+        shown = "dari ORVELLA_DEMO_PASSWORD" if os.environ.get("ORVELLA_DEMO_PASSWORD") else cfg["password"]
         print(f"Akun demo (kata sandi: {shown}):")
         for p in cfg["staff"] + cfg["learners"]:
             print(f"  {p.get('role', 'learner'):8} {p['email']}")
@@ -310,7 +310,7 @@ def seed_all(s: Seeder) -> None:
     db = s.db
     cfg = json.loads((HERE / "users.json").read_text(encoding="utf-8"))
     # A public deployment (e.g. behind a tunnel) sets its own demo password instead of the documented test one.
-    pw = hash_password(os.environ.get("GNOSIA_DEMO_PASSWORD") or cfg["password"])
+    pw = hash_password(os.environ.get("ORVELLA_DEMO_PASSWORD") or cfg["password"])
     org = s.add(Organization(name=cfg["org"]))
     path = s.add(Path(slug="js-dasar", title="JavaScript Dasar", description="Dari console.log sampai array. 8 bab, 1 proyek, 1 ujian akhir."))
     db.flush()

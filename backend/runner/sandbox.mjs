@@ -1,4 +1,4 @@
-// GNOSIA code runner — executes one learner program inside node:vm and
+// Orvella code runner — executes one learner program inside node:vm and
 // evaluates test cases against it. Reads a JSON job on stdin, writes a JSON
 // result on stdout. Started by app/services/runner.py with Node's permission
 // model (no fs writes, no child processes, no network).

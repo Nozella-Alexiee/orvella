@@ -1,5 +1,5 @@
-"""App settings. Override any field with an environment variable prefixed GNOSIA_
-(e.g. GNOSIA_DATABASE_URL=postgresql+psycopg://...)."""
+"""App settings. Override any field with an environment variable prefixed ORVELLA_
+(e.g. ORVELLA_DATABASE_URL=postgresql+psycopg://...)."""
 import shutil
 from pathlib import Path
 
@@ -20,13 +20,13 @@ def _find_node() -> str:
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="GNOSIA_", env_file=BACKEND_DIR / ".env", extra="ignore")
+    model_config = SettingsConfigDict(env_prefix="ORVELLA_", env_file=BACKEND_DIR / ".env", extra="ignore")
 
-    # PostgreSQL in development and production, e.g. postgresql+psycopg://gnosia:***@localhost:5432/gnosia (set in backend/.env).
+    # PostgreSQL in development and production, e.g. postgresql+psycopg://orvella:***@localhost:5432/orvella (set in backend/.env).
     # Falls back to a local SQLite file when nothing is configured.
-    database_url: str = f"sqlite:///{(BACKEND_DIR / 'gnosia.db').as_posix()}"
+    database_url: str = f"sqlite:///{(BACKEND_DIR / 'orvella.db').as_posix()}"
     secret_key: str = "dev-only-change-me-in-production"
-    session_cookie: str = "gnosia_session"
+    session_cookie: str = "orvella_session"
     session_days: int = 30
     cookie_secure: bool = False
 

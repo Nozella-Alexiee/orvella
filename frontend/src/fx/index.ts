@@ -1,4 +1,4 @@
-/* GNOSIA effect kit — a typed port of design/mockups/motion.js (see MOTION.md).
+/* Orvella effect kit — a typed port of design/mockups/motion.js (see MOTION.md).
    Built on the Web Animations API. Intensity (html[data-motion]):
      full → everything · calm → no particles, confetti, tilt or ambient drift · off → state changes only */
 import confettiLib from 'canvas-confetti';
@@ -12,7 +12,7 @@ const store = {
 };
 
 function readMotion(): MotionLevel {
-  const v = (root().dataset.motion || store.get('gnosia-motion')) as MotionLevel | null;
+  const v = (root().dataset.motion || store.get('orvella-motion')) as MotionLevel | null;
   if (v === 'full' || v === 'calm' || v === 'off') return v;
   return matchMedia('(prefers-reduced-motion: reduce)').matches ? 'off' : 'full';
 }
@@ -27,7 +27,7 @@ const on = () => level !== 'off';
 export function setMotion(v: MotionLevel) {
   level = v;
   root().dataset.motion = v;
-  store.set('gnosia-motion', v);
+  store.set('orvella-motion', v);
 }
 
 export const ease = {
@@ -118,8 +118,8 @@ export function flyTo(src: El, dst: El, { dur = 700 } = {}): Promise<void> {
 
 // ---------- Sound (off by default; Pengaturan › Suara) ----------
 let ctx: AudioContext | null = null;
-export const soundOn = () => store.get('gnosia-sound') === 'on';
-export function setSound(onOff: boolean) { store.set('gnosia-sound', onOff ? 'on' : 'off'); }
+export const soundOn = () => store.get('orvella-sound') === 'on';
+export function setSound(onOff: boolean) { store.set('orvella-sound', onOff ? 'on' : 'off'); }
 export function sound(kind: 'ok' | 'no' | 'done' | 'tick') {
   if (!soundOn()) return;
   try {

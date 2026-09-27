@@ -71,7 +71,7 @@ export default function Pengaturan() {
   return (
     <main className="page" style={{ maxWidth: 1040 }}>
       <style>{css}</style>
-      <div className="page-head"><div><div className="eyebrow">Pengaturan</div><h1 className="big-serif mt-2" style={{ fontSize: 44 }}>Atur GNOSIA <em>sesukamu</em>.</h1></div></div>
+      <div className="page-head"><div><div className="eyebrow">Pengaturan</div><h1 className="big-serif mt-2" style={{ fontSize: 44 }}>Atur Orvella <em>sesukamu</em>.</h1></div></div>
       <div className="set">
         <nav className="set-nav" aria-label="Bagian pengaturan">{sections.map(([id, l]) => <a key={id} href={`#${id}`} aria-current={active === id ? 'true' : undefined} onClick={() => setActive(id)}>{l}</a>)}</nav>
         <div>
@@ -97,7 +97,7 @@ export default function Pengaturan() {
           </section>
 
           <section className="set-sec" id="motion">
-            <h2>Animasi &amp; suara</h2><p className="t-sm t-muted">Animasi di GNOSIA selalu menandakan sesuatu. Pilih seberapa ramai yang nyaman untukmu.</p>
+            <h2>Animasi &amp; suara</h2><p className="t-sm t-muted">Animasi di Orvella selalu menandakan sesuatu. Pilih seberapa ramai yang nyaman untukmu.</p>
             <div className="intensity" role="radiogroup">
               {([['full', 'sparkles', 'Penuh', 'Partikel, konfeti, tilt, Nosi bergerak'], ['calm', 'wind', 'Kalem', 'Transisi halus saja, tanpa efek ramai'], ['off', 'pause', 'Mati', 'Hanya warna dan teks. Mengikuti “kurangi gerakan”.']] as const).map(([m, ic, l, s]) => (
                 <button key={m} role="radio" aria-checked={p.motion === m} aria-pressed={p.motion === m} onClick={() => setIntensity(m, l)}><Icon name={ic} className="t-accent" /><b>{l}</b><span className="t-xs t-muted">{s}</span></button>

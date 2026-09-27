@@ -1,11 +1,11 @@
-# GNOSIA
+# Orvella
 
 Platform belajar ngoding (JavaScript) dengan 4 fase per bab: **Pahami → Perkuat → Kuis → Uji**.
 Tampilan dibangun ulang dari paket desain di `design/` (18 layar) dengan React + Vite + TypeScript,
 dan backend-nya FastAPI + PostgreSQL.
 
 ```
-gnosia/
+orvella/
   design/     paket desain asli (mockup HTML, spesifikasi, token). Referensi, tidak di-build.
   backend/    FastAPI · SQLAlchemy · PostgreSQL · runner kode (Node sandbox)
   frontend/   React 19 · Vite · TypeScript · React Query · CodeMirror 6
@@ -18,9 +18,9 @@ Yang dibutuhkan: Python 3.12+, Node.js 20+ (dipakai Vite **dan** untuk menjalank
 
 1. Siapkan `backend/.env` (salin dari `backend/.env.example`):
    ```
-   GNOSIA_DATABASE_URL=postgresql+psycopg://gnosia:PASSWORD@localhost:5432/gnosia
-   GNOSIA_SECRET_KEY=string-acak-yang-panjang
-   GNOSIA_PG_SUPERUSER_PASSWORD=password-user-postgres   # hanya untuk membuat role & database
+   ORVELLA_DATABASE_URL=postgresql+psycopg://orvella:PASSWORD@localhost:5432/orvella
+   ORVELLA_SECRET_KEY=string-acak-yang-panjang
+   ORVELLA_PG_SUPERUSER_PASSWORD=password-user-postgres   # hanya untuk membuat role & database
    ```
 2. Setup pertama kali (venv, paket, role + database PostgreSQL, data demo, paket npm):
    ```powershell
@@ -40,8 +40,8 @@ Kalau PowerShell menolak menjalankan skrip ("running scripts is disabled"), paka
 ### PostgreSQL di laptop ini
 
 PostgreSQL 17 terpasang sebagai service Windows `postgresql-x64-17` (jalan otomatis saat Windows menyala, port 5432,
-pgAdmin 4 ikut terpasang). Database `gnosia` dipakai aplikasi dan `gnosia_test` untuk tes. Password user `postgres` dan
-`gnosia` dibuat acak saat setup dan hanya tersimpan di `backend/.env` (file itu tidak untuk dibagikan / di-commit).
+pgAdmin 4 ikut terpasang). Database `orvella` dipakai aplikasi dan `orvella_test` untuk tes. Password user `postgres` dan
+`orvella` dibuat acak saat setup dan hanya tersimpan di `backend/.env` (file itu tidak untuk dibagikan / di-commit).
 
 ## Docker + URL publik sementara (Cloudflare Tunnel)
 
@@ -64,7 +64,7 @@ Perintah lain (sama untuk `.ps1` dan `.sh`): `url` (tampilkan URL aktif), `logs`
 `reset` (hapus semua data dan mulai dari data demo baru).
 
 - Pertama kali, skrip membuat `.env` di folder proyek berisi password acak (database, secret key, dan **password akun demo**).
-  Password demo dicetak di terminal. Karena URL-nya publik, akun demo tidak memakai `gnosia123`.
+  Password demo dicetak di terminal. Karena URL-nya publik, akun demo tidak memakai `orvella123`.
 - URL berganti setiap kali tunnel dinyalakan ulang. Quick tunnel cocok untuk demo/uji coba, bukan untuk produksi
   (tidak ada jaminan uptime). Untuk alamat tetap, pakai named tunnel dengan akun Cloudflare dan domain sendiri.
 - Kalau URL tidak kunjung muncul (jaringan memblokir UDP/QUIC), ubah `TUNNEL_PROTOCOL=http2` di `.env` lalu jalankan lagi.
@@ -74,7 +74,7 @@ Perintah lain (sama untuk `.ps1` dan `.sh`): `url` (tampilkan URL aktif), `logs`
 
 ## Akun demo
 
-Saat dijalankan lokal dengan `dev.ps1`, semua memakai kata sandi `gnosia123` (lihat `backend/app/seed/users.json`).
+Saat dijalankan lokal dengan `dev.ps1`, semua memakai kata sandi `orvella123` (lihat `backend/app/seed/users.json`).
 Di Docker, kata sandinya diambil dari `DEMO_PASSWORD` di `.env` (dibuat acak oleh skrip tunnel).
 
 | Peran | Email | Yang bisa dicoba |
@@ -94,7 +94,7 @@ cd backend
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 Secara bawaan tes memakai SQLite sementara. Untuk menguji ke PostgreSQL:
-`$env:GNOSIA_TEST_DATABASE_URL="postgresql+psycopg://gnosia:PASSWORD@localhost:5432/gnosia_test"` (database ini di-reset).
+`$env:ORVELLA_TEST_DATABASE_URL="postgresql+psycopg://orvella:PASSWORD@localhost:5432/orvella_test"` (database ini di-reset).
 
 Frontend: `cd frontend; npm run typecheck`.
 
@@ -104,8 +104,8 @@ Frontend: `cd frontend; npm run typecheck`.
 cd frontend; npm run build          # hasil di frontend/dist
 cd ..\backend; .\.venv\Scripts\python.exe -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
-FastAPI menyajikan `frontend/dist` sekaligus API-nya, jadi cukup satu server. Set `GNOSIA_COOKIE_SECURE=true` di balik HTTPS,
-dan ganti `GNOSIA_SECRET_KEY`.
+FastAPI menyajikan `frontend/dist` sekaligus API-nya, jadi cukup satu server. Set `ORVELLA_COOKIE_SECURE=true` di balik HTTPS,
+dan ganti `ORVELLA_SECRET_KEY`.
 
 ## Cara kerjanya (singkat)
 

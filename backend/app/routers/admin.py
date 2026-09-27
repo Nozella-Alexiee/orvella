@@ -188,7 +188,7 @@ def export(me: User = Depends(admin_only), db: Session = Depends(get_db)) -> Str
                         "ya" if p.completed_at else "", p.active_seconds // 60, xp])
     buf.seek(0)
     return StreamingResponse(iter([buf.getvalue().encode("utf-8-sig")]), media_type="text/csv",
-                             headers={"Content-Disposition": 'attachment; filename="gnosia-progres.csv"'})
+                             headers={"Content-Disposition": 'attachment; filename="orvella-progres.csv"'})
 
 
 # ------------------------------------------------------------------ people

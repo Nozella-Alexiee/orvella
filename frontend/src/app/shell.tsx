@@ -25,7 +25,7 @@ const MENTOR: NavItem[] = [
 ];
 
 export function Logo({ to }: { to: string }) {
-  return <Link className="logo" to={to}><span className="logo-glyph" /><span className="logo-word">gnosia</span></Link>;
+  return <Link className="logo" to={to}><span className="logo-glyph" /><span className="logo-word">orvella</span></Link>;
 }
 
 /** Top navigation (learner / mentor) with the sliding pill, plus the mobile tab bar. */

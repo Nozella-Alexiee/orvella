@@ -1,5 +1,5 @@
 <#
-  GNOSIA · Cloudflare quick tunnel (Docker) — Windows PowerShell 5.1+ / PowerShell 7
+  Orvella · Cloudflare quick tunnel (Docker) — Windows PowerShell 5.1+ / PowerShell 7
 
   Menjalankan aplikasi (FastAPI + React + PostgreSQL) di Docker lalu membuka URL publik sementara
   https://<acak>.trycloudflare.com lewat Cloudflare. Tidak perlu akun Cloudflare.
@@ -87,7 +87,7 @@ function Show-Info([string]$url) {
   $port = Get-EnvValue 'APP_PORT'; if (-not $port) { $port = '8000' }
   $demo = Get-EnvValue 'DEMO_PASSWORD'
   Say ''
-  Say 'GNOSIA sudah online' Green
+  Say 'Orvella sudah online' Green
   Say "  Publik : $url" Cyan
   Say "  Lokal  : http://localhost:$port"
   Say ''
@@ -124,7 +124,7 @@ switch ($Command) {
   'logs' { Invoke-Compose @('logs', '-f', '--tail', '100') }
   'stop' { Invoke-Compose @('down'); Say 'Dimatikan. Data tetap tersimpan di volume Docker.' Green }
   'reset' {
-    $answer = Read-Host 'Ini akan menghapus SEMUA data GNOSIA di Docker (akun, progres, konten). Ketik HAPUS untuk lanjut'
+    $answer = Read-Host 'Ini akan menghapus SEMUA data Orvella di Docker (akun, progres, konten). Ketik HAPUS untuk lanjut'
     if ($answer -ne 'HAPUS') { Say 'Dibatalkan.'; exit 0 }
     Invoke-Compose @('down', '-v')
     Say 'Semua container dan data dihapus. Jalankan start untuk mulai dari data demo baru.' Green

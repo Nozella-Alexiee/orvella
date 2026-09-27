@@ -7,8 +7,8 @@ import { Prec, RangeSetBuilder, StateField, StateEffect, EditorState } from '@co
 import { tags as t } from '@lezer/highlight';
 import { cx } from '../design/ui';
 
-/* CodeMirror 6 styled like the GNOSIA code cards — deliberately not an IDE: no minimap, no tabs, no gutter icons. */
-const gnosiaHighlight = HighlightStyle.define([
+/* CodeMirror 6 styled like the Orvella code cards — deliberately not an IDE: no minimap, no tabs, no gutter icons. */
+const orvellaHighlight = HighlightStyle.define([
   { tag: [t.keyword, t.definitionKeyword, t.modifier, t.controlKeyword, t.operatorKeyword, t.bool, t.null], class: 'k' },
   { tag: [t.string, t.special(t.string), t.regexp], class: 's' },
   { tag: [t.number], class: 'n' },
@@ -48,7 +48,7 @@ export function CodeEditor({ value, onChange, onRun, badLine, small, minHeight, 
   const view = useRef<EditorView | null>(null);
   const extensions = useMemo(() => [
     javascript(),
-    syntaxHighlighting(gnosiaHighlight),
+    syntaxHighlighting(orvellaHighlight),
     theme,
     indentUnit.of('  '),
     EditorState.tabSize.of(2),

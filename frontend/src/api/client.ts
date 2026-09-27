@@ -38,7 +38,7 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   if (!res.ok) {
     const detail = (data && typeof data === 'object' && 'detail' in (data as object)) ? (data as { detail: Detail }).detail : (text || res.statusText);
     const err = new ApiError(res.status, detail);
-    if (res.status === 401) window.dispatchEvent(new CustomEvent('gnosia:unauthorized'));
+    if (res.status === 401) window.dispatchEvent(new CustomEvent('orvella:unauthorized'));
     throw err;
   }
   return data as T;

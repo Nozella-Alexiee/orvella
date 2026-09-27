@@ -49,7 +49,7 @@ export default function Beranda() {
         <section className="welcome">
           <Nosi size="xl" mood="cheer" />
           <div>
-            <div className="eyebrow">Selamat datang di GNOSIA</div>
+            <div className="eyebrow">Selamat datang di Orvella</div>
             <h1 className="big-serif mt-2" style={{ fontSize: 44 }}>Halo {first}, aku <em>Nosi</em>.</h1>
             <p className="t-lg t-muted mt-3" style={{ maxWidth: '52ch', lineHeight: 1.6 }}>Setiap bab punya 4 langkah: <b style={{ color: 'var(--pahami-ink)' }}>Pahami</b> konsepnya, <b style={{ color: 'var(--perkuat-ink)' }}>Perkuat</b> dengan latihan, <b style={{ color: 'var(--kuis-ink)' }}>Kuis</b> singkat, lalu <b style={{ color: 'var(--uji-ink)' }}>Uji</b>. Tidak ada yang dilompati.</p>
             <div className="row gap-3 mt-6 wrap">

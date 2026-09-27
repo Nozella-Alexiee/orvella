@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# GNOSIA · Cloudflare quick tunnel (Docker) — Linux / macOS / WSL / Git Bash
+# Orvella · Cloudflare quick tunnel (Docker) — Linux / macOS / WSL / Git Bash
 #
 # Menjalankan aplikasi (FastAPI + React + PostgreSQL) di Docker lalu membuka URL publik sementara
 # https://<acak>.trycloudflare.com lewat Cloudflare. Tidak perlu akun Cloudflare.
@@ -63,7 +63,7 @@ show_info() {
   port="$(env_value APP_PORT)"; port="${port:-8000}"
   demo="$(env_value DEMO_PASSWORD)"
   echo
-  echo "${G}GNOSIA sudah online${N}"
+  echo "${G}Orvella sudah online${N}"
   echo "  Publik : ${C}$1${N}"
   echo "  Lokal  : http://localhost:$port"
   echo
@@ -104,7 +104,7 @@ case "$CMD" in
   logs) compose logs -f --tail 100 ;;
   stop) compose down; echo "${G}Dimatikan. Data tetap tersimpan di volume Docker.${N}" ;;
   reset)
-    read -r -p "Ini akan menghapus SEMUA data GNOSIA di Docker (akun, progres, konten). Ketik HAPUS untuk lanjut: " answer
+    read -r -p "Ini akan menghapus SEMUA data Orvella di Docker (akun, progres, konten). Ketik HAPUS untuk lanjut: " answer
     [ "$answer" = "HAPUS" ] || { echo "Dibatalkan."; exit 0; }
     compose down -v
     echo "${G}Semua container dan data dihapus. Jalankan start untuk mulai dari data demo baru.${N}"

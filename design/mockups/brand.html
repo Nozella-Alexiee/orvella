@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Orvella Identitas</title>
+<meta name="description" content="Identitas merek Orvella dan lembar maskot Orvi: logo, warna, tipografi, suara, mood, perilaku Pip, stiker.">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=JetBrains+Mono:wght@400..800&display=swap">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/brand.css">
+<script>(function(){var q=new URLSearchParams(location.search),h=document.documentElement,g=function(k){try{return localStorage.getItem(k)}catch(e){return null}};var t=q.get('theme')||g('orv-theme');if(t==='light'||t==='dark')h.dataset.theme=t;var m=q.get('motion')||g('orv-motion');if(m==='full'||m==='calm'||m==='off')h.dataset.motion=m;})();</script>
+</head>
+<body>
+<header class="doc-top">
+  <div class="wrap doc-top-in">
+    <a class="logo" href="index.html"><span class="logo-mark" data-logo></span><span class="logo-word">Orvella</span></a>
+    <span class="doc-title">Identitas &amp; Orvi <span class="badge badge-warn">Fase 1 · untuk dicek</span></span>
+    <button class="btn btn-ghost btn-icon" id="themeBtn" type="button" aria-label="Ganti tema"><i data-lucide="moon"></i></button>
+  </div>
+</header>
+
+<div class="wrap doc">
+  <nav class="toc" aria-label="Isi halaman">
+    <a href="#nama">Nama</a><a href="#logo">Logo</a><a href="#warna">Warna</a><a href="#tipe">Tipografi</a><a href="#suara">Suara</a>
+    <a href="#orvi" class="toc-strong">Orvi</a><a href="#anatomi">Anatomi</a><a href="#mood">Mood</a><a href="#pip">Pip</a><a href="#stiker">Stiker</a><a href="#aturan">Aturan</a><a href="#gerak">Gerak</a>
+  </nav>
+
+  <main class="doc-main">
+    <!-- ======================= NAMA ======================= -->
+    <section id="nama" class="blk blk-hero">
+      <div class="name-lockup">
+        <span class="logo-mark name-mark" data-logo></span>
+        <h1 class="name-word">Orvella</h1>
+      </div>
+      <div class="name-grid">
+        <div class="stack" style="--gap:14px">
+          <p class="lead"><b>Orvella</b> berasal dari kata <em>orbit</em>. Belajar di sini seperti mengorbit satu konsep: kamu mengitarinya dari beberapa sisi sampai benar-benar paham, lalu pindah ke orbit berikutnya.</p>
+          <p class="muted">Cincin di logo punya satu bulan kecil, Pip. Di dalam aplikasi, cincin yang sama dibagi menjadi empat busur: Pahami, Perkuat, Kuis, dan Uji. Satu bab selesai saat keempat busurnya menyala.</p>
+          <p class="tagline">“Belajar ngoding dari paham.”</p>
+        </div>
+        <figure class="name-ring">
+          <div id="nameRing"></div>
+          <figcaption class="small faint">Cincin fase: 2 dari 4 fase selesai, Kuis sedang berjalan.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ======================= LOGO ======================= -->
+    <section id="logo" class="blk">
+      <header class="blk-head"><span class="eyebrow">01 · Logo</span><h2>Bola cahaya, cincin miring, satu Pip.</h2>
+        <p class="muted">Tanda logo adalah Orvi tanpa wajah. Arahkan kursor ke logo mana pun: Pip berputar lebih cepat.</p></header>
+      <div class="logo-grid">
+        <div class="lg-tile lg-cream"><a class="logo lg-big" href="#logo"><span class="logo-mark" data-logo></span><span class="logo-word">Orvella</span></a><span class="lg-cap">Utama · di atas susu</span></div>
+        <div class="lg-tile lg-night"><a class="logo lg-big" href="#logo"><span class="logo-mark" data-logo></span><span class="logo-word">Orvella</span></a><span class="lg-cap">Di atas malam</span></div>
+        <div class="lg-tile lg-sun"><a class="logo lg-big" href="#logo"><span class="logo-mark" data-logo></span><span class="logo-word">Orvella</span></a><span class="lg-cap">Di atas marigold</span></div>
+        <div class="lg-tile lg-mono"><a class="logo lg-big" href="#logo"><span class="logo-mark" data-logo></span><span class="logo-word">Orvella</span></a><span class="lg-cap">Satu warna · cetak, stempel</span></div>
+      </div>
+      <div class="logo-row">
+        <div class="lg-spec">
+          <div class="app-icons">
+            <span class="app-icon ai-lg"><span class="logo-mark" data-logo></span></span>
+            <span class="app-icon ai-md"><span class="logo-mark" data-logo></span></span>
+            <span class="app-icon ai-sm"><span class="logo-mark" data-logo></span></span>
+          </div>
+          <p class="small"><b>Ikon aplikasi</b> 512 · 64 · 32 px. Latar nila, tanda di tengah dengan ruang 22%.</p>
+        </div>
+        <div class="lg-spec">
+          <div class="clear-demo"><span class="clear-box"><span class="logo-mark" data-logo></span><span class="logo-word">Orvella</span></span></div>
+          <p class="small"><b>Ruang kosong</b> minimal selebar satu Pip di keempat sisi. <b>Ukuran minimal</b>: tanda 20 px, logo lengkap 88 px.</p>
+        </div>
+      </div>
+      <h3 class="sub-h">Jangan</h3>
+      <div class="dont-grid">
+        <figure class="dont"><span class="logo dont-stretch"><span class="logo-mark" data-logo></span><span class="logo-word">Orvella</span></span><figcaption>Meregangkan atau memiringkan</figcaption></figure>
+        <figure class="dont"><span class="logo dont-recolor"><span class="logo-mark" data-logo></span><span class="logo-word">Orvella</span></span><figcaption>Mengganti warna bola</figcaption></figure>
+        <figure class="dont"><span class="logo dont-glow"><span class="logo-mark" data-logo></span><span class="logo-word">Orvella</span></span><figcaption>Menambah efek neon atau bayangan</figcaption></figure>
+        <figure class="dont"><span class="logo dont-font"><span class="logo-mark" data-logo></span><span class="logo-word">Orvella</span></span><figcaption>Memakai huruf lain</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- ======================= WARNA ======================= -->
+    <section id="warna" class="blk">
+      <header class="blk-head"><span class="eyebrow">02 · Warna</span><h2>Hangat di siang hari, bercahaya di malam hari.</h2>
+        <p class="muted">Nilai di bawah dibaca langsung dari <code class="inline">tokens.css</code>. Ganti tema di pojok kanan atas untuk melihat palet Malam.</p></header>
+      <h3 class="sub-h">Merek</h3>
+      <div class="sw-grid" id="swBrand"></div>
+      <h3 class="sub-h">Empat fase</h3>
+      <p class="small faint sub-note">Hanya dipakai di dalam pemutar pelajaran, cincin fase, dan tag fase.</p>
+      <div class="ph-sw-grid" id="swPhase"></div>
+      <h3 class="sub-h">Bahasa pemrograman</h3>
+      <p class="small faint sub-note">Monogram teks buatan sendiri, bukan logo resmi. Warnanya dipakai untuk chip, sampul jalur, serta cincin dan jejak Pip.</p>
+      <div class="lang-sw" id="swLang"></div>
+      <h3 class="sub-h">Cek kontras (WCAG)</h3>
+      <div class="contrast" id="contrast" role="table" aria-label="Rasio kontras pasangan warna"></div>
+    </section>
+
+    <!-- ======================= TIPE ======================= -->
+    <section id="tipe" class="blk">
+      <header class="blk-head"><span class="eyebrow">03 · Tipografi</span><h2>Tiga huruf, tiga tugas.</h2></header>
+      <div class="type-hero">
+        <div class="type-meta"><b>Bricolage Grotesque</b><span>Judul dan angka besar. Variabel: tebal 200–800, lebar 75–100.</span></div>
+        <p class="type-play" id="typePlay" contenteditable="true" spellcheck="false">Pahami dulu.</p>
+        <div class="type-ctrl">
+          <label for="tWght">Tebal <output id="oWght">800</output></label><input type="range" id="tWght" min="200" max="800" value="800">
+          <label for="tWdth">Lebar <output id="oWdth">82</output></label><input type="range" id="tWdth" min="75" max="100" value="82">
+        </div>
+      </div>
+      <div class="type-pair">
+        <div class="type-card">
+          <div class="type-meta"><b>Plus Jakarta Sans</b><span>Semua teks antarmuka. Dirancang Tokotype, foundry dari Indonesia.</span></div>
+          <p class="tp-body">Variabel adalah nama untuk sebuah nilai. Di Python, nama itu seperti label yang ditempel ke objek; di C++, seperti kotak dengan ukuran tetap.</p>
+          <div class="tp-weights"><span style="font-weight:400">Biasa 400</span><span style="font-weight:600">Setengah tebal 600</span><span style="font-weight:800">Tebal 800</span></div>
+        </div>
+        <div class="type-card type-card-code">
+          <div class="type-meta"><b>JetBrains Mono</b><span>Kode, keluaran terminal, dan nilai di memori.</span></div>
+          <pre class="tp-code"><span class="tk-kw">fn</span> <span class="tk-fn">main</span>() {
+    <span class="tk-kw">let</span> skor = <span class="tk-num">10</span>;
+    <span class="tk-kw">if</span> skor != <span class="tk-num">0</span> =&gt; <span class="tk-com">// 0O Il1</span>
+}</pre>
+        </div>
+      </div>
+      <div class="scale" id="typeScale"></div>
+    </section>
+
+    <!-- ======================= SUARA ======================= -->
+    <section id="suara" class="blk">
+      <header class="blk-head"><span class="eyebrow">04 · Suara</span><h2>Seperti kakak kelas yang sabar.</h2>
+        <p class="muted">Bahasa Indonesia yang santai tapi rapi. Pakai “kamu”. Istilah kode tetap dalam bahasa aslinya.</p></header>
+      <div class="voice-traits">
+        <div><b>Jelas</b><p class="small muted">Sebut barisnya, sebut namanya. Hindari “terjadi kesalahan”.</p></div>
+        <div><b>Hangat</b><p class="small muted">Salah itu bagian dari belajar. Tidak ada kata “gagal” atau “bodoh”.</p></div>
+        <div><b>Jujur</b><p class="small muted">Tidak memuji berlebihan dan tidak menyembunyikan error.</p></div>
+        <div><b>Singkat</b><p class="small muted">Satu kalimat pokok, satu langkah berikutnya.</p></div>
+      </div>
+      <div class="voice-grid">
+        <div class="vc"><span class="vc-when">Jawaban belum tepat</span><p class="vc-do"><i data-lucide="check"></i>Belum tepat. Lihat baris 3: <code>skor</code> dipakai sebelum dibuat.</p><p class="vc-dont"><i data-lucide="x"></i>Salah! Coba lagi.</p></div>
+        <div class="vc"><span class="vc-when">Error dari compiler</span><p class="vc-do"><i data-lucide="check"></i>Compiler menolak baris 5 karena <code>total</code> belum dideklarasikan.</p><p class="vc-dont"><i data-lucide="x"></i>Terjadi kesalahan saat menjalankan kode.</p></div>
+        <div class="vc"><span class="vc-when">Bab selesai</span><p class="vc-do"><i data-lucide="check"></i>Bab 2 beres. Variabel sudah kamu kuasai.</p><p class="vc-dont"><i data-lucide="x"></i>LUAR BIASA!!! Kamu jenius!!!</p></div>
+        <div class="vc"><span class="vc-when">Fase terkunci</span><p class="vc-do"><i data-lucide="check"></i>Uji terbuka setelah Kuis mencapai 70%.</p><p class="vc-dont"><i data-lucide="x"></i>Akses ditolak.</p></div>
+      </div>
+    </section>
+
+    <!-- ======================= ORVI ======================= -->
+    <section id="orvi" class="blk blk-orvi">
+      <header class="blk-head"><span class="eyebrow">05 · Maskot</span><h2>Ini Orvi. Dan bulan kecilnya, Pip.</h2>
+        <p class="muted">Orvi adalah bola cahaya yang menemani belajar. Pip mengitarinya dan berperan sebagai tangan: menunjuk, membawa nilai, lalu kembali ke orbit. Semua kontrol di bawah bisa dicoba.</p></header>
+      <div class="lab">
+        <div class="lab-stage" id="labStage">
+          <div id="labOrvi"></div>
+        </div>
+        <div class="lab-ctrl">
+          <div class="ctrl"><span class="ctrl-l">Mood</span>
+            <div class="chips" id="labMood">
+              <button type="button" data-m="idle" aria-pressed="true">Diam</button><button type="button" data-m="happy" aria-pressed="false">Senang</button>
+              <button type="button" data-m="think" aria-pressed="false">Mikir</button><button type="button" data-m="focus" aria-pressed="false">Fokus</button>
+              <button type="button" data-m="oops" aria-pressed="false">Kaget</button><button type="button" data-m="sleep" aria-pressed="false">Tidur</button>
+              <button type="button" data-m="cheer" aria-pressed="false">Pesta</button>
+            </div></div>
+          <div class="ctrl"><span class="ctrl-l">Warna cincin</span><div class="tints" id="labTint"></div></div>
+          <div class="ctrl"><label class="ctrl-l" for="labSize">Ukuran <output id="labSizeO">240</output> px</label><input type="range" id="labSize" min="28" max="300" value="240"></div>
+          <div class="ctrl ctrl-row">
+            <span class="ctrl-l">Mata ikut kursor</span><button class="switch" type="button" role="switch" aria-checked="true" id="labFollow" aria-label="Mata ikut kursor"></button>
+          </div>
+          <div class="ctrl"><label class="ctrl-l" for="labSay">Suruh Orvi bilang sesuatu</label>
+            <form class="say-form" id="labSayForm"><input class="input" id="labSay" maxlength="90" value="Belum tepat, tidak apa-apa. Lihat baris 3."><button class="btn btn-primary" type="submit">Bilang</button></form></div>
+        </div>
+      </div>
+
+      <!-- anatomi -->
+      <div class="anat" id="anatomi">
+        <div class="anat-fig" id="anatFig">
+          <div class="anat-orvi" id="anatOrvi"></div>
+          <svg class="anat-lines" id="anatLines" aria-hidden="true"></svg>
+        </div>
+        <ol class="anat-list">
+          <li data-a="pip"><b>Pip</b> bulan pendamping, satu-satunya “tangan” Orvi</li>
+          <li data-a="ring"><b>Cincin orbit</b> berwarna sesuai bahasa yang sedang dipelajari</li>
+          <li data-a="shine"><b>Pantulan cahaya</b> di kiri atas, selalu di posisi sama</li>
+          <li data-a="eye"><b>Mata</b> mengikuti kursor dan berkedip tiap 2–6 detik</li>
+          <li data-a="cheek"><b>Pipi</b> makin merah saat senang</li>
+          <li data-a="mouth"><b>Mulut</b> berubah bentuk per mood</li>
+          <li data-a="shadow"><b>Bayangan</b> mengecil saat Orvi melompat</li>
+        </ol>
+      </div>
+
+      <!-- konstruksi -->
+      <div class="build">
+        <svg class="build-svg" viewBox="-130 -120 260 240" role="img" aria-label="Konstruksi geometris Orvi">
+          <g class="bg-guides">
+            <line x1="-125" y1="0" x2="125" y2="0"/><line x1="0" y1="-115" x2="0" y2="115"/>
+            <circle r="58"/><ellipse rx="88" ry="22" transform="rotate(-16)"/>
+            <circle cx="-19" cy="-3" r="10.2"/><circle cx="19" cy="-3" r="10.2"/>
+            <circle cx="83.5" cy="-18.3" r="10"/>
+          </g>
+          <g class="bg-dims">
+            <line x1="-58" y1="80" x2="58" y2="80"/><text x="0" y="96">Ø 116 · badan</text>
+            <text x="92" y="-40">cincin 176 × 44</text><text x="92" y="-28">miring −16°</text>
+            <text x="-122" y="-62">mata ±19, −3</text>
+            <text x="100" y="-4">Pip Ø 20</text>
+          </g>
+        </svg>
+        <div class="build-copy">
+          <h3>Konstruksi</h3>
+          <p class="muted">Orvi dibangun dari lingkaran dan elips saja, sehingga mudah digambar ulang di ukuran berapa pun. Satuan dasarnya jari-jari badan (58). Semua ukuran lain turunan darinya.</p>
+          <table class="dims">
+            <tr><td>Badan</td><td class="mono">r 58</td></tr>
+            <tr><td>Cincin</td><td class="mono">rx 88 · ry 22 · −16°</td></tr>
+            <tr><td>Pip</td><td class="mono">r 10 · 1 putaran / 5,2 d</td></tr>
+            <tr><td>Mata</td><td class="mono">7,6 × 10,2 di (±19, −3)</td></tr>
+            <tr><td>Warna badan</td><td class="mono">#FFF3C9 → #FFC53D → #F28C00</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- mood -->
+      <h3 class="sub-h" id="mood">Tujuh mood, dan kapan dipakai</h3>
+      <div class="moods" id="moods"></div>
+
+      <!-- ukuran -->
+      <h3 class="sub-h">Ukuran</h3>
+      <div class="sizes" id="sizes"></div>
+
+      <!-- tint -->
+      <h3 class="sub-h">Cincin mengikuti bahasa</h3>
+      <div class="tint-row" id="tintRow"></div>
+
+      <!-- pip -->
+      <h3 class="sub-h" id="pip">Perilaku Pip</h3>
+      <div class="pip-lab">
+        <div class="pip-scene">
+          <div class="pip-orvi" id="pipOrvi"></div>
+          <div class="pip-props">
+            <span class="pip-val" id="pipVal">10</span>
+            <div class="pip-box" id="pipBox"><small>skor</small><b id="pipBoxV"></b></div>
+            <button class="btn btn-sun btn-sm" type="button" id="pipTarget">Kirim jawaban</button>
+          </div>
+        </div>
+        <div class="pip-acts">
+          <button class="pip-act" type="button" data-p="point"><i data-lucide="pointer"></i><span><b>Menunjuk</b><small>Pip terbang, mengetuk dua kali, lalu kembali. 0,8 d terbang · 0,7 d diam.</small></span></button>
+          <button class="pip-act" type="button" data-p="carry"><i data-lucide="package"></i><span><b>Membawa nilai</b><small>Mengambil nilai, membawanya ke kotak variabel, lalu menjatuhkannya.</small></span></button>
+          <button class="pip-act" type="button" data-p="park"><i data-lucide="moon"></i><span><b>Parkir</b><small>Saat Orvi tidur, Pip berhenti di atas kepalanya.</small></span></button>
+          <button class="pip-act" type="button" data-p="loop"><i data-lucide="orbit"></i><span><b>Putaran cepat</b><small>Tiga putaran cepat saat merayakan.</small></span></button>
+        </div>
+      </div>
+
+      <!-- stiker -->
+      <h3 class="sub-h" id="stiker">Stiker pencapaian</h3>
+      <div class="stickers" id="stickers"></div>
+
+      <!-- aturan -->
+      <h3 class="sub-h" id="aturan">Boleh dan jangan</h3>
+      <div class="rules">
+        <ul class="rule-ok">
+          <li>Satu Orvi besar per layar. Yang lain ukuran kecil.</li>
+          <li>Pip hanya menunjuk hal yang sedang dibahas.</li>
+          <li>Orvi mengecil dan diam (mood Fokus) selama Kuis dan Uji.</li>
+          <li>Warna cincin mengikuti bahasa yang sedang dipelajari.</li>
+          <li>Setiap ucapan Orvi juga dibacakan untuk pembaca layar.</li>
+        </ul>
+        <ul class="rule-no">
+          <li>Mengubah warna badan Orvi. Badan selalu marigold.</li>
+          <li>Membuat Orvi marah, mengejek, atau menangis.</li>
+          <li>Menaruh Orvi di atas tombol utama atau teks soal.</li>
+          <li>Menambah Pip kedua, atau memberi Orvi tangan.</li>
+          <li>Menggerakkan Orvi saat pengguna memilih gerak Mati.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ======================= GERAK ======================= -->
+    <section id="gerak" class="blk">
+      <header class="blk-head"><span class="eyebrow">06 · Gerak</span><h2>Hidup, tapi tidak berisik.</h2>
+        <p class="muted">Setiap gerakan punya alasan: menunjukkan sebab-akibat, memberi umpan balik, atau mengarahkan mata. Pengguna bisa memilih Penuh, Kalem, atau Mati.</p></header>
+      <div class="motion-grid">
+        <div class="mo"><div class="mo-demo"><button class="btn btn-primary btn-sm" type="button" id="moSpring">Pegas</button><button class="btn btn-sm" type="button" id="moLinear">Linear</button><span class="mo-ball" id="moBall"></span></div><b>Pegas, bukan linear</b><p class="small muted">Benda sedikit melewati tujuan lalu kembali, seperti benda sungguhan.</p></div>
+        <div class="mo"><div class="mo-demo"><button class="btn btn-sun btn-sm" type="button" id="moXp">Jawab benar</button><span class="xp-pill" id="moXpPill"><span class="xp-dot">XP</span><span id="moXpN">120</span></span></div><b>Sebab lalu akibat</b><p class="small muted">XP terbang dari tempat kamu menjawab ke penghitung, supaya jelas dari mana asalnya.</p></div>
+        <div class="mo"><div class="mo-demo mo-level"><div class="segmented" id="moLevel"><button type="button" data-l="full" aria-pressed="true">Penuh</button><button type="button" data-l="calm" aria-pressed="false">Kalem</button><button type="button" data-l="off" aria-pressed="false">Mati</button></div></div><b>Bisa diatur</b><p class="small muted">Kalem hanya memakai perubahan warna dan gerak kecil. Mati menghentikan semuanya. Otomatis mengikuti “kurangi gerakan” di perangkat.</p></div>
+      </div>
+      <div class="tok-grid" id="motionEases"></div>
+      <div class="tok-grid is-dur" id="motionDurs"></div>
+    </section>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/DrawSVGPlugin.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/MorphSVGPlugin.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<script>/* cadangan offline: pakai salinan lokal di vendor/ bila CDN tidak terjangkau */
+window.gsap||["gsap", "ScrollTrigger", "DrawSVGPlugin", "MorphSVGPlugin"].forEach(function(n){document.write('<script src="vendor/gsap/'+n+'.min.js"><\/script>')});
+window.lucide||document.write('<script src="vendor/lucide.min.js"><\/script>');
+window.confetti||document.write('<script src="vendor/confetti.browser.min.js"><\/script>');</script>
+<script src="js/fx.js"></script>
+<script src="js/sound.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/orvi.js"></script>
+<script src="js/brand.js"></script>
+<script src="js/mock.js"></script>
+</body>
+</html>
