@@ -178,6 +178,14 @@ export default function WebWorkspace({ nb, update }: { nb: Notebook; update: (n:
         setTimeout(poll, 900);
       }
     } catch (e) {
+      // the request may have been cut (proxy, flaky network) while the server did start: ask once before giving up
+      if (!(e instanceof ApiError) || e.status === 0 || e.status >= 500) {
+        await new Promise(r => setTimeout(r, 1500));
+        try {
+          const st = await api.get<Resp>(`/api/web/${nb.id}/status`);
+          if (st.status.state !== 'stopped') { apply(st); setPreview(st.preview || null); return; }
+        } catch { /* fall through to the message */ }
+      }
       setStatus({ state: 'stopped' });
       toast({ kind: 'danger', icon: 'server', title: 'Server belum bisa dinyalakan', body: e instanceof ApiError ? e.message : 'Coba lagi sebentar.' });
     } finally { setBusy(false); }
