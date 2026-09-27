@@ -2,14 +2,18 @@
 import { Icon } from '../design/Icon';
 import { cx } from '../design/ui';
 import { Html } from '../lib/html';
+import type { IoTest } from '../api/types';
 import { Area, ConceptChips, Field, Num, StringList, Text } from './fields';
+import { IoTestsTable, LangSelect, QuickQuizModal, useBuilderLang } from './studioEditors';
+import { FILE_OF } from '../lib/langs';
 
 type Concept = { key: string; name: string };
 type Q = { id: string; t: string; c?: string; o: string[]; a: number; e: string; trivia?: boolean; concepts?: string[] };
 export type KuisCfg = { round_size: number; seconds: number; pass_pct: number; combo_max: number; bank: Q[] };
 type Test = { id: string; name: string; kind: string; pattern?: string; expr?: string; equals?: string | number; line?: number; text?: string; trim?: boolean; fail?: string; hidden?: boolean; weight?: number };
 export type ChallengeCfg = { title: string; minutes: number; difficulty: string; filename: string; story: string; steps: string[]; starter: string;
-  art?: { kind: string; title: string; name: string; value: string }; tests: Test[]; concepts?: string[]; assist?: string; related_scene?: string };
+  art?: { kind: string; title: string; name: string; value: string }; tests: Test[]; concepts?: string[]; assist?: string; related_scene?: string;
+  language?: string; solution?: string };
 type EQ = { id: string; label?: string; t: string; code?: string; type: 'choice' | 'short' | 'code'; o?: string[]; pts: number; answer?: number; accept?: string[]; tests?: Test[]; concepts?: string[] };
 export type ExamCfg = { minutes: number; pass_mark: number; questions: EQ[] };
 
@@ -17,11 +21,17 @@ const nid = (p: string) => `${p}${Math.random().toString(36).slice(2, 7)}`;
 
 export function KuisEditor({ k, onChange, concepts, stats }: { k: KuisCfg; onChange: (k: KuisCfg) => void; concepts: Concept[]; stats: Record<string, { n: number; wrong_pct: number }> }) {
   const [open, setOpen] = useState<string | null>(null);
+  const [paste, setPaste] = useState(false);
   const setQ = (id: string, patch: Partial<Q>) => onChange({ ...k, bank: k.bank.map(q => (q.id === id ? { ...q, ...patch } : q)) });
   return (
     <div>
       <div className="row between"><span className="phase-tag" data-phase="kuis">Kuis · bank soal</span>
-        <button className="btn btn-secondary btn-sm btn-press" onClick={() => { const q: Q = { id: nid('k'), t: 'Pertanyaan baru', o: ['A', 'B', 'C', 'D'], a: 0, e: '', concepts: [] }; onChange({ ...k, bank: [...k.bank, q] }); setOpen(q.id); }}><Icon name="plus" />Soal</button></div>
+        <div className="row gap-2">
+          <button className="btn btn-sun btn-sm btn-press" onClick={() => setPaste(true)}><Icon name="clipboard-paste" />Tempel soal cepat</button>
+          <button className="btn btn-secondary btn-sm btn-press" onClick={() => { const q: Q = { id: nid('k'), t: 'Pertanyaan baru', o: ['A', 'B', 'C', 'D'], a: 0, e: '', concepts: [] }; onChange({ ...k, bank: [...k.bank, q] }); setOpen(q.id); }}><Icon name="plus" />Soal</button>
+        </div></div>
+      <QuickQuizModal open={paste} onClose={() => setPaste(false)} target="bank Kuis"
+        onAdd={qs => onChange({ ...k, bank: [...k.bank, ...qs.map(q => ({ id: nid('k'), t: q.t, c: q.c, o: q.o, a: q.a, e: q.e, concepts: [] }))] })} />
       <div className="b-sec form-grid">
         <Field label="Soal per ronde"><Num value={k.round_size} min={1} onChange={v => onChange({ ...k, round_size: v })} /></Field>
         <Field label="Waktu per soal (detik)"><Num value={k.seconds} min={5} onChange={v => onChange({ ...k, seconds: v })} /></Field>
@@ -95,16 +105,22 @@ export function TestsTable({ tests, onChange }: { tests: Test[]; onChange: (t: T
 }
 
 export function ChallengeEditor({ c, onChange, concepts }: { c: ChallengeCfg | null; onChange: (c: ChallengeCfg | null) => void; concepts: Concept[] }) {
+  const chapterLang = useBuilderLang();
   if (!c) return (
     <div><span className="phase-tag" data-phase="uji">Uji · Challenge</span>
       <div className="card mt-4"><div className="empty"><div className="empty-glyph"><Icon name="swords" /></div><div className="t-h4">Belum ada challenge</div><p>Challenge adalah tugas coding dengan robot penguji.</p>
-        <button className="btn btn-primary btn-press" onClick={() => onChange({ title: 'Challenge baru', minutes: 10, difficulty: 'sedang', filename: 'main.js', story: '', steps: [''], starter: '// tulis kodemu di sini\n', tests: [], concepts: [], assist: 'L1', art: { kind: 'board', title: 'CHALLENGE', name: 'program', value: '?' } })}><Icon name="plus" />Buat challenge</button></div></div>
+        <button className="btn btn-primary btn-press" onClick={() => onChange({ title: 'Challenge baru', minutes: 10, difficulty: 'sedang', filename: FILE_OF[chapterLang] || 'main.js', story: '', steps: [''],
+          starter: '', tests: [], concepts: [], assist: 'L1', language: chapterLang, solution: '', art: { kind: 'board', title: 'CHALLENGE', name: 'program', value: '?' } })}><Icon name="plus" />Buat challenge</button></div></div>
     </div>
   );
   const set = (p: Partial<ChallengeCfg>) => onChange({ ...c, ...p });
+  const lang = c.language || 'javascript';
+  // stdin → stdout tests work in every language; the older JavaScript checks stay for JS challenges that use them
+  const io = lang !== 'javascript' || c.tests.every(t => t.kind === 'io');
   return (
     <div>
       <div className="row between"><span className="phase-tag" data-phase="uji">Uji · Challenge</span><button className="btn btn-danger btn-sm" onClick={() => onChange(null)}><Icon name="trash-2" />Hapus challenge</button></div>
+      <div className="b-sec"><Field label="Bahasa"><LangSelect value={lang} onChange={l => set({ language: l, filename: FILE_OF[l] || c.filename })} /></Field></div>
       <div className="b-sec form-grid">
         <Field label="Judul"><Text value={c.title} onChange={v => set({ title: v })} /></Field>
         <Field label="Tingkat"><div className="segmented">{['mudah', 'sedang', 'sulit'].map(d => <button key={d} aria-pressed={c.difficulty === d} onClick={() => set({ difficulty: d })}>{d[0].toUpperCase() + d.slice(1)}</button>)}</div></Field>
@@ -116,7 +132,13 @@ export function ChallengeEditor({ c, onChange, concepts }: { c: ChallengeCfg | n
         <Field label="Gambar cerita (judul · nama · angka)"><div className="row gap-1"><Text value={c.art?.title} onChange={v => set({ art: { kind: 'board', name: c.art?.name || '', value: c.art?.value || '', title: v } })} /><Text value={c.art?.name} onChange={v => set({ art: { kind: 'board', title: c.art?.title || '', value: c.art?.value || '', name: v } })} /><Text value={c.art?.value} onChange={v => set({ art: { kind: 'board', title: c.art?.title || '', name: c.art?.name || '', value: v } })} /></div></Field>
       </div>
       <div className="b-sec"><span className="eyebrow">Kode awal</span><Area mono rows={6} value={c.starter} onChange={v => set({ starter: v })} /></div>
-      <div className="b-sec"><span className="eyebrow">Tes (robot penguji)</span><TestsTable tests={c.tests} onChange={v => set({ tests: v })} /></div>
+      {io && <div className="b-sec"><span className="eyebrow">Solusi referensi (tidak terlihat siswa)</span><Area mono rows={6} value={c.solution} onChange={v => set({ solution: v })} /></div>}
+      <div className="b-sec"><span className="eyebrow">Tes (robot penguji)</span>
+        {io ? <div className="mt-2"><IoTestsTable tests={c.tests as unknown as IoTest[]} onChange={v => set({ tests: v.map(t => ({ ...t, kind: 'io', name: t.name || t.id })) as unknown as Test[] })} lang={lang} solution={c.solution || ''} />
+          <p className="t-xs t-faint mt-2">Tes yang tidak disembunyikan tampil sebagai contoh input/output di brief challenge. Poin menentukan skor.</p></div>
+          : <TestsTable tests={c.tests} onChange={v => set({ tests: v })} />}
+        {lang === 'javascript' && !io && <button className="btn btn-ghost btn-sm mt-2" onClick={() => set({ tests: [] })}><Icon name="repeat" />Ganti ke tes input/output</button>}
+      </div>
       <div className="b-sec"><span className="eyebrow">Konsep yang diuji</span><ConceptChips all={concepts} value={c.concepts || []} onChange={v => set({ concepts: v })} /></div>
     </div>
   );

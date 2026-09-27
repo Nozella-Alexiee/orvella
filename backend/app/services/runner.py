@@ -215,7 +215,7 @@ def _short(s: str, n: int = 60) -> str:
     return s if len(s) <= n else s[: n - 1] + "…"
 
 
-def run_tests(lang: str | None, code: str, tests: list[dict[str, Any]], user_id: int | None = None) -> dict[str, Any]:
+def run_tests(lang: str | None, code: str, tests: list[dict[str, Any]], user_id: int | None = None, with_output: bool = False) -> dict[str, Any]:
     """Runs a challenge's or an exam question's tests in any language.
 
     JavaScript tests of the original kinds (expr, stdout_last, ...) use the harness; stdin → stdout
@@ -243,7 +243,10 @@ def run_tests(lang: str | None, code: str, tests: list[dict[str, Any]], user_id:
             detail = "program berhenti karena error"
         else:
             detail = f'diharapkan "{_short(t.get("expect", ""))}", keluaranmu "{_short(r.get("stdout", "")) or "(kosong)"}"'
-        results.append({"id": r["id"], "pass": bool(r.get("pass")), "detail": detail, "ms": max(1, int(r.get("ms") or 1))})
+        row = {"id": r["id"], "pass": bool(r.get("pass")), "detail": detail, "ms": max(1, int(r.get("ms") or 1))}
+        if with_output and not r.get("skipped"):
+            row["got"] = (r.get("stdout") or "")[:2000]
+        results.append(row)
     shown = next((r for r in res.get("tests", []) if not by_id.get(r["id"], {}).get("hidden") and not r.get("skipped")), None)
     return {"logs": lines(shown.get("stdout", ""), 60) if shown else [], "error": res.get("error"), "results": results,
             "diagnostics": res.get("diagnostics", [])}

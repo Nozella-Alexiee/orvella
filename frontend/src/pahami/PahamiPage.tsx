@@ -14,6 +14,7 @@ import { burst, confetti, pop, shake, sound, ticker } from '../fx';
 import { useHeartbeat, useLockRedirect } from '../lib/hooks';
 import { DoneOverlay, Gate, PhaseBar, PlayerFoot, PlayerShell, PlayerTop } from '../player/Player';
 import { SceneView } from './Scene';
+import { useHighlightLang } from '../lib/useLang';
 
 type PahamiData = PlayerHeader & { scenes: Scene[]; scene: number; done: boolean; minutes: number; next: { items: number } };
 type DoneRes = { xp: number; phases: Record<string, { state: string }>; xp_week: number; next: { items: number } };
@@ -28,6 +29,7 @@ export default function PahamiPage() {
   useLockRedirect(q.error);
   useHeartbeat(Number(id));
   const d = q.data;
+  useHighlightLang(d?.language);
   const N = d?.scenes.length || 0;
   const [cur, setCur] = useState(0);
   const [mood, setMood] = useState<Mood>('think');
@@ -60,7 +62,9 @@ export default function PahamiPage() {
     if (!d || !scene) return '';
     return scene.kicker || `Bab ${d.chapter.number} · ${d.chapter.title} · ±${d.minutes} menit`;
   }, [d, scene]);
-  const gated = scene?.advance === 'all_tokens' && (pips[cur]?.[0] ?? 0) < (pips[cur]?.[1] ?? 1) && !d?.done;
+  const vtype = scene?.visual?.type;
+  const mustInteract = scene?.advance === 'all_tokens' || (vtype === 'video' && !!(scene?.visual as { checkpoints?: unknown[] } | undefined)?.checkpoints?.length);
+  const gated = mustInteract && (pips[cur]?.[0] ?? 0) < (pips[cur]?.[1] ?? 1) && !d?.done;
 
   const go = (n: number) => { dir.current = n > cur ? 1 : -1; setCur(n); };
   const next = async () => {
@@ -68,7 +72,10 @@ export default function PahamiPage() {
     pop(nextRef.current);
     if (gated) {
       shake(document.querySelector('[data-tok-progress]'));
-      toast({ kind: 'accent', icon: 'hand', title: 'Ketuk semua bagian dulu', body: 'Setiap bagian kode punya tugasnya sendiri.' });
+      const msg = vtype === 'video' ? ['Jawab pertanyaan di video dulu', 'Videonya berhenti di titik penting. Jawab semua pertanyaannya untuk lanjut.']
+        : vtype === 'memory' ? ['Putar animasinya sampai akhir', 'Lihat setiap langkah memori dulu, pakai tombol Putar atau panah.']
+          : ['Ketuk semua bagian dulu', 'Setiap bagian kode punya tugasnya sendiri.'];
+      toast({ kind: 'accent', icon: 'hand', title: msg[0], body: msg[1] });
       return;
     }
     if (cur < N) { go(cur + 1); return; }

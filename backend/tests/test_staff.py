@@ -42,7 +42,8 @@ def test_admin_overview_and_publish(client):
     ov = client.get("/api/admin/overview").json()
     titles = " ".join(f["title"] for f in ov["flags"])
     assert "temukan bug const" in titles  # 58%-ish wrong on first try
-    assert ov["kpis"]["published"] == 2 and ov["kpis"]["chapters"] == 8
+    # 2 of 8 JavaScript chapters + the 6 multi-language starter chapters (all published)
+    assert ov["kpis"]["published"] == 8 and ov["kpis"]["chapters"] == 14
     ch = client.get("/api/admin/chapters/2").json()
     assert ch["version"] == 3 and not ch["problems"]
     draft = ch["draft"]

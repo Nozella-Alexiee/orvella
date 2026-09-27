@@ -405,3 +405,18 @@ def project_message(pid: int, body: MessageIn, user: User = Depends(current_user
         learning.notify(db, mentor.id, "message", f"Pesan dari {user.name}", body.body.strip()[:120], f"/mentor/siswa/{user.id}")
     db.commit()
     return _project_view(db, user, proj, pp)
+
+
+class TraceIn(BaseModel):
+    code: str = Field(max_length=8000)
+    stdin: str = Field(default="", max_length=4000)
+
+
+@router.post("/trace")
+def trace(body: TraceIn, user: User = Depends(current_user)) -> dict[str, Any]:
+    """Line-by-line memory steps of a Python program (Playground "Lihat memori")."""
+    from .studio import trace as run_trace
+    try:
+        return run_trace(body.code, body.stdin, user.id)
+    except runner.RateLimited as e:
+        raise HTTPException(429, str(e)) from e

@@ -87,11 +87,19 @@ class User(Base):
 
 # --------------------------------------------------------------- content ---
 class Path(Base):
+    """A learning path in one language. Admin paths are public; mentors make their own and publish them to their classes."""
     __tablename__ = "paths"
     id: Mapped[int] = mapped_column(primary_key=True)
     slug: Mapped[str] = mapped_column(String(60), unique=True)
     title: Mapped[str] = mapped_column(String(120))
     description: Mapped[str] = mapped_column(Text, default="")
+    language: Mapped[str] = mapped_column(String(20), default="javascript", server_default="javascript")
+    level: Mapped[str] = mapped_column(String(20), default="Pemula", server_default="Pemula")
+    owner_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", use_alter=True, name="fk_paths_owner_id_users"))
+    # draft = only the owner sees it · class = learners in class_ids · public = the whole catalog (admin decides)
+    visibility: Mapped[str] = mapped_column(String(12), default="public", server_default="public")
+    class_ids: Mapped[list[int] | None] = mapped_column(JSON, default=list)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=now)
 
 
 class Chapter(Base):

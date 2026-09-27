@@ -14,7 +14,7 @@ type NavItem = { id: string; icon: string; label: string; to: string; match?: (p
 
 const LEARNER: NavItem[] = [
   { id: 'beranda', icon: 'house', label: 'Beranda', to: '/beranda' },
-  { id: 'peta', icon: 'map', label: 'Peta', to: '/peta', match: p => p.startsWith('/peta') || /^\/bab\/\d+\/?$/.test(p) },
+  { id: 'peta', icon: 'map', label: 'Peta', to: '/peta', match: p => p.startsWith('/peta') || p.startsWith('/jalur') || /^\/bab\/\d+\/?$/.test(p) },
   { id: 'playground', icon: 'notebook-pen', label: 'Playground', to: '/playground' },
   { id: 'proyek', icon: 'folder-kanban', label: 'Proyek', to: '/proyek' },
   { id: 'progres', icon: 'sparkles', label: 'Progres', to: '/progres' },
@@ -23,6 +23,7 @@ const MENTOR: NavItem[] = [
   { id: 'mentor', icon: 'layout-dashboard', label: 'Ringkasan', to: '/mentor', match: p => p === '/mentor' },
   { id: 'siswa', icon: 'users', label: 'Siswa', to: '/mentor/siswa', match: p => p.startsWith('/mentor/siswa') },
   { id: 'review', icon: 'message-square-code', label: 'Antrian review', to: '/mentor/review' },
+  { id: 'studio', icon: 'wand-sparkles', label: 'Studio', to: '/studio', match: p => p.startsWith('/studio') },
 ];
 
 export function Logo({ to }: { to: string }) {
@@ -141,7 +142,7 @@ export function AdminSidebar() {
   const toggleTheme = usePrefs(s => s.toggleTheme);
   const groups: [string, [string, string, string, string, string?][]][] = [
     ['Ringkasan', [['admin', 'layout-dashboard', 'Dashboard', '/admin'], ['mentor', 'chart-no-axes-column', 'Tampilan mentor', '/mentor']]],
-    ['Konten', [['bab', 'blocks', 'Bab & Scene', '/admin/bab', fmt(c?.chapters)], ['perkuat', 'list-checks', 'Bank soal Perkuat', '/admin/bab?fokus=perkuat', fmt(c?.perkuat)],
+    ['Konten', [['studio', 'wand-sparkles', 'Studio Materi', '/studio'], ['bab', 'blocks', 'Bab & Scene', '/admin/bab', fmt(c?.chapters)], ['perkuat', 'list-checks', 'Bank soal Perkuat', '/admin/bab?fokus=perkuat', fmt(c?.perkuat)],
       ['kuis', 'zap', 'Bank soal Kuis', '/admin/bab?fokus=kuis', fmt(c?.kuis)], ['challenge', 'swords', 'Challenge', '/admin/bab?fokus=challenge', fmt(c?.challenge)],
       ['ulangan', 'timer', 'Ulangan', '/admin/bab?fokus=ulangan', fmt(c?.ulangan)], ['proyek', 'folder-kanban', 'Proyek', '/admin/bab?fokus=proyek', fmt(c?.proyek)]]],
     ['Orang', [['users', 'users', 'Pengguna', '/admin/pengguna'], ['mentors', 'graduation-cap', 'Mentor', '/admin/pengguna?peran=mentor'], ['org', 'building-2', 'Kelas', '/admin/pengguna?tab=kelas']]],
@@ -211,12 +212,14 @@ function Palette({ me, close }: { me: Me; close: () => void }) {
     const learner = me.role === 'learner';
     const go: PalItem[] = learner
       ? [{ icon: 'house', title: 'Beranda', href: '/beranda', kbd: 'G B' }, { icon: 'map', title: 'Peta belajar', href: '/peta', kbd: 'G P' },
+         { icon: 'layout-grid', title: 'Semua jalur', hint: 'Python, C++, Rust, Web…', href: '/jalur' },
          { icon: 'notebook-pen', title: 'Playground', hint: 'Ngoding bebas', href: '/playground', kbd: 'G N' }, { icon: 'sparkles', title: 'Progres', href: '/progres' },
          { icon: 'folder-kanban', title: 'Proyek', href: '/proyek' }]
       : [{ icon: 'layout-dashboard', title: 'Ringkasan kelas', href: '/mentor' }, { icon: 'message-square-code', title: 'Antrian review', href: '/mentor/review' },
+         { icon: 'wand-sparkles', title: 'Studio Materi', hint: 'Buat jalur & bab', href: '/studio' },
          ...(me.role === 'admin' ? [{ icon: 'blocks', title: 'Builder bab', href: '/admin/bab' }, { icon: 'users', title: 'Pengguna', href: '/admin/pengguna' }] : [])];
     const actions: PalItem[] = [
-      ...(learner ? [{ icon: 'plus', title: 'Notebook baru', hint: 'Tanpa pelajaran', href: '/playground?baru=1' }] : []),
+      ...(learner ? [{ icon: 'plus', title: 'Program atau notebook baru', hint: '12 bahasa + proyek web', href: '/playground?baru=1' }] : []),
       { icon: 'sun-moon', title: 'Ganti tema', hint: 'Paper / Ink', action: toggleTheme },
       { icon: 'wind', title: 'Intensitas animasi', hint: 'Penuh · Kalem · Mati', href: '/pengaturan#motion' },
     ];

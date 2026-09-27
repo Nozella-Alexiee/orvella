@@ -8,6 +8,7 @@ import { fill } from '../lib/calc';
 import { highlightLine } from '../lib/highlight';
 import { Html } from '../lib/html';
 import { Knob } from './Knob';
+import { BoxModelViz, MarkdownViz, MemoryViz, RunViz, VideoViz } from './visuals2';
 
 type Ctx = { setMood: (m: Mood) => void; onProgress?: (seen: number, total: number) => void; preview?: boolean };
 
@@ -275,6 +276,11 @@ export function VisualView({ v, ctx }: { v: Visual; ctx: Ctx }) {
     case 'summary': return <SummaryViz v={v} />;
     case 'code': return <CodeViz v={v} />;
     case 'shelf': return <ShelfViz v={v} />;
+    case 'video': return <VideoViz v={v} ctx={ctx} />;
+    case 'markdown': return <MarkdownViz v={v} />;
+    case 'run': return <RunViz v={v} ctx={ctx} />;
+    case 'memory': return <MemoryViz v={v} ctx={ctx} />;
+    case 'boxmodel': return <BoxModelViz v={v} />;
     default: return null;
   }
 }

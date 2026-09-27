@@ -14,6 +14,7 @@ import { highlightLine } from '../lib/highlight';
 import { Html } from '../lib/html';
 import { useHeartbeat, useLockRedirect } from '../lib/hooks';
 import { Gate, PhaseBar, PlayerShell, PlayerTop } from '../player/Player';
+import { useHighlightLang } from '../lib/useLang';
 
 type Intro = PlayerHeader & { round_size: number; seconds: number; pass_pct: number; combo_max: number; tries: number; best: number | null; passed: boolean;
   uji: UjiOptions };
@@ -32,6 +33,7 @@ export default function KuisPage({ daily = false }: { daily?: boolean }) {
   const qc = useQueryClient();
   const refreshMe = useRefreshMe();
   const intro = useApi<Intro>(!daily ? `/api/chapters/${id}/kuis` : null, { staleTime: 0 });
+  useHighlightLang((intro.data as { language?: string } | undefined)?.language);
   useLockRedirect(intro.error);
   useHeartbeat(daily ? null : Number(id));
   const [stage, setStage] = useState<'intro' | 'count' | 'play' | 'result'>('intro');

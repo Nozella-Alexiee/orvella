@@ -27,6 +27,7 @@ class Lang:
     pids: int = 128
     env: dict[str, str] = field(default_factory=dict)
     version: tuple[str, ...] = ()
+    max_stdout: int = 64 * 1024
 
 
 LANGS: dict[str, Lang] = {l.id: l for l in [
@@ -57,10 +58,14 @@ LANGS: dict[str, Lang] = {l.id: l for l in [
          version=("python3", "-c", "import sqlite3; print('SQLite', sqlite3.sqlite_version)")),
     # the legacy JavaScript test harness (node:vm, tests evaluated inside the program's context)
     Lang("js-harness", "JavaScript (tes lama)", "node", "job.json",
-         ("node", "--max-old-space-size=64", "--disallow-code-generation-from-strings", "/box/.orv/sandbox.mjs"), run_timeout=8.0),
+         ("node", "--max-old-space-size=64", "--disallow-code-generation-from-strings", "/box/.orv/sandbox.mjs"), run_timeout=8.0,
+         max_stdout=512 * 1024),
+    # a Python program stepped line by line for the memory animation (helpers/pytrace.py)
+    Lang("python-trace", "Python (jejak memori)", "py", "main.py", ("python3", "/box/.orv/pytrace.py", "main.py"), run_timeout=5.0,
+         max_stdout=1024 * 1024),
 ]}
 
-PUBLIC_LANGS = [l for l in LANGS.values() if l.id != "js-harness"]
+PUBLIC_LANGS = [l for l in LANGS.values() if l.id not in ("js-harness", "python-trace")]
 
 _JAVA_PUBLIC = re.compile(r"\bpublic\s+(?:(?:final|abstract|sealed|strictfp)\s+)*(?:class|record|enum|interface)\s+([A-Za-z_]\w*)")
 _JAVA_TYPE = re.compile(r"\b(?:class|record|enum|interface)\s+([A-Za-z_]\w*)")

@@ -1,6 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { useApi } from '../api/hooks';
+import { api } from '../api/client';
+import { LangIcon } from '../design/LangIcon';
 import type { MapData, MapNode } from '../api/types';
 import { Icon } from '../design/Icon';
 import { PhaseRing } from '../design/PhaseRing';
@@ -40,8 +42,10 @@ function routePath(pts: number[][]) {
 }
 
 export default function Peta() {
-  const { pathId = 'js-dasar' } = useParams();
+  const { pathId = 'saya' } = useParams();
   const q = useApi<MapData>(`/api/paths/${pathId}/map`);
+  // opening another path's map makes it the one Beranda follows
+  useEffect(() => { if (pathId !== 'saya' && q.data) api.post(`/api/paths/${pathId}/pick`).catch(() => undefined); }, [pathId, q.data]);
   const mapRef = useRef<HTMLDivElement>(null);
   const doneRef = useRef<SVGPathElement>(null);
   const [W, setW] = useState(0);
@@ -145,9 +149,9 @@ export default function Peta() {
           <section>
             <div className="eyebrow mb-2">Jalur</div>
             <div className="course-pick">
-              {d && <Link aria-current="true" to={`/peta/${d.path.slug}`}><span className="badge badge-mono">JS</span><div className="grow t-sm t-medium">{d.path.title}</div><Icon name="check" size={14} className="t-accent" /></Link>}
-              {d?.other_paths.map(p => <Link key={p.slug} to={`/peta/${p.slug}`}><span className="badge badge-mono">{p.title.slice(0, 2).toUpperCase()}</span><div className="grow t-sm">{p.title}</div></Link>)}
-              {d && !d.other_paths.length && <p className="t-xs t-faint">Jalur lain (TypeScript, Python) sedang disiapkan.</p>}
+              {d && <Link aria-current="true" to={`/peta/${d.path.slug}`}><LangIcon id={d.path.language || 'javascript'} size={20} /><div className="grow t-sm t-medium">{d.path.title}</div><Icon name="check" size={14} className="t-accent" /></Link>}
+              {d?.other_paths.slice(0, 5).map(p => <Link key={p.slug} to={`/peta/${p.slug}`}><LangIcon id={p.language || 'javascript'} size={20} /><div className="grow t-sm">{p.title}</div></Link>)}
+              <Link to="/jalur" className="t-sm"><Icon name="layout-grid" size={14} /><div className="grow t-sm">Semua jalur ({(d?.other_paths.length ?? 0) + 1})</div><Icon name="chevron-right" size={14} /></Link>
             </div>
           </section>
           <section>

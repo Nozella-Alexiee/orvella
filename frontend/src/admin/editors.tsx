@@ -2,13 +2,16 @@ import type { Exercise, Scene, Visual } from '../api/types';
 import { Icon } from '../design/Icon';
 import { cx } from '../design/ui';
 import { Area, ConceptChips, Field, JsonArea, Num, StringList, Text } from './fields';
+import { CodeItemForm, VisualForm } from './studioEditors';
 
 type Concept = { key: string; name: string };
-type AnyItem = Exercise & { answer?: unknown; hints?: { l3?: string; l4?: string; l5?: string }; l6?: string; explain?: string; similar_id?: string; diagnosis?: string };
+type AnyItem = Exercise & { answer?: unknown; hints?: { l3?: string; l4?: string; l5?: string }; l6?: string; explain?: string; similar_id?: string; diagnosis?: string; solution?: string };
 
 export const VISUALS: [Visual['type'], string, string][] = [
-  ['intro', 'box', 'Pengantar'], ['tokens', 'hand', 'Token diklik'], ['livecode', 'code-xml', 'Kode hidup'], ['trychange', 'lock', 'let vs const'],
-  ['cards', 'layout-grid', 'Kartu contoh'], ['knobcalc', 'calculator', 'Dua knob'], ['code', 'terminal', 'Kode + output'], ['shelf', 'layout-list', 'Rak array'], ['summary', 'list-checks', 'Ringkasan'],
+  ['markdown', 'file-text', 'Teks'], ['video', 'youtube', 'Video YouTube'], ['run', 'play', 'Kode interaktif'], ['memory', 'memory-stick', 'Animasi memori'],
+  ['code', 'terminal', 'Kode + output'], ['cards', 'layout-grid', 'Kartu contoh'], ['intro', 'box', 'Pengantar'], ['summary', 'list-checks', 'Ringkasan'],
+  ['boxmodel', 'box', 'Box model CSS'], ['tokens', 'hand', 'Token diklik'], ['livecode', 'code-xml', 'Kode hidup'], ['knobcalc', 'calculator', 'Dua knob'],
+  ['trychange', 'lock', 'let vs const'], ['shelf', 'layout-list', 'Rak array'],
 ];
 
 export const VISUAL_TEMPLATE: Record<Visual['type'], Visual> = {
@@ -21,11 +24,17 @@ export const VISUAL_TEMPLATE: Record<Visual['type'], Visual> = {
   code: { type: 'code', file: 'kode.js', lines: ['console.log("Halo");'], outputs: ['Halo'] },
   shelf: { type: 'shelf', name: 'nilai', items: [80, 72, 91], hot: 1 },
   summary: { type: 'summary', cards: [{ icon: 'box', title: 'Poin penting', body: 'Penjelasan singkat.' }], callout: { icon: 'arrow-right-circle', html: '<b>Berikutnya: Perkuat.</b>' } },
+  video: { type: 'video', id: '', title: '', checkpoints: [] },
+  markdown: { type: 'markdown', md: '## Judul kecil\n\nTulis penjelasanmu di sini. Pakai **tebal**, *miring*, dan `kode`.\n\n- poin pertama\n- poin kedua' },
+  run: { type: 'run', lang: 'python', code: 'print("Halo!")', note: 'Ubah kodenya lalu tekan Jalankan.' },
+  memory: { type: 'memory', lang: 'python', template: 'python', lines: [], steps: [] },
+  boxmodel: { type: 'boxmodel', width: 160, padding: 16, border: 4, margin: 20, sizing: 'content-box' },
 };
 
 export const TYPES: [Exercise['type'], string, string][] = [
   ['choice', 'list', 'Pilih'], ['fill', 'puzzle', 'Lengkapi'], ['predict', 'terminal', 'Tebak output'], ['parsons', 'arrow-down-up', 'Susun baris'],
   ['bug', 'bug', 'Temukan bug'], ['slider', 'sliders-horizontal', 'Atur nilai'], ['match', 'link', 'Pasangkan'],
+  ['code', 'code-xml', 'Tulis kode'], ['translate', 'git-compare', 'Terjemahkan kode'],
 ];
 
 export function itemTemplate(type: Exercise['type'], id: string): AnyItem {
@@ -38,6 +47,10 @@ export function itemTemplate(type: Exercise['type'], id: string): AnyItem {
     case 'bug': return { ...base, title: 'Program ini error. Ketuk baris penyebabnya.', lines: ['const a = 1;', 'a = 2;'], error: 'TypeError: Assignment to constant variable.', answer: 2 };
     case 'slider': return { ...base, code: 'const harga = 2000;\nlet jumlah = {{v}};\nconst total = harga * jumlah;', lit: [2], min: 1, max: 10, value: 1, var: 'jumlah', result: { label: 'total', mul: 2000 }, target: 10000, answer: 5 };
     case 'match': return { ...base, left: [{ key: 'a', text: 'Maksud A' }, { key: 'b', text: 'Maksud B' }], right: [{ key: 'b', text: 'kode B' }, { key: 'a', text: 'kode A' }], right_code: true };
+    case 'code': return { ...base, title: 'Tulis program yang membaca dua angka lalu mencetak jumlahnya.', lang: 'python', starter: 'a = int(input())\nb = int(input())\n',
+      solution: 'a = int(input())\nb = int(input())\nprint(a + b)\n', tests: [{ id: 't1', name: '3 + 4', stdin: '3\n4', expect: '7', match: 'trim', pts: 1, kind: 'io' }] } as AnyItem;
+    case 'translate': return { ...base, title: 'Terjemahkan program Python ini ke bahasa bab ini.', from_lang: 'python', from_code: 'nama = input()\nprint("Halo, " + nama)',
+      lang: 'javascript', starter: '', solution: '', tests: [{ id: 't1', name: 'sapaan', stdin: 'Ana', expect: 'Halo, Ana', match: 'trim', pts: 1, kind: 'io' }] } as AnyItem;
   }
 }
 
@@ -51,7 +64,7 @@ export function SceneEditor({ s, onChange, concepts, stat, onPlay }: { s: Scene;
       <div className="mt-3"><Text big value={s.title} onChange={v => set('title', v)} label="Judul scene" /></div>
       <div className="b-sec form-grid">
         <Field label="Kicker (label kecil)"><Text value={s.kicker} onChange={v => set('kicker', v)} placeholder="kosong = nama bab + durasi" /></Field>
-        <Field label="Syarat lanjut"><select className="select" value={s.advance || 'free'} onChange={e => set('advance', e.target.value as Scene['advance'])}><option value="free">Bebas</option><option value="all_tokens">Semua token sudah diklik</option></select></Field>
+        <Field label="Syarat lanjut"><select className="select" value={s.advance || 'free'} onChange={e => set('advance', e.target.value as Scene['advance'])}><option value="free">Bebas</option><option value="all_tokens">Semua interaksi selesai dulu</option></select></Field>
         <Field label="Narasi" full><Area value={s.say} onChange={v => set('say', v || undefined)} rows={2} /></Field>
         <Field label="Lead (paragraf pembuka, opsional)" full><Area value={s.lead} onChange={v => set('lead', v || undefined)} rows={2} /></Field>
       </div>
@@ -59,7 +72,13 @@ export function SceneEditor({ s, onChange, concepts, stat, onPlay }: { s: Scene;
         <div className="types">
           {VISUALS.map(([t, ic, l]) => <button key={t} aria-pressed={vtype === t} onClick={() => set('visual', structuredClone(VISUAL_TEMPLATE[t]))}><Icon name={ic} style={{ color: 'var(--pahami-ink)' }} /><b>{l}</b></button>)}
         </div>
-        {s.visual && <div className="mt-3"><Field label="Parameter visual (JSON)" help="Kode di baris memakai {{knob}} atau {{nama}} untuk angka yang bisa digeser. Teks boleh berisi <b>, <i>, <span class=&quot;ic&quot;>."><JsonArea value={s.visual} onChange={v => set('visual', v as Visual)} label="Parameter visual" /></Field></div>}
+        {s.visual && <div className="mt-4"><VisualForm v={s.visual} set={v => set('visual', v)} /></div>}
+        {s.visual && (
+          <details className="mt-3 adv" open={!['video', 'markdown', 'run', 'memory', 'boxmodel', 'code', 'intro', 'summary', 'cards'].includes(s.visual.type)}>
+            <summary className="t-sm t-muted">Pengaturan lanjutan (JSON)</summary>
+            <div className="mt-2"><Field label="Parameter visual (JSON)" help="Kode di baris memakai {{knob}} atau {{nama}} untuk angka yang bisa digeser. Teks boleh berisi <b>, <i>, <span class=&quot;ic&quot;>."><JsonArea value={s.visual} onChange={v => set('visual', v as Visual)} label="Parameter visual" /></Field></div>
+          </details>
+        )}
       </div>
       <div className="b-sec"><div className="row between"><span className="eyebrow" style={{ margin: 0 }}>Langkah animasi</span><button className="btn btn-ghost btn-sm" onClick={() => set('steps', [...(s.steps || []), { desc: '', trigger: 'next' }])}><Icon name="plus" />Langkah</button></div>
         <div className="mt-2">
@@ -131,6 +150,7 @@ export function ItemEditor({ it, onChange, items, concepts, stat, wrongLines }: 
 }
 
 function AnswerEditor({ it, set }: { it: AnyItem; set: (p: Partial<AnyItem>) => void }) {
+  if (it.type === 'code' || it.type === 'translate') return <CodeItemForm it={it} set={set} />;
   if (it.type === 'choice' || it.type === 'predict') return (
     <div className="stack gap-2">
       {it.type === 'predict' && <Field label="Kode"><Area mono value={it.code} onChange={v => set({ code: v })} rows={3} /></Field>}

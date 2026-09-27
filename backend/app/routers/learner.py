@@ -13,7 +13,7 @@ from ..db import get_db
 from ..models import (Attempt, Chapter, ChapterProgress, Concept, ConceptMastery, ExamSession, Klass, MasterySnapshot,
                       Message, Notebook, Notification, Path, Project, ProjectProgress, QuizRound, Submission, User)
 from ..security import current_user
-from ..services import activity, content as content_svc, learning, unlock
+from ..services import activity, content as content_svc, learning, paths as paths_svc, unlock
 from ..views import ago, person
 
 router = APIRouter(prefix="/api", tags=["learner"])
@@ -233,23 +233,49 @@ def _studied_chapters(db: Session, user: User, pm: dict[int, ChapterProgress]) -
 
 
 def _user_path(db: Session, user: User) -> Path:
-    klass = db.get(Klass, user.class_id) if user.class_id else None
-    path = db.get(Path, klass.path_id) if klass and klass.path_id else db.scalar(select(Path).order_by(Path.id))
-    if path is None:
-        raise HTTPException(404, "Belum ada jalur belajar.")
-    return path
+    return paths_svc.current(db, user)
 
 
 @router.get("/paths")
-def paths(user: User = Depends(current_user), db: Session = Depends(get_db)) -> list[dict[str, Any]]:
-    return [{"slug": p.slug, "title": p.title} for p in db.scalars(select(Path).order_by(Path.id))]
+def paths(user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict[str, Any]:
+    """The catalog: every path this user may open, with progress."""
+    pm = learning.progress_map(db, user.id)
+    cur = paths_svc.current(db, user)
+    klass = db.get(Klass, user.class_id) if user.class_id else None
+    out = []
+    for p in paths_svc.visible(db, user):
+        chapters = [c for c in learning.path_chapters(db, p.id) if c.kind == "chapter"]
+        published = [c for c in chapters if c.version]
+        if not published and not paths_svc.can_edit(user, p):
+            continue
+        done_phases = sum(unlock.done_count(pm[c.id].phases) for c in published if c.id in pm)
+        owner = db.get(User, p.owner_id) if p.owner_id else None
+        out.append({
+            "slug": p.slug, "title": p.title, "description": p.description, "language": p.language, "level": p.level,
+            "chapters": len(published), "chapters_total": len(chapters),
+            "pct": round(100 * done_phases / (4 * len(published))) if published else 0,
+            "started": any(c.id in pm for c in published), "current": p.id == cur.id,
+            "from_class": bool((klass and klass.path_id == p.id) or (user.class_id and user.class_id in (p.class_ids or []) and p.visibility == "class")),
+            "by": owner.name if owner else "Tim Orvella", "visibility": p.visibility,
+        })
+    return {"current": cur.slug, "items": out}
+
+
+@router.post("/paths/{slug}/pick")
+def pick_path(slug: str, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict[str, str]:
+    """Makes this path the one Beranda and /peta follow."""
+    path = paths_svc.require_view(db, user, db.scalar(select(Path).where(Path.slug == slug)))
+    user.prefs = {**(user.prefs or {}), "path": path.slug}
+    db.commit()
+    return {"current": path.slug}
 
 
 @router.get("/paths/{slug}/map")
 def path_map(slug: str, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict[str, Any]:
-    path = db.scalar(select(Path).where(Path.slug == slug))
-    if path is None:
-        raise HTTPException(404, "Jalur tidak ditemukan.")
+    if slug == "saya":
+        path = paths_svc.current(db, user)
+    else:
+        path = paths_svc.require_view(db, user, db.scalar(select(Path).where(Path.slug == slug)))
     chapters = learning.path_chapters(db, path.id)
     pm = learning.progress_map(db, user.id)
     cur = learning.current_chapter(db, user, chapters, pm)
@@ -288,13 +314,13 @@ def path_map(slug: str, user: User = Depends(current_user), db: Session = Depend
     total_phases = 4 * len(learn)
     done_phases = sum(unlock.done_count(pm[c.id].phases) for c in learn if c.id in pm)
     return {
-        "path": {"slug": path.slug, "title": path.title, "description": path.description},
+        "path": {"slug": path.slug, "title": path.title, "description": path.description, "language": path.language, "level": path.level},
         "nodes": nodes,
         "current_id": cur.id if cur else None,
         "summary": {"chapters_done": done, "chapters_total": len(learn), "phases_done": done_phases, "phases_total": total_phases,
                     "pct": round(100 * done_phases / total_phases) if total_phases else 0,
                     "ring": [min(1.0, max(0.0, done_phases / total_phases * 4 - i)) if total_phases else 0 for i in range(4)]},
-        "other_paths": [{"slug": p.slug, "title": p.title} for p in db.scalars(select(Path).where(Path.id != path.id))],
+        "other_paths": [{"slug": p.slug, "title": p.title, "language": p.language} for p in paths_svc.visible(db, user) if p.id != path.id],
     }
 
 
@@ -303,6 +329,7 @@ def chapter_overview(chapter_id: int, user: User = Depends(current_user), db: Se
     ch = get_chapter(db, chapter_id)
     if ch.kind != "chapter":
         raise HTTPException(404, "Bukan bab belajar.")
+    paths_svc.require_view(db, user, db.get(Path, ch.path_id))
     chapters = learning.path_chapters(db, ch.path_id)
     pm = learning.progress_map(db, user.id)
     unlocked = learning.is_unlocked(db, user, ch, chapters, pm)
@@ -343,7 +370,8 @@ def chapter_overview(chapter_id: int, user: User = Depends(current_user), db: Se
     return {
         "chapter": {**learning.chapter_ref(ch), "description": ch.description, "subtitle": ch.subtitle, "icon": ch.icon,
                     "module": _module_of(ch, chapters)},
-        "path": {"slug": path.slug, "title": path.title},
+        "path": {"slug": path.slug, "title": path.title, "language": path.language},
+        "language": content.get("language") or path.language,
         "position": {"number": ch.number, "total": len(learn)},
         "phases": phases,
         "current": cur,

@@ -1,6 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { Exercise } from '../api/types';
+import { CodeEditor, type EditorDiag } from '../code/CodeEditor';
 import { Icon } from '../design/Icon';
+import { LangIcon } from '../design/LangIcon';
+import { FILE_OF, LANG_BY_ID } from '../lib/langs';
 import { cx } from '../design/ui';
 import { burst, ease, motion, pop, shake } from '../fx';
 import { highlightLine } from '../lib/highlight';
@@ -306,9 +309,65 @@ export function MatchEx({ item, locked, onChange }: Props) {
   );
 }
 
+// ---------------------------------------------------------------- Code / Translate
+type CodeMarks = { results: { id: string; pass: boolean; detail: string; ms: number }[]; logs: string[];
+  error: { name: string; message: string; line: number | null } | null; diagnostics?: EditorDiag[] };
+
+/** Write real code; the tests run in the sandbox when the learner presses Cek. */
+export function CodeEx({ item, locked, marks, onChange }: Props) {
+  const lang = item.lang || 'python';
+  const [code, setCode] = useState(item.starter || '');
+  useEffect(() => { onChange(item.starter || '', !!(item.starter || '').trim()); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const m = marks && !Array.isArray(marks) && 'results' in (marks as object) ? (marks as unknown as CodeMarks) : null;
+  const examples = (item.tests || []).filter(t => !t.hidden && t.stdin !== undefined).slice(0, 2);
+  return (
+    <div data-answer-area>
+      {item.type === 'translate' && item.from_code && (
+        <div className="codecard mt-4">
+          <div className="cc-head"><span className="cc-file"><LangIcon id={item.from_lang || 'python'} size={16} />{FILE_OF[item.from_lang || 'python']}</span>
+            <span className="t-xs" style={{ color: 'var(--editor-dim)' }}>terjemahkan ke {LANG_BY_ID[lang]?.name}</span></div>
+          <div className="cc-body">{item.from_code.split('\n').map((l, i) => <div className="cc-line" key={i}><span className="cc-ln">{i + 1}</span><span dangerouslySetInnerHTML={{ __html: highlightLine(l, item.from_lang || 'python') || ' ' }} /></div>)}</div>
+        </div>
+      )}
+      {examples.length > 0 && (
+        <div className="row gap-2 wrap mt-4">
+          {examples.map(t => <div key={t.id} className="io-ex" style={{ minWidth: 220 }}><div><span className="t-label">Input</span><pre>{t.stdin || '(kosong)'}</pre></div><div><span className="t-label">Output</span><pre>{t.expect}</pre></div></div>)}
+        </div>
+      )}
+      <div className="codecard mt-4">
+        <div className="cc-head"><span className="cc-file"><LangIcon id={lang} size={16} />{FILE_OF[lang] || 'main'}</span><span className="t-xs" style={{ color: 'var(--editor-dim)' }}>{LANG_BY_ID[lang]?.rt}</span></div>
+        <CodeEditor value={code} lang={lang} readOnly={locked} minHeight={180} maxHeight={420} label="Jawaban kode"
+          badLine={m?.error?.line ?? null} diagnostics={m?.diagnostics}
+          onChange={v => { setCode(v); onChange(v, v.trim().length > 0); }} />
+        {m && (
+          <div className="cc-out">
+            {m.error && <span className="out-bubble is-err"><Icon name="circle-x" size={14} />{m.error.name}: {m.error.message}{m.error.line ? ` · baris ${m.error.line}` : ''}</span>}
+            {m.logs.slice(0, 8).map((l, i) => <span className="out-bubble" key={i}><span className="p">›</span>{l || ' '}</span>)}
+          </div>
+        )}
+      </div>
+      {m && (
+        <div className="robots mt-3">
+          {m.results.map((r, i) => {
+            const t = item.tests?.find(x => x.id === r.id);
+            return (
+              <div key={r.id} className={cx('robot', r.pass ? 'is-pass' : 'is-fail')}>
+                <span className="rb"><Icon name={r.pass ? 'check' : 'x'} /></span><span>{t?.hidden ? 'Tes tersembunyi' : t?.name || `Tes ${i + 1}`}</span>
+                <span className="rmeta">{r.pass ? `${r.ms} ms` : 'gagal'}</span>
+                {!r.pass && r.detail && <span className="rdiff">{r.detail}</span>}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export const TYPE_CHIP: Record<string, [string, string]> = {
   choice: ['list', 'Pilih jawaban'], predict: ['terminal', 'Tebak output'], fill: ['puzzle', 'Lengkapi kode'], parsons: ['arrow-down-up', 'Susun baris'],
   bug: ['bug', 'Temukan bug'], slider: ['sliders-horizontal', 'Atur nilai'], match: ['link', 'Pasangkan'],
+  code: ['code-xml', 'Tulis kode'], translate: ['git-compare', 'Terjemahkan kode'],
 };
 
 export function ExerciseBody(p: Props) {
@@ -319,6 +378,7 @@ export function ExerciseBody(p: Props) {
     case 'bug': return <BugEx {...p} />;
     case 'slider': return <SliderEx {...p} />;
     case 'match': return <MatchEx {...p} />;
+    case 'code': case 'translate': return <CodeEx {...p} />;
     default: return null;
   }
 }

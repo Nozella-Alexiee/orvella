@@ -17,7 +17,7 @@ from ..db import get_db
 from ..models import (Attempt, Chapter, ChapterProgress, ChapterVersion, Concept, ContentReport, DailyActivity, Klass, Organization,
                       Path, PlayerState, QuizRound, User, now)
 from ..security import hash_password, require_role
-from ..services import activity, content as content_svc, unlock
+from ..services import activity, content as content_svc, paths as paths_svc, unlock
 from ..views import ago, person
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
@@ -295,10 +295,12 @@ def chapter(cid: int, me: User = Depends(staff), db: Session = Depends(get_db)) 
     ch = db.get(Chapter, cid)
     if ch is None:
         raise HTTPException(404, "Bab tidak ditemukan.")
+    path = paths_svc.require_view(db, me, db.get(Path, ch.path_id))
     draft = ch.draft or content_svc.empty_content()
     return {
         "id": ch.id, "kind": ch.kind, "number": ch.number, "title": ch.title, "subtitle": ch.subtitle, "description": ch.description,
-        "icon": ch.icon, "status": ch.status, "version": ch.version, "path": db.get(Path, ch.path_id).title,
+        "icon": ch.icon, "status": ch.status, "version": ch.version, "path": path.title, "path_id": path.id,
+        "language": draft.get("language") or path.language, "can_edit": paths_svc.can_edit(me, path),
         "draft": draft, "draft_saved": ago(ch.draft_saved_at) if ch.draft_saved_at else None,
         "dirty": bool(ch.version) and (content_svc.published(db, ch) != draft),
         "stats": {"perkuat": item_stats(db, ch.id, "perkuat"), "kuis": item_stats(db, ch.id, "kuis"), "scenes": _scene_stats(db, ch),
@@ -381,7 +383,27 @@ def validate(c: dict[str, Any]) -> list[str]:
         p.append("Mode Uji = Challenge, tapi challenge kosong.")
     if has_ch and not c["challenge"].get("tests"):
         p.append("Challenge belum punya tes.")
+    for i, s in enumerate(scenes, 1):
+        v = s.get("visual") or {}
+        if v.get("type") == "video" and not v.get("id"):
+            p.append(f"Scene {i}: tempel tautan video YouTube.")
+        if v.get("type") == "memory" and not v.get("steps"):
+            p.append(f"Scene {i}: animasi memori belum dibuat.")
+        if v.get("type") == "run" and not (v.get("code") or "").strip():
+            p.append(f"Scene {i}: kode interaktif masih kosong.")
+    for n, it in enumerate(items, 1):
+        if it.get("type") in ("code", "translate") and not it.get("tests"):
+            p.append(f"Soal Perkuat {n}: soal kode butuh minimal satu tes.")
     return p
+
+
+def normalize(c: dict[str, Any]) -> dict[str, Any]:
+    """Fills derived fields before saving: the L6 solution of code items comes from their reference solution."""
+    import html as _html
+    for it in c.get("perkuat", {}).get("items", []):
+        if it.get("type") in ("code", "translate") and it.get("solution") and not it.get("l6"):
+            it["l6"] = f"<pre class=\"codeblock\"><code>{_html.escape(it['solution'])}</code></pre>"
+    return c
 
 
 class DraftIn(BaseModel):
@@ -393,11 +415,9 @@ class DraftIn(BaseModel):
 
 
 @router.put("/chapters/{cid}/draft")
-def save_draft(cid: int, body: DraftIn, me: User = Depends(admin_only), db: Session = Depends(get_db)) -> dict[str, Any]:
-    ch = db.get(Chapter, cid)
-    if ch is None:
-        raise HTTPException(404, "Bab tidak ditemukan.")
-    ch.draft = body.draft
+def save_draft(cid: int, body: DraftIn, me: User = Depends(staff), db: Session = Depends(get_db)) -> dict[str, Any]:
+    ch = paths_svc.require_chapter_edit(db, me, cid)
+    ch.draft = normalize(body.draft)
     for f in ("title", "subtitle", "description", "icon"):
         v = getattr(body, f)
         if v is not None:
@@ -409,10 +429,8 @@ def save_draft(cid: int, body: DraftIn, me: User = Depends(admin_only), db: Sess
 
 
 @router.post("/chapters/{cid}/publish")
-def publish(cid: int, me: User = Depends(admin_only), db: Session = Depends(get_db)) -> dict[str, Any]:
-    ch = db.get(Chapter, cid)
-    if ch is None:
-        raise HTTPException(404, "Bab tidak ditemukan.")
+def publish(cid: int, me: User = Depends(staff), db: Session = Depends(get_db)) -> dict[str, Any]:
+    ch = paths_svc.require_chapter_edit(db, me, cid)
     problems = validate(ch.draft or {})
     if problems:
         raise HTTPException(422, {"message": "Belum bisa diterbitkan.", "problems": problems})
@@ -435,9 +453,7 @@ class StatusIn(BaseModel):
 
 @router.post("/chapters/{cid}/status")
 def set_status(cid: int, body: StatusIn, me: User = Depends(staff), db: Session = Depends(get_db)) -> dict[str, Any]:
-    ch = db.get(Chapter, cid)
-    if ch is None:
-        raise HTTPException(404, "Bab tidak ditemukan.")
+    ch = paths_svc.require_chapter_edit(db, me, cid)
     if body.status not in ("draft", "review"):
         raise HTTPException(422, "Status tidak dikenal.")
     ch.status = body.status if not ch.version or body.status == "review" else "published"

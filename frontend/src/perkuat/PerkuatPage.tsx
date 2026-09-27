@@ -14,6 +14,7 @@ import { Html } from '../lib/html';
 import { useHeartbeat, useLockRedirect } from '../lib/hooks';
 import { DoneOverlay, Gate, PhaseBar, PlayerFoot, PlayerShell, PlayerTop } from '../player/Player';
 import { ExerciseBody, TYPE_CHIP, type Marks } from './exercises';
+import { useHighlightLang } from '../lib/useLang';
 
 type PerkuatData = PlayerHeader & {
   mode: 'phase' | 'mini'; items: Exercise[]; index: number; solved: Record<string, boolean>; attempts: Record<string, number>;
@@ -33,6 +34,7 @@ export default function PerkuatPage() {
   const refreshMe = useRefreshMe();
   const mini = params.has('latih') || params.has('mini');
   const [d, setD] = useState<PerkuatData | null>(null);
+  useHighlightLang(d?.language);
   const [error, setError] = useState<unknown>(null);
   const [i, setI] = useState(0);
   const [phase, setPhase] = useState<'answer' | 'next' | 'retry'>('answer');
@@ -147,7 +149,7 @@ export default function PerkuatPage() {
 
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
-      if ((e.target as Element).closest('input,textarea,.bugline,.pblock,.slot')) return;
+      if ((e.target as Element).closest('input,textarea,.bugline,.pblock,.slot,.cm-editor')) return;
       if (e.key === 'Enter' && !(e.target as Element).closest('button')) { e.preventDefault(); primary(); }
     };
     document.addEventListener('keydown', k);

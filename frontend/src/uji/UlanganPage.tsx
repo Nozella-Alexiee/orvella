@@ -15,6 +15,7 @@ import { highlightLine } from '../lib/highlight';
 import { Html } from '../lib/html';
 import { useHeartbeat, useLockRedirect, useOnline } from '../lib/hooks';
 import { PlayerFoot, PlayerShell, PlayerTop } from '../player/Player';
+import { useHighlightLang } from '../lib/useLang';
 
 type Q = { id: string; t: string; code?: string; type: 'choice' | 'short' | 'code'; o?: string[]; pts: number; pre?: string; label?: string };
 type Result = { score: number; passed: boolean; used: string; rows: { n: number; label: string; ok: boolean; pts: number; max: number; note: string }[] };
@@ -32,6 +33,7 @@ export default function UlanganPage() {
   const online = useOnline();
   useHeartbeat(Number(id));
   const [data, setData] = useState<StartRes | null>(null);
+  useHighlightLang((data as { language?: string } | null)?.language);
   const [error, setError] = useState<unknown>(null);
   const [answers, setAnswers] = useState<Record<string, unknown>>({});
   const [flags, setFlags] = useState<string[]>([]);

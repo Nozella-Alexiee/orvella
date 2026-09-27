@@ -188,7 +188,7 @@ def _ms(state: dict[str, Any]) -> int:
 
 def execute(image: str, cmd: list[str], job: Job, *, read_only: bool, mem_mb: int, timeout: float, pids: int = 128,
             env: dict[str, str] | None = None, extra_mounts: list[Mount] | None = None, fsize_mb: int = 16,
-            kind: str = "run") -> Exec:
+            kind: str = "run", max_stdout: int = cfg.MAX_STDOUT) -> Exec:
     """Runs one container to completion and returns its output. Waits for a free queue slot first."""
     mem_mb = min(mem_mb, cfg.MAX_MEMORY_MB)
     with QUEUE.slot():
@@ -232,7 +232,7 @@ def execute(image: str, cmd: list[str], job: Job, *, read_only: bool, mem_mb: in
             res.ms = min(_ms(state), int(timeout * 1000)) if not res.timeout else int(timeout * 1000)
             out = c.logs(stdout=True, stderr=False)
             err = c.logs(stdout=False, stderr=True)
-            res.stdout, cut1 = _decode(out, cfg.MAX_STDOUT)
+            res.stdout, cut1 = _decode(out, max_stdout)
             m = _STATS.search(err.decode("utf-8", errors="replace")[-200:]) if err else None
             if m:
                 err = err[: len(err) - len(m.group(0).encode())]
@@ -289,7 +289,7 @@ class RunRequest:
 
 
 def _helpers(job: Job) -> None:
-    for name in ("sqlrun.py", "sandbox.mjs"):
+    for name in ("sqlrun.py", "sandbox.mjs", "pytrace.py"):
         src = cfg.HELPERS_DIR / name
         if src.exists():
             job.write(f".orv/{name}", src.read_bytes())
@@ -328,7 +328,7 @@ def run(req: RunRequest) -> dict[str, Any]:
         def one(idx: int, stdin: str) -> Exec:
             job.write(f"in/{idx}.txt", stdin)
             return execute(lang.image, ["sh", "-c", _WRAP, "orv", f"/box/in/{idx}.txt", *run_cmd], job, read_only=True,
-                           mem_mb=run_mem, timeout=run_timeout, pids=lang.pids, env=lang.env)
+                           mem_mb=run_mem, timeout=run_timeout, pids=lang.pids, env=lang.env, max_stdout=lang.max_stdout)
 
         if not req.tests:
             out["run"] = one(0, req.stdin).as_dict()

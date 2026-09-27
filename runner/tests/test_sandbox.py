@@ -119,3 +119,16 @@ def test_compare_modes():
     assert sandbox.compare("1 2\n3", "1 2 3", "tokens")
     assert sandbox.compare("Skor: 10 poin", "Skor", "contains")
     assert sandbox.compare("umur 17", r"umur \d+", "regex")
+
+
+def test_python_trace_records_memory():
+    code = "a = [1, 2]\nb = a\nb.append(3)\n\ndef dobel(x):\n    return x * 2\n\nn = dobel(4)\nprint(n)"
+    r = run("python-trace", code)
+    data = json.loads(r["run"]["stdout"])
+    assert data["error"] is None and data["out"] == "8\n"
+    last = data["steps"][-1]
+    g = {v["name"]: v for v in last["frames"][0]["vars"]}
+    assert g["a"]["ref"] == g["b"]["ref"] and g["n"]["v"] == "8"
+    lst = next(o for o in last["heap"] if o["id"] == g["a"]["ref"])
+    assert [i["v"] for i in lst["items"]] == ["1", "2", "3"]
+    assert any(len(s["frames"]) == 2 and s["frames"][1]["name"] == "dobel()" for s in data["steps"])

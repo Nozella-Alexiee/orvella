@@ -18,6 +18,7 @@ import { burst, confetti, motion, shake, sound, ticker } from '../fx';
 import { Html } from '../lib/html';
 import { useAutosave, useHeartbeat, useLockRedirect } from '../lib/hooks';
 import { DoneOverlay, PhaseBar, PlayerShell, PlayerTop } from '../player/Player';
+import { useHighlightLang } from '../lib/useLang';
 
 type Challenge = { title: string; minutes: number; difficulty: string; filename: string; story: string; steps: string[]; starter: string;
   art?: { kind: string; title: string; name: string; value: string }; language?: string;
@@ -54,6 +55,7 @@ export default function ChallengePage() {
   useLockRedirect(q.error);
   useHeartbeat(Number(id));
   const d = q.data;
+  useHighlightLang(d?.challenge?.language || d?.language);
   const [code, setCode] = useState<string | null>(null);
   const [robots, setRobots] = useState<Robot[]>([]);
   const [logs, setLogs] = useState<string[] | null>(null);

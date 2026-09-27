@@ -30,6 +30,9 @@ const Builder = lazy(() => import('../admin/BuilderPage'));
 const ChapterList = lazy(() => import('../admin/ChapterList'));
 const People = lazy(() => import('../admin/PeoplePage'));
 const Runtime = lazy(() => import('../admin/RuntimePage'));
+const Jalur = lazy(() => import('../pages/Jalur'));
+const StudioHome = lazy(() => import('../studio/StudioPages').then(m => ({ default: m.StudioHome })));
+const StudioPath = lazy(() => import('../studio/StudioPages').then(m => ({ default: m.StudioPath })));
 const NotFound = lazy(() => import('../pages/NotFound'));
 
 function RequireAuth({ roles, children }: { roles?: string[]; children: ReactNode }) {
@@ -50,6 +53,9 @@ function MentorLayout() {
 }
 function AdminShell() {
   return <RequireAuth roles={['admin']}><AdminLayout><Suspense fallback={<Boot />}><Outlet /></Suspense></AdminLayout></RequireAuth>;
+}
+function StudioShell() {
+  return <RequireAuth roles={['mentor', 'admin']}><Suspense fallback={<Boot />}><Outlet /></Suspense></RequireAuth>;
 }
 function PlayerLayout() {
   return <RequireAuth><Suspense fallback={<Boot />}><Outlet /></Suspense></RequireAuth>;
@@ -89,7 +95,8 @@ export function App() {
 
             <Route element={<LearnerLayout />}>
               <Route path="/beranda" element={<Beranda />} />
-              <Route path="/peta" element={<Navigate to="/peta/js-dasar" replace />} />
+              <Route path="/peta" element={<Navigate to="/peta/saya" replace />} />
+              <Route path="/jalur" element={<Jalur />} />
               <Route path="/peta/:pathId" element={<Peta />} />
               <Route path="/bab/:id" element={<Bab />} />
               <Route path="/playground" element={<Playground />} />
@@ -114,6 +121,11 @@ export function App() {
               <Route path="/mentor/siswa" element={<Roster />} />
               <Route path="/mentor/siswa/:userId" element={<Siswa />} />
               <Route path="/mentor/review" element={<ReviewQueue />} />
+              <Route path="/studio" element={<StudioHome />} />
+              <Route path="/studio/jalur/:id" element={<StudioPath />} />
+            </Route>
+            <Route element={<StudioShell />}>
+              <Route path="/studio/bab/:id" element={<Builder studio />} />
             </Route>
 
             <Route element={<AdminShell />}>

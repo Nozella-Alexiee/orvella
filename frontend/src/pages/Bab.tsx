@@ -12,6 +12,7 @@ import { highlightLine } from '../lib/highlight';
 import { useLockRedirect } from '../lib/hooks';
 import { shake } from '../fx';
 import { ApiError } from '../api/client';
+import { useHighlightLang } from '../lib/useLang';
 
 /* from mockups/bab.html */
 const css = `
@@ -42,6 +43,7 @@ export default function Bab() {
   const q = useApi<ChapterOverview>(`/api/chapters/${id}`);
   useLockRedirect(q.error);
   useEffect(() => { if (loc.hash === '#uji' && q.data) document.getElementById('uji')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, [loc.hash, q.data]);
+  useHighlightLang((q.data as { language?: string } | undefined)?.language);
   if (q.error instanceof ApiError && q.error.status === 409) return null;
   if (q.error) return <main className="page"><LoadError onRetry={() => q.refetch()} /></main>;
   if (!q.data) return (
@@ -141,7 +143,7 @@ export default function Bab() {
           <div className="row between"><span className="eyebrow" style={{ color: 'var(--pahami-ink)' }}>Catatan ringkas · dari Pahami</span>
             {d.cheatsheet && <button className="btn btn-ghost btn-sm" onClick={copy}><Icon name="copy" />Salin</button>}</div>
           {d.cheatsheet
-            ? <pre dangerouslySetInnerHTML={{ __html: d.cheatsheet.split('\n').map(highlightLine).join('\n') }} />
+            ? <pre dangerouslySetInnerHTML={{ __html: d.cheatsheet.split('\n').map(l => highlightLine(l)).join('\n') }} />
             : <div className="row gap-3 mt-4 t-sm t-muted"><Icon name="lock" />Terbuka setelah kamu menyelesaikan Pahami.</div>}
         </section>
       </div>

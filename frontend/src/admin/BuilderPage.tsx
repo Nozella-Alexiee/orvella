@@ -18,14 +18,19 @@ import { ExerciseBody, TYPE_CHIP } from '../perkuat/exercises';
 import { ConceptChips, Field, Num, Text, Area } from './fields';
 import { ItemEditor, itemTemplate, SceneEditor, VISUAL_TEMPLATE, VISUALS } from './editors';
 import { ChallengeEditor, ExamEditor, KuisEditor, type ChallengeCfg, type ExamCfg, type KuisCfg } from './editors2';
+import { BuilderLang, QuickQuizModal } from './studioEditors';
+import { LangIcon } from '../design/LangIcon';
+import { LANG_BY_ID } from '../lib/langs';
+import { useHighlightLang } from '../lib/useLang';
 
 type AnyItem = Exercise & { answer?: unknown; hints?: Record<string, string>; l6?: string; explain?: string; similar_id?: string; diagnosis?: string };
 type Draft = {
-  minutes: Record<string, number>; concepts: string[]; cheatsheet: string;
+  minutes: Record<string, number>; concepts: string[]; cheatsheet: string; language?: string;
   pahami: { scenes: Scene[] }; perkuat: { items: AnyItem[] }; kuis: KuisCfg; ulangan: ExamCfg; challenge: ChallengeCfg | null; uji_mode: string;
 };
 type Data = {
   id: number; kind: string; number: number; title: string; subtitle: string; description: string; icon: string; status: string; version: number; path: string;
+  path_id: number; language: string; can_edit: boolean;
   draft: Draft; draft_saved: string | null; dirty: boolean; problems: string[];
   stats: { perkuat: Record<string, { n: number; wrong_pct: number }>; kuis: Record<string, { n: number; wrong_pct: number }>; scenes: Record<string, { stopped_pct: number }>; wrong_lines: Record<string, Record<string, number>> };
   concepts: { key: string; name: string }[];
@@ -68,6 +73,8 @@ const css = `
 .prev-frame .viz { padding: 16px; }
 .prev-frame .vbox .box { width: 96px; height: 70px; }
 .prev-frame .grid-2 { grid-template-columns: 1fr; }
+.prev-frame .mem, .prev-frame .boxm { grid-template-columns: 1fr; }
+.prev-frame .mem-board { gap: 28px; flex-wrap: wrap; }
 .tc-table td .input { height: 30px; font-family: var(--font-mono); font-size: 12px; }
 @media (max-width: 1280px) { .b-grid { grid-template-columns: 240px minmax(0, 1fr); } .b-prev { display: none; } }
 @media (max-width: 860px) { .b-grid { grid-template-columns: 1fr; } .b-outline { display: none; } .types { grid-template-columns: 1fr 1fr; } .form-grid { grid-template-columns: 1fr; } }
@@ -75,8 +82,9 @@ const css = `
 
 const plain = (s: string) => s.replace(/<[^>]+>/g, '').replace(/&quot;/g, '"');
 
-export default function BuilderPage() {
+export default function BuilderPage({ studio }: { studio?: boolean }) {
   const { id } = useParams();
+  const [pasteItems, setPasteItems] = useState(false);
   const qc = useQueryClient();
   const [params, setParams] = useSearchParams();
   const q = useApi<Data>(`/api/admin/chapters/${id}`, { staleTime: 0 });
@@ -172,6 +180,8 @@ export default function BuilderPage() {
     return <p className="t-sm t-faint mt-3">Pilih scene, soal, kuis, atau challenge untuk melihat pratinjau.</p>;
   }, [draft, kind, sceneIdx, itemIdx, play, phone, meta?.title]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const lang = draft?.language || q.data?.language || 'javascript';
+  useHighlightLang(lang);
   if (q.error) return <div className="page"><LoadError onRetry={() => q.refetch()} /></div>;
   if (!q.data || !draft || !meta) return <div className="page"><Skel h={40} w={400} /><Skel h={500} r={16} className="mt-4" /></div>;
   const d = q.data;
@@ -182,14 +192,15 @@ export default function BuilderPage() {
     <>
       <style>{css}</style>
       <div className="b-top">
-        <div className="crumbs t-sm t-muted"><Link to="/admin/bab">Konten</Link> / {d.path} / <b style={{ color: 'var(--text)' }}>Bab {d.number} · {meta.title}</b></div>
+        <div className="crumbs t-sm t-muted">{studio ? <Link to={`/studio/jalur/${d.path_id}`}><Icon name="arrow-left" size={14} /> Studio</Link> : <Link to="/admin/bab">Konten</Link>} / <LangIcon id={lang} size={14} style={{ verticalAlign: -2 }} /> {d.path} / <b style={{ color: 'var(--text)' }}>Bab {d.number} · {meta.title}</b></div>
+        {!d.can_edit && <span className="badge badge-warning">hanya lihat</span>}
         {d.version ? <span className="badge badge-success">Terbit · v{d.version}</span> : <span className="badge">Draft</span>}
         <span className="save-state hide-sm"><Icon name={save === 'saving' ? 'loader-circle' : save === 'error' || save === 'offline' ? 'circle-alert' : 'cloud-check'} size={14} className={save === 'saving' ? 'spin' : ''} />
           {save === 'saving' ? 'Menyimpan…' : save === 'error' || save === 'offline' ? 'Gagal menyimpan draft' : `Draft v${nextV} tersimpan`}</span>
         <div className="grow" />
         {problems.length > 0 && <button className="btn btn-ghost btn-sm" onClick={() => setShowProblems(true)}><Icon name="triangle-alert" style={{ color: 'var(--warning)' }} />{problems.length} masalah</button>}
         {d.version > 0 && <Link className="btn btn-secondary btn-press" to={`/bab/${d.id}/pahami`} target="_blank"><Icon name="eye" /><span className="hide-sm">Pratinjau sebagai siswa</span></Link>}
-        <button ref={pubBtn} className={cx('btn btn-primary btn-press', publishing && 'is-loading')} onClick={publish}><Icon name="upload" />Terbitkan v{nextV}</button>
+        <button ref={pubBtn} className={cx('btn btn-primary btn-press', publishing && 'is-loading')} onClick={publish} disabled={!d.can_edit}><Icon name="upload" />Terbitkan v{nextV}</button>
       </div>
       <div className="b-grid">
         <nav className="b-outline" aria-label="Struktur bab">
@@ -210,6 +221,7 @@ export default function BuilderPage() {
                 <span className="nm">{it.label || plain(it.title)}</span><span className="ty">{TYPE_CHIP[it.type]?.[1].split(' ')[0].toLowerCase()}</span></button>
             ))}
             <button className="o-item" style={{ color: 'var(--text-faint)' }} onClick={addItem}><Icon name="plus" size={14} />Tambah soal</button>
+            <button className="o-item" style={{ color: 'var(--text-faint)' }} onClick={() => setPasteItems(true)}><Icon name="clipboard-paste" size={14} />Tempel soal pilihan ganda</button>
           </div>
           <div className="o-phase" data-phase="kuis"><div className="o-head"><span className="dot" />3 · Kuis<span className="t-xs t-faint" style={{ marginLeft: 'auto', fontWeight: 400 }}>bank {draft.kuis.bank.length}</span></div>
             <button className={cx('o-item', kind === 'kuis' && 'is-sel')} onClick={() => select('kuis')}><span className="nm">Bank soal · {draft.kuis.round_size} per ronde</span><span className="ty">kuis</span></button></div>
@@ -219,6 +231,7 @@ export default function BuilderPage() {
         </nav>
 
         <section className="b-edit">
+          <BuilderLang.Provider value={lang}>
           {kind === 'info' && (
             <div>
               <span className="phase-tag">Info bab</span>
@@ -227,6 +240,7 @@ export default function BuilderPage() {
                 <Field label="Subjudul (di peta)"><Text value={meta.subtitle} onChange={v => changeMeta({ ...meta, subtitle: v })} /></Field>
                 <Field label="Deskripsi" full><Area value={meta.description} onChange={v => changeMeta({ ...meta, description: v })} rows={3} /></Field>
                 <Field label="Ikon"><select className="select" value={meta.icon} onChange={e => changeMeta({ ...meta, icon: e.target.value })}>{iconNames.map(n => <option key={n}>{n}</option>)}</select></Field>
+                <Field label="Bahasa bab"><div className="row gap-2" style={{ alignItems: 'center' }}><LangIcon id={lang} size={22} /><b>{LANG_BY_ID[lang]?.name}</b><span className="t-xs t-faint">mengikuti jalur · salin bab ke jalur lain untuk bahasa lain</span></div></Field>
                 <Field label="Mode Uji"><select className="select" value={draft.uji_mode} onChange={e => change({ ...draft, uji_mode: e.target.value })}><option value="any">Siswa memilih Ulangan atau Challenge</option><option value="ulangan">Wajib Ulangan</option><option value="challenge">Wajib Challenge</option></select></Field>
                 {(['pahami', 'perkuat', 'kuis', 'uji'] as const).map(p => <Field key={p} label={`Perkiraan menit · ${p}`}><Num value={draft.minutes[p]} onChange={v => change({ ...draft, minutes: { ...draft.minutes, [p]: v } })} /></Field>)}
               </div>
@@ -255,6 +269,7 @@ export default function BuilderPage() {
           {kind === 'kuis' && <KuisEditor k={draft.kuis} concepts={d.concepts} stats={d.stats.kuis} onChange={k => change({ ...draft, kuis: k })} />}
           {kind === 'challenge' && <ChallengeEditor c={draft.challenge} concepts={d.concepts} onChange={c => change({ ...draft, challenge: c })} />}
           {kind === 'ulangan' && <ExamEditor ex={draft.ulangan} concepts={d.concepts} onChange={e => change({ ...draft, ulangan: e })} />}
+          </BuilderLang.Provider>
         </section>
 
         <aside className="b-prev" aria-label="Pratinjau">
@@ -265,6 +280,13 @@ export default function BuilderPage() {
           <div className="callout mt-4"><Icon name="info" /><div className="t-xs">Pratinjau memakai komponen yang sama dengan aplikasi siswa, jadi yang kamu lihat di sini sama dengan yang dilihat siswa.</div></div>
         </aside>
       </div>
+      <QuickQuizModal open={pasteItems} onClose={() => setPasteItems(false)} target="soal Perkuat"
+        onAdd={qs => {
+          const add = qs.map((qq, i) => ({ id: `q${Date.now().toString(36)}${i}`, type: (qq.c ? 'predict' : 'choice') as AnyItem['type'], title: qq.t, code: qq.c, choices: qq.o, answer: qq.a,
+            explain: qq.e, hints: { l3: '' }, concepts: [], has_hints: [], has_solution: false, cols: qq.c ? 2 : undefined }));
+          change({ ...draft, perkuat: { items: [...items, ...add] } });
+          toast({ kind: 'success', icon: 'plus', title: `${add.length} soal ditambahkan ke Perkuat` });
+        }} />
       <Modal open={showProblems} onClose={() => setShowProblems(false)} title="Belum bisa diterbitkan" foot={<button className="btn btn-primary" onClick={() => setShowProblems(false)}>Oke</button>}>
         <ul className="problems">{problems.map((p, i) => <li key={i}>{p}</li>)}</ul>
       </Modal>

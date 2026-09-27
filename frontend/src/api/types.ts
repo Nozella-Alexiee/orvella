@@ -20,7 +20,7 @@ export type PhaseMeta = {
   score: number | null; link: string;
 };
 
-export type PlayerHeader = { chapter: ChapterRef; phases: PhaseMeta[]; xp: number; streak: number };
+export type PlayerHeader = { chapter: ChapterRef; phases: PhaseMeta[]; xp: number; streak: number; language?: string };
 
 export type ReviewCard = {
   concept: string; name: string; phase: PhaseId; source: string; note: string; tier: number; chapter: string;
@@ -53,9 +53,9 @@ export type MapNode = {
 };
 
 export type MapData = {
-  path: { slug: string; title: string; description: string }; nodes: MapNode[]; current_id: number | null;
+  path: { slug: string; title: string; description: string; language?: string; level?: string }; nodes: MapNode[]; current_id: number | null;
   summary: { chapters_done: number; chapters_total: number; phases_done: number; phases_total: number; pct: number; ring: number[] };
-  other_paths: { slug: string; title: string }[];
+  other_paths: { slug: string; title: string; language?: string }[];
 };
 
 export type Skill = { key: string; name: string; skill: string; tier: number; weak: boolean };
@@ -85,15 +85,28 @@ export type Visual =
       formula: { a: string; op: '*' | '+' | '-'; b: string }; result: string; output_prefix?: string }
   | { type: 'summary'; cards: { icon: string; title: string; body: string }[]; callout?: { icon: string; html: string } }
   | { type: 'code'; file?: string; lines: string[]; outputs?: string[] }
-  | { type: 'shelf'; name: string; items: (string | number)[]; hot?: number };
+  | { type: 'shelf'; name: string; items: (string | number)[]; hot?: number }
+  | { type: 'video'; id: string; title?: string; start?: number; end?: number; checkpoints?: Checkpoint[] }
+  | { type: 'markdown'; md: string }
+  | { type: 'run'; lang: string; code: string; stdin?: string; note?: string }
+  | { type: 'memory'; lang: string; lines: string[]; steps: MemStep[]; note?: string; template?: string }
+  | { type: 'boxmodel'; width: number; padding: number; border: number; margin: number; sizing?: 'content-box' | 'border-box' };
+
+export type Checkpoint = { t: number; q: string; o: string[]; a: number; e?: string };
+export type MemVal = { v?: string; ref?: string; ptr?: string };
+export type MemVar = MemVal & { name: string; addr?: string; moved?: boolean; type?: string };
+export type MemObj = { id: string; type: string; label?: string; items?: (MemVal & { k?: string })[]; more?: number; freed?: boolean; addr?: string };
+export type MemStep = { line: number; frames: { name: string; vars: MemVar[] }[]; heap: MemObj[]; out?: string; note?: string; event?: string; ret?: string };
 
 export type Scene = {
   id: string; kicker: string; title: string; say?: string; lead?: string; visual?: Visual;
   reveals?: { q: string; a: string }[]; steps?: { desc: string; trigger: string }[]; advance?: 'free' | 'all_tokens'; concepts?: string[];
 };
 
+export type IoTest = { id: string; name?: string; hidden?: boolean; stdin?: string; expect?: string; match?: string; pts?: number; kind?: string };
 export type Exercise = {
-  id: string; type: 'choice' | 'predict' | 'fill' | 'parsons' | 'bug' | 'slider' | 'match'; title: string; help?: string; label?: string;
+  id: string; type: 'choice' | 'predict' | 'fill' | 'parsons' | 'bug' | 'slider' | 'match' | 'code' | 'translate'; title: string; help?: string; label?: string;
+  lang?: string; starter?: string; from_lang?: string; from_code?: string; tests?: IoTest[];
   choices?: string[]; code?: string; cols?: number; tray?: { val: string; label: string }[]; lines?: (string | { id: string; code: string })[];
   error?: string; min?: number; max?: number; value?: number; var?: string; result?: { label: string; mul: number }; target?: number; lit?: number[];
   left?: { key: string; text: string }[]; right?: { key: string; text: string }[]; left_code?: boolean; right_code?: boolean;

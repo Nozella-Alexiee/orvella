@@ -54,7 +54,11 @@ def empty_content() -> dict[str, Any]:
 
 # ------------------------------------------------------------- learner views
 def perkuat_item_public(item: dict[str, Any]) -> dict[str, Any]:
-    out = {k: v for k, v in item.items() if k not in ("answer", "hints", "explain", "l6")}
+    out = {k: v for k, v in item.items() if k not in ("answer", "hints", "explain", "l6", "solution", "tests")}
+    if item.get("type") in ("code", "translate"):
+        out["tests"] = [{"id": t["id"], "name": t.get("name") or t["id"], "hidden": bool(t.get("hidden")),
+                         **({} if t.get("hidden") else {"stdin": t.get("stdin", ""), "expect": t.get("expect", "")})}
+                        for t in item.get("tests", [])]
     out["has_hints"] = [lvl for lvl in ("l3", "l4", "l5") if (item.get("hints") or {}).get(lvl)]
     out["has_solution"] = bool(item.get("l6"))
     return out
@@ -107,6 +111,8 @@ def check_perkuat(item: dict[str, Any], answer: Any) -> tuple[bool, Any]:
     if t == "slider":
         ok = _as_int(answer) == key
         return ok, {"ok": ok}
+    if t in ("code", "translate"):
+        raise ValueError("soal kode dinilai lewat runner")
     if t == "match":
         pairs = answer or []
         left = {p["key"] for p in item.get("left", [])}

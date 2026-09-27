@@ -5,7 +5,9 @@ import { Icon } from '../design/Icon';
 import { LangIcon } from '../design/LangIcon';
 import { Orvi, type Mood } from '../design/Orvi';
 import { toast } from '../design/toast';
-import { cx } from '../design/ui';
+import { cx, Modal } from '../design/ui';
+import type { MemStep } from '../api/types';
+import { MemoryViz } from '../pahami/visuals2';
 import { motion, pop, shake, sound } from '../fx';
 import { Html } from '../lib/html';
 import { COMPILED, FILE_OF, LANG_BY_ID } from '../lib/langs';
@@ -48,6 +50,16 @@ export function ProgramView({ nb, update, info }: { nb: Notebook; update: (n: No
   const runBtn = useRef<HTMLButtonElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   const running = phase === 'compile' || phase === 'run';
+  const [mem, setMem] = useState<{ lines: string[]; steps: MemStep[]; error?: string } | null>(null);
+  const [tracing, setTracing] = useState(false);
+  const showMemory = async () => {
+    setTracing(true);
+    try {
+      const r = await api.post<{ steps: MemStep[]; error: { name: string; message: string } | null }>('/api/trace', { code, stdin });
+      setMem({ lines: code.split('\n'), steps: r.steps, error: r.error ? `${r.error.name}: ${r.error.message}` : undefined });
+    } catch (e) { toast({ kind: 'danger', icon: 'memory-stick', title: 'Animasi memori belum bisa dibuat', body: e instanceof ApiError ? e.message : '' }); }
+    finally { setTracing(false); }
+  };
 
   useEffect(() => { setOut(null); setPhase('idle'); setDiag(null); setDown(null); setMood('idle'); }, [nb.id]);
 
@@ -119,6 +131,10 @@ export function ProgramView({ nb, update, info }: { nb: Notebook; update: (n: No
           <span className="cc-file"><LangIcon id={lang} size={18} />{FILE_OF[lang] || 'main'}</span>
           <span className="t-xs" style={{ color: 'var(--editor-dim)' }}>{L?.rt}</span>
           <span className="grow" />
+          {lang === 'python' && (
+            <button className={cx('btn btn-ghost btn-sm', tracing && 'is-loading')} style={{ color: 'var(--editor-dim)' }} title="Jalankan baris demi baris dan lihat isi memori" onClick={showMemory}>
+              <Icon name="memory-stick" />Lihat memori</button>
+          )}
           {info?.starters[lang] && (
             <button className="btn btn-ghost btn-sm" style={{ color: 'var(--editor-dim)' }} title="Kembalikan contoh awal"
               onClick={() => { setFiles({ code: info.starters[lang].code, stdin: info.starters[lang].stdin }); setOut(null); setPhase('idle'); }}>
@@ -235,6 +251,12 @@ export function ProgramView({ nb, update, info }: { nb: Notebook; update: (n: No
           )}
         </section>
       )}
+      <Modal open={!!mem} onClose={() => setMem(null)} title="Memori, baris demi baris" width={1080}>
+        {mem && (mem.steps.length
+          ? <>{mem.error && <div className="callout callout-warning mb-3"><Icon name="triangle-alert" /><div className="t-sm">Program berhenti karena {mem.error}. Langkah terakhir menunjukkan keadaan saat error.</div></div>}
+              <MemoryViz v={{ type: 'memory', lang: 'python', lines: mem.lines, steps: mem.steps }} /></>
+          : <p className="t-muted">{mem.error || 'Program ini tidak punya langkah untuk dianimasikan.'}</p>)}
+      </Modal>
     </div>
   );
 }

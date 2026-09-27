@@ -30,6 +30,9 @@ PRAISE = ["Mantap!", "Tepat sekali!", "Keren!", "Betul!"]
 
 # ------------------------------------------------------------------ guards
 def require_phase(db: Session, user: User, ch: Chapter, phase: str) -> tuple[ChapterProgress, dict[str, Any]]:
+    from ..models import Path
+    from ..services import paths as paths_svc
+    paths_svc.require_view(db, user, db.get(Path, ch.path_id))
     if not ch.version:
         raise HTTPException(409, {"code": "soon", "message": "Bab ini sedang disiapkan.", "redirect": "/peta"})
     if user.role == "learner" and not learning.is_unlocked(db, user, ch):
@@ -46,8 +49,10 @@ def require_phase(db: Session, user: User, ch: Chapter, phase: str) -> tuple[Cha
 
 
 def header(db: Session, user: User, ch: Chapter, prog: ChapterProgress, content: dict[str, Any]) -> dict[str, Any]:
+    from ..models import Path
     return {
         "chapter": learning.chapter_ref(ch),
+        "language": content.get("language") or db.get(Path, ch.path_id).language,
         "phases": phase_meta(db, user, ch, prog, content),
         "xp": activity.week_xp(db, user.id),
         "streak": activity.streak(db, user),
@@ -204,7 +209,13 @@ def perkuat_check(chapter_id: int, body: CheckIn, user: User = Depends(current_u
     item = content_svc.find(items, body.item_id)
     if item is None or body.item_id not in data.get("order", []):
         raise HTTPException(404, "Soal tidak ditemukan.")
-    ok, marks = content_svc.check_perkuat(item, body.answer)
+    if item.get("type") in ("code", "translate"):
+        # written code: run the item's stdin/stdout tests in the sandbox
+        res = runner.run_tests(item.get("lang") or content.get("language"), str(body.answer or ""), item.get("tests", []), user.id)
+        ok = bool(res["results"]) and all(r["pass"] for r in res["results"])
+        marks = {"results": res["results"], "logs": res["logs"][:30], "error": res["error"], "diagnostics": res.get("diagnostics", [])}
+    else:
+        ok, marks = content_svc.check_perkuat(item, body.answer)
     iid = item["id"]
     attempts = dict(data.get("attempts", {}))
     attempts[iid] = attempts.get(iid, 0) + 1

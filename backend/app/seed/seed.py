@@ -291,10 +291,16 @@ def run(reset: bool = False) -> None:
     db = SessionLocal()
     try:
         if db.scalar(select(User).limit(1)):
-            print("Database sudah berisi data. Jalankan dengan --reset untuk mengulang seed.")
+            from . import multilang
+            added = multilang.ensure(db)
+            db.commit()
+            print("Database sudah berisi data." + (f" Jalur baru ditambahkan: {', '.join(added)}." if added else " Jalankan dengan --reset untuk mengulang seed."))
             return
         s = Seeder(db)
         seed_all(s)
+        db.flush()
+        from . import multilang
+        multilang.ensure(db)
         db.commit()
         print("Seed selesai.")
         cfg = json.loads((HERE / "users.json").read_text(encoding="utf-8"))
@@ -312,7 +318,8 @@ def seed_all(s: Seeder) -> None:
     # A public deployment (e.g. behind a tunnel) sets its own demo password instead of the documented test one.
     pw = hash_password(os.environ.get("ORVELLA_DEMO_PASSWORD") or cfg["password"])
     org = s.add(Organization(name=cfg["org"]))
-    path = s.add(Path(slug="js-dasar", title="JavaScript Dasar", description="Dari console.log sampai array. 8 bab, 1 proyek, 1 ujian akhir."))
+    path = s.add(Path(slug="js-dasar", title="JavaScript Dasar", description="Dari console.log sampai array. 8 bab, 1 proyek, 1 ujian akhir.",
+                      language="javascript", level="Pemula", visibility="public"))
     db.flush()
 
     # staff
