@@ -8,7 +8,7 @@ import type { ChapterRef, PhaseMeta, PlayerHeader } from '../api/types';
 import { CodeEditor } from '../code/CodeEditor';
 import { TestRobots, type Robot } from '../code/TestRobots';
 import { Icon } from '../design/Icon';
-import { Nosi, type Mood } from '../design/Nosi';
+import { Orvi, type Mood } from '../design/Orvi';
 import { PhaseRing } from '../design/PhaseRing';
 import { toast } from '../design/toast';
 import { cx, LoadError, PhaseTag, SaveState, Skel } from '../design/ui';
@@ -190,7 +190,7 @@ export function ChapterDone({ id, out, chapter, mentor, kuis, tests }: { id: str
   const next = out.next_chapter;
   return (
     <DoneOverlay wide>
-      <div className="badge-medal"><PhaseRing values={[1, 1, 1, 1]} size={132} stroke={9} /><Nosi size="lg" mood="cheer" style={{ width: 84, height: 84 }} /></div>
+      <div className="badge-medal"><PhaseRing values={[1, 1, 1, 1]} size={132} stroke={9} /><Orvi size={110} mood="cheer" /></div>
       <div className="eyebrow mt-4">Bab {chapter.number} selesai · 4 dari 4 fase</div>
       <h2 className="big-serif mt-2" style={{ fontSize: 44 }}>{chapter.title}: <em>dikuasai</em>.</h2>
       <p className="t-muted mt-3">Pahami → Perkuat → Kuis{kuis != null ? ` ${Math.round(kuis)}%` : ''} → Challenge {tests}.{mentor ? ` Mentor kamu, ${mentor}, akan melihat kode ini.` : ''}</p>

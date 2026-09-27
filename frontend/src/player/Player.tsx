@@ -2,7 +2,7 @@ import { forwardRef, type ReactNode } from 'react';
 import { Link } from 'react-router';
 import type { PhaseId, PhaseMeta } from '../api/types';
 import { Icon } from '../design/Icon';
-import { Nosi, type Mood } from '../design/Nosi';
+import { Orvi, type Mood } from '../design/Orvi';
 import { cx, Flame } from '../design/ui';
 
 /** LessonPlayer frame: data-phase root, aura, top bar with PhaseBar, stage and a fixed footer (COMPONENTS §2). */
@@ -45,7 +45,7 @@ export function PlayerTop({ exitTo, center, right, xp, streak, mood, bump, xpRef
         <div className="row gap-3 pt-right">
           {streak !== undefined && <span className="stat-chip"><Flame />{streak}</span>}
           {xp !== undefined && <span className="stat-chip"><Icon name="zap" style={{ color: 'var(--xp)' }} /><span ref={xpRef}>{xp}</span></span>}
-          <Nosi size="sm" mood={mood} bump={bump} />
+          <Orvi size="sm" mood={mood} bump={bump} />
         </div>
       )}
     </header>

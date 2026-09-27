@@ -1,11 +1,6 @@
 /* App-level additions on top of the design package (tokens.css, base.css, components.css are copied verbatim).
    Only helpers the mockups did not need live here. */
 
-/* Self-hosted fonts (fontsource) — same families as tokens.css, variable builds first. */
-:root {
-  --font-serif: 'Newsreader Variable', 'Newsreader', 'Iowan Old Style', Georgia, serif;
-  --font-sans: 'Geist Variable', 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-}
 
 #root { min-height: 100vh; }
 .spin { animation: spin 1s linear infinite; }
@@ -21,22 +16,22 @@
 .boot { min-height: 60vh; display: grid; place-items: center; }
 
 /* code editor (CodeMirror) inside a code card, themed with the syntax tokens */
-.cm-host { background: var(--editor-bg); }
+.cm-host { background: var(--editor-bg); color: var(--syn-text); }
 .cm-host .cm-editor { font-family: var(--font-mono); font-size: 15px; line-height: 1.75; background: transparent; color: var(--syn-text); }
 .cm-host.is-sm .cm-editor { font-size: 14px; }
 .cm-host .cm-editor.cm-focused { outline: none; }
 .cm-host .cm-scroller { font-family: inherit; line-height: inherit; }
-.cm-host .cm-content { padding: 18px 0; caret-color: var(--ph-fill, var(--accent)); }
+.cm-host .cm-content { padding: 18px 0; caret-color: var(--marigold); }
 .cm-host.is-sm .cm-content { padding: 14px 0; }
-.cm-host .cm-gutters { background: transparent; border: 0; color: var(--text-faint); font-size: 12px; padding-left: 12px; }
+.cm-host .cm-gutters { background: transparent; border: 0; color: var(--editor-dim); font-size: 12px; padding-left: 12px; }
 .cm-host .cm-lineNumbers .cm-gutterElement { padding: 0 12px 0 4px; min-width: 24px; }
-.cm-host .cm-activeLine { background: color-mix(in srgb, var(--ph-soft, var(--accent-soft)) 45%, transparent); }
-.cm-host .cm-activeLineGutter { background: transparent; color: var(--text-muted); }
+.cm-host .cm-activeLine { background: rgb(255 255 255 / .045); }
+.cm-host .cm-activeLineGutter { background: transparent; color: var(--syn-text); }
 .cm-host .cm-selectionBackground, .cm-host .cm-editor.cm-focused .cm-selectionBackground, .cm-host .cm-content ::selection { background: var(--editor-selection) !important; }
-.cm-host .cm-line.is-bad { background: var(--uji-soft); }
-.cm-host .cm-gutterElement.is-bad { color: var(--uji-ink); font-weight: 700; }
-.cm-host .cm-cursor { border-left-color: var(--ph-fill, var(--accent)); border-left-width: 2px; }
-.cm-host .cm-editor .cm-placeholder { color: var(--text-faint); }
+.cm-host .cm-line.is-bad { background: color-mix(in oklab, var(--uji-fill) 24%, transparent); }
+.cm-host .cm-gutterElement.is-bad { color: #FFB2A6; font-weight: 700; }
+.cm-host .cm-cursor { border-left-color: var(--marigold); border-left-width: 2px; }
+.cm-host .cm-editor .cm-placeholder { color: var(--editor-dim); }
 .cm-host.min-320 .cm-editor { min-height: 320px; }
 
 /* builder */

@@ -16,7 +16,8 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          codemirror: ['@uiw/react-codemirror', '@codemirror/lang-javascript', '@codemirror/view', '@codemirror/state', '@codemirror/language'],
+          codemirror: ['@uiw/react-codemirror', '@codemirror/view', '@codemirror/state', '@codemirror/language'],
+          gsap: ['gsap'],
           react: ['react', 'react-dom', 'react-router', '@tanstack/react-query', 'zustand'],
         },
       },

@@ -7,7 +7,7 @@ import { api, ApiError } from '../api/client';
 import { useRefreshMe } from '../api/hooks';
 import type { ChapterRef, PlayerHeader } from '../api/types';
 import { Icon } from '../design/Icon';
-import { Nosi } from '../design/Nosi';
+import { Orvi } from '../design/Orvi';
 import { toast } from '../design/toast';
 import { cx, LoadError, Modal, PhaseTag, SaveState, Skel } from '../design/ui';
 import { confetti, pop, sound, ticker } from '../fx';
@@ -221,7 +221,7 @@ function ExamResult({ id, res, header }: { id: string; res: SubmitRes; header: P
       <div className="stage-wrap"><div className="stage">
         <section className="scene scene-enter">
           <div className="t-center">
-            <Nosi size="lg" mood={r.passed ? 'cheer' : 'think'} />
+            <Orvi size="lg" mood={r.passed ? 'cheer' : 'think'} />
             <div className="eyebrow mt-3">Ulangan terkirim · {r.used} digunakan</div>
             <div className="score-num mt-2"><span ref={scoreRef}>0</span><span className="t-faint" style={{ fontSize: '.35em' }}>/100</span></div>
             {r.passed

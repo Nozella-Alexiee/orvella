@@ -6,7 +6,7 @@ import { api, ApiError } from '../api/client';
 import { useApi, useRefreshMe } from '../api/hooks';
 import type { KuisQuestion, PhaseMeta, PlayerHeader } from '../api/types';
 import { Icon } from '../design/Icon';
-import { Nosi, type Mood } from '../design/Nosi';
+import { Orvi, type Mood } from '../design/Orvi';
 import { toast } from '../design/toast';
 import { cx, LoadError, PhaseTag, Skel } from '../design/ui';
 import { burst, confetti, motion, pop, shake, sound, ticker, xpFloat } from '../fx';
@@ -159,7 +159,7 @@ export default function KuisPage({ daily = false }: { daily?: boolean }) {
                       : <>{info!.round_size} soal trivia tentang {info!.chapter.title.toLowerCase()}. Jawab cepat untuk combo. Nilai minimal <b>{info!.pass_pct}%</b> membuka fase Uji.</>}
                 </p>
               </div>
-              <Nosi size="lg" mood="cheer" className="hide-sm" />
+              <Orvi size="lg" mood="cheer" className="hide-sm" />
             </div>
             <div className="intro-rules">
               <div><b>{daily ? 5 : review ? 3 : info!.round_size}</b><span className="t-sm t-muted">soal</span></div>
@@ -227,7 +227,7 @@ function Results({ id, res, daily, review, roundId, onRetry }: { id?: string; re
   return (
     <section className="scene scene-enter">
       <div className="t-center">
-        <Nosi size="lg" mood={res.passed || !gate ? 'cheer' : 'think'} />
+        <Orvi size="lg" mood={res.passed || !gate ? 'cheer' : 'think'} />
         <div className="eyebrow mt-3">{gate ? (res.passed ? 'Lulus kuis' : 'Belum lulus, belum masalah') : daily ? 'Kuis harian selesai' : 'Kuis ulang selesai'}</div>
         <div className="score-num mt-2"><span ref={pctRef}>0</span><span style={{ fontSize: '.4em' }} className="t-faint">%</span></div>
         <p className="t-muted mt-2">

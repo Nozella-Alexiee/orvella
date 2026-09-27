@@ -4,7 +4,7 @@ import './beranda.css';
 import { useApi, useMe } from '../api/hooks';
 import type { Home } from '../api/types';
 import { Icon } from '../design/Icon';
-import { Nosi } from '../design/Nosi';
+import { Orvi } from '../design/Orvi';
 import { PhaseRing } from '../design/PhaseRing';
 import { Avatar, EmptyState, Flame, LoadError, PhaseTag, Skel } from '../design/ui';
 import { Html } from '../lib/html';
@@ -47,10 +47,10 @@ export default function Beranda() {
     return (
       <main className="page">
         <section className="welcome">
-          <Nosi size="xl" mood="cheer" />
+          <Orvi size="xl" mood="cheer" />
           <div>
             <div className="eyebrow">Selamat datang di Orvella</div>
-            <h1 className="big-serif mt-2" style={{ fontSize: 44 }}>Halo {first}, aku <em>Nosi</em>.</h1>
+            <h1 className="big-serif mt-2" style={{ fontSize: 44 }}>Halo {first}, aku <em>Orvi</em>.</h1>
             <p className="t-lg t-muted mt-3" style={{ maxWidth: '52ch', lineHeight: 1.6 }}>Setiap bab punya 4 langkah: <b style={{ color: 'var(--pahami-ink)' }}>Pahami</b> konsepnya, <b style={{ color: 'var(--perkuat-ink)' }}>Perkuat</b> dengan latihan, <b style={{ color: 'var(--kuis-ink)' }}>Kuis</b> singkat, lalu <b style={{ color: 'var(--uji-ink)' }}>Uji</b>. Tidak ada yang dilompati.</p>
             <div className="row gap-3 mt-6 wrap">
               {start && <Link className="btn btn-primary btn-xl btn-press" to={`/bab/${start.id}/pahami`}>Mulai Bab {start.number} · {start.title}<Icon name="arrow-right" /></Link>}
@@ -73,7 +73,7 @@ export default function Beranda() {
     <main className="page">
       <div className="greet">
         <div><div className="eyebrow">{todayLabel()}</div><h1 className="big-serif mt-2" style={{ fontSize: 44 }}>{greeting()}, <em>{first}</em>.</h1></div>
-        <div className="hint-row" style={{ margin: 0 }}><Html as="div" className="balloon" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }} html={h.nudge} /><Nosi mood="happy" /></div>
+        <div className="hint-row" style={{ margin: 0 }}><Html as="div" className="balloon" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }} html={h.nudge} /><Orvi mood="happy" /></div>
       </div>
 
       {c ? (
@@ -94,7 +94,7 @@ export default function Beranda() {
           </div>
         </section>
       ) : (
-        <section className="continue"><div className="stack gap-3"><h2 className="big-serif" style={{ fontSize: 36, margin: 0 }}>Semua bab yang terbit sudah selesai.</h2><p className="t-muted">Bab berikutnya sedang disiapkan. Sambil menunggu, coba Playground atau ulas konsep yang perlu diulang.</p><div className="row gap-2"><Link className="btn btn-primary btn-lg btn-press" to="/peta">Lihat peta</Link><Link className="btn btn-ghost btn-lg" to="/playground">Playground</Link></div></div><Nosi size="xl" mood="cheer" /></section>
+        <section className="continue"><div className="stack gap-3"><h2 className="big-serif" style={{ fontSize: 36, margin: 0 }}>Semua bab yang terbit sudah selesai.</h2><p className="t-muted">Bab berikutnya sedang disiapkan. Sambil menunggu, coba Playground atau ulas konsep yang perlu diulang.</p><div className="row gap-2"><Link className="btn btn-primary btn-lg btn-press" to="/peta">Lihat peta</Link><Link className="btn btn-ghost btn-lg" to="/playground">Playground</Link></div></div><Orvi size="xl" mood="cheer" /></section>
       )}
 
       <div className="widgets">

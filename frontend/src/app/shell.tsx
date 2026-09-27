@@ -1,9 +1,10 @@
-﻿import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { Icon } from '../design/Icon';
 import { Avatar, Flame } from '../design/ui';
+import { LogoMark } from '../design/LogoMark';
 import { useApi, useMe } from '../api/hooks';
 import { api } from '../api/client';
 import { usePrefs } from '../state/prefs';
@@ -25,7 +26,7 @@ const MENTOR: NavItem[] = [
 ];
 
 export function Logo({ to }: { to: string }) {
-  return <Link className="logo" to={to}><span className="logo-glyph" /><span className="logo-word">orvella</span></Link>;
+  return <Link className="logo" to={to} aria-label="Orvella"><LogoMark /><span className="logo-word">Orvella</span></Link>;
 }
 
 /** Top navigation (learner / mentor) with the sliding pill, plus the mobile tab bar. */

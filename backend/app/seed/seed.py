@@ -362,7 +362,7 @@ def seed_all(s: Seeder) -> None:
     for p in cfg["learners"]:
         people[p["story"]] = s.add(User(email=p["email"], name=p["name"], password_hash=pw, role="learner", org_id=org.id, class_id=xii.id,
                                         avatar=p["avatar"], onboarded=True, goal="sekolah", daily_goal_min=20,
-                                        prefs={"nosi": True, "reminders": True, "mentor_sees_wrong": True, "language": "id"},
+                                        prefs={"orvi": True, "reminders": True, "mentor_sees_wrong": True, "language": "id"},
                                         created_at=ago(days=46 + rng.randint(0, 6)), last_active_at=ago(hours=3)))
     db.flush()
     story_nadia(s, people["nadia"], mentor)
@@ -397,7 +397,7 @@ def finish_bab1(s: Seeder, u: User, start_days: int, mentor: User | None = None,
     r = s.kuis_round(u, "halo", kuis_wrong or [], t0 + timedelta(days=1))
     s.xp(u, r.score // 20, "Kuis · Halo, JavaScript", t0 + timedelta(days=1))
     s.xp(u, 60, "kuis selesai · Halo, JavaScript", t0 + timedelta(days=1))
-    code = '// Kartu perkenalan Nosi\nconsole.log("Halo, aku Nosi");\nconsole.log(2025 - 2010);\n'
+    code = '// Kartu perkenalan Orvi\nconsole.log("Halo, aku Orvi");\nconsole.log(2025 - 2010);\n'
     s.attempt(u, "halo", "challenge", "challenge", False, t0 + timedelta(days=1, minutes=10), n=1,
               answer={"code": code.replace("2025 - 2010", "15"), "passed": 3, "total": 4, "error": None})
     s.attempt(u, "halo", "challenge", "challenge", True, t0 + timedelta(days=1, minutes=14), n=2, answer={"code": code, "passed": 4, "total": 4, "error": None})
@@ -593,7 +593,7 @@ def generic_class(s: Seeder, klass: Klass, n: int, pw: str, org: Organization, o
         email = name.lower().replace(" ", ".") + "@smksig.sch.id"
         u = s.add(User(email=email, name=name, password_hash=pw, role="learner", org_id=org.id, class_id=klass.id,
                        avatar=rng.choice(["", "a2", "a3", "a4", "a5"]), onboarded=True, goal="sekolah", daily_goal_min=rng.choice([10, 20, 20, 30]),
-                       prefs={"nosi": True, "reminders": True, "mentor_sees_wrong": True, "language": "id"}, created_at=ago(days=40 + rng.randint(0, 8))))
+                       prefs={"orvi": True, "reminders": True, "mentor_sees_wrong": True, "language": "id"}, created_at=ago(days=40 + rng.randint(0, 8))))
         s.db.flush()
         stalled = where in ("perkuat", "bab1") and i % 7 == 3
         last = ago(days=rng.randint(8, 9)) if stalled else ago(hours=rng.randint(1, 40))

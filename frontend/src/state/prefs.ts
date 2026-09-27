@@ -15,19 +15,19 @@ type Prefs = {
   theme: ThemeChoice;
   motion: MotionLevel;
   sound: boolean;
-  nosi: boolean;
+  orvi: boolean;
   setTheme: (t: ThemeChoice) => void;
   toggleTheme: () => void;
   setMotion: (m: MotionLevel) => void;
   setSound: (on: boolean) => void;
-  setNosi: (on: boolean) => void;
+  setOrvi: (on: boolean) => void;
 };
 
 export const usePrefs = create<Prefs>((set, get) => ({
   theme: (read('orvella-theme') as ThemeChoice) || 'system',
   motion: motion(),
   sound: soundOn(),
-  nosi: read('orvella-nosi') !== 'off',
+  orvi: read('orvella-orvi') !== 'off',
   setTheme: t => { write('orvella-theme', t); applyTheme(t); set({ theme: t }); },
   toggleTheme: () => {
     const cur = document.documentElement.dataset.theme === 'ink' ? 'ink' : 'paper';
@@ -35,7 +35,7 @@ export const usePrefs = create<Prefs>((set, get) => ({
   },
   setMotion: m => { setMotion(m); set({ motion: m }); },
   setSound: on => { setSound(on); set({ sound: on }); },
-  setNosi: on => { write('orvella-nosi', on ? 'on' : 'off'); set({ nosi: on }); },
+  setOrvi: on => { write('orvella-orvi', on ? 'on' : 'off'); set({ orvi: on }); },
 }));
 
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { PhaseRing } from '../design/PhaseRing';
-import { Nosi, type Mood } from '../design/Nosi';
+import { Orvi, type Mood } from '../design/Orvi';
 import { motion, rise } from '../fx';
 
 const STEPS: [string, string, string, number[], Mood][] = [
@@ -10,7 +10,7 @@ const STEPS: [string, string, string, number[], Mood][] = [
   ['uji', 'Fase 4', 'Lalu buktikan.', [1, 1, 1, 1], 'cheer'],
 ];
 
-/** Right panel of the auth screens: cycles phase colour, ring and Nosi every 3.2 s. */
+/** Right panel of the auth screens: cycles phase colour, ring and Orvi every 3.2 s. */
 export function AuthOrbit() {
   const [k, setK] = useState(0);
   const title = useRef<HTMLDivElement>(null);
@@ -25,7 +25,7 @@ export function AuthOrbit() {
     <aside className="auth-right" data-phase={ph} aria-hidden="true">
       <div className="orbit">
         <PhaseRing values={ring} size={360} stroke={14} />
-        <Nosi mood={mood} bump={k} style={{ width: 170, height: 170 }} force />
+        <Orvi mood={mood} bump={k} size={240} force />
       </div>
       <div className="orbit-cap"><div className="eyebrow">{key}</div><div className="big-serif mt-2" style={{ fontSize: 34 }} ref={title}>{t}</div></div>
     </aside>

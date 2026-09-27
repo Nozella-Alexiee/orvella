@@ -3,7 +3,7 @@ import { Link, useLocation, useParams } from 'react-router';
 import { useApi } from '../api/hooks';
 import type { ChapterOverview, PhaseMeta } from '../api/types';
 import { Icon } from '../design/Icon';
-import { Nosi } from '../design/Nosi';
+import { Orvi } from '../design/Orvi';
 import { PhaseRing } from '../design/PhaseRing';
 import { toast } from '../design/toast';
 import { cx, LoadError, Mastery, PhaseTag, Skel } from '../design/ui';
@@ -85,7 +85,7 @@ export default function Bab() {
             <span className="t-sm t-faint">{d.completed ? `Bab selesai · ±${d.eta.total} menit total` : `±${d.eta.total} menit total · sisa ±${left} menit`}</span>
           </div>
         </div>
-        <div className="t-center"><PhaseRing values={d.ring} size={220} stroke={14}><Nosi size="lg" mood={d.completed ? 'cheer' : 'happy'} style={{ width: 110, height: 110 }} /></PhaseRing></div>
+        <div className="t-center"><PhaseRing values={d.ring} size={220} stroke={14}><Orvi size={150} mood={d.completed ? 'cheer' : 'happy'} /></PhaseRing></div>
       </section>
 
       <section className="journey" aria-label="Empat fase bab ini">

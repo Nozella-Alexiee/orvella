@@ -6,7 +6,7 @@ import { api, ApiError } from '../api/client';
 import { useRefreshMe } from '../api/hooks';
 import type { Exercise, PhaseMeta, PlayerHeader } from '../api/types';
 import { Icon } from '../design/Icon';
-import { Nosi, type Mood } from '../design/Nosi';
+import { Orvi, type Mood } from '../design/Orvi';
 import { toast } from '../design/toast';
 import { cx, LoadError, Modal, Skel } from '../design/ui';
 import { burst, confetti, correct, pop, sound, ticker, wrong } from '../fx';
@@ -188,7 +188,7 @@ export default function PerkuatPage() {
           {solution && <div className="solution"><div className="eyebrow" style={{ color: 'var(--kuis-ink)' }}>Jawaban lengkap · L6</div><Html as="div" className="t-sm mt-2" html={solution} /></div>}
         </section>
         {hint && (
-          <div className="hint-row"><Nosi mood="think" /><div className="balloon"><span className="lvl">Petunjuk · L{hint.level || '–'}</span><Html html={hint.text} /></div></div>
+          <div className="hint-row"><Orvi mood="think" /><div className="balloon"><span className="lvl">Petunjuk · L{hint.level || '–'}</span><Html html={hint.text} /></div></div>
         )}
       </div></main>
 
@@ -231,7 +231,7 @@ function PerkuatDone({ id, res }: { id: string; res: Complete }) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <DoneOverlay>
-      <Nosi size="xl" mood="cheer" />
+      <Orvi size="xl" mood="cheer" />
       <div className="eyebrow mt-4">Fase 2 dari 4 selesai</div>
       <h2 className="big-serif mt-2" style={{ fontSize: 44 }}>Pemahamanmu <em style={{ color: 'var(--perkuat-ink)' }}>makin kuat</em>.</h2>
       <div className="done-stats"><div><b ref={acc}>0</b><span className="t-xs t-faint">% tepat</span></div><div><b ref={first}>0</b><span className="t-xs t-faint">benar di coba 1</span></div><div><b style={{ color: 'var(--xp)' }}>+<span ref={xp}>0</span></b><span className="t-xs t-faint">XP</span></div></div>
@@ -246,7 +246,7 @@ function MiniDone({ id, res, onBack }: { id: string; res: Complete; onBack: () =
   useEffect(() => { sound('done'); pop(document.querySelector('.done-card')); }, []);
   return (
     <DoneOverlay>
-      <Nosi size="lg" mood="happy" />
+      <Orvi size="lg" mood="happy" />
       <div className="eyebrow mt-4">Perkuat mini selesai</div>
       <h2 className="big-serif mt-2" style={{ fontSize: 40 }}>Konsepnya sudah <em>diulang</em>.</h2>
       <p className="t-muted mt-3">{res.first_try} dari {res.total} benar di percobaan pertama.</p>

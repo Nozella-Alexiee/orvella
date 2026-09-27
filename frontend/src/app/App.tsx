@@ -6,7 +6,7 @@ import { AdminLayout, AppNav, CommandPalette } from './shell';
 import { ToastStack } from '../design/toast';
 import { Boot, homeFor } from './common';
 
-const Landing = lazy(() => import('../pages/Landing'));
+const Landing = lazy(() => import('../pages/landing/LandingPage'));
 const Auth = lazy(() => import('../pages/Auth'));
 const Onboarding = lazy(() => import('../pages/Onboarding'));
 const Beranda = lazy(() => import('../pages/Beranda'));

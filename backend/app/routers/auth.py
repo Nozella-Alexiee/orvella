@@ -13,7 +13,7 @@ from ..views import me_view
 
 router = APIRouter(prefix="/api", tags=["auth"])
 
-DEFAULT_PREFS = {"nosi": True, "reminders": True, "mentor_sees_wrong": True, "language": "id"}
+DEFAULT_PREFS = {"orvi": True, "reminders": True, "mentor_sees_wrong": True, "language": "id"}
 
 
 class RegisterIn(BaseModel):

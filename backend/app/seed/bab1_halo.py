@@ -168,13 +168,13 @@ EXAM = [
 
 CHALLENGE = {
     "title": "Kartu perkenalan", "minutes": 8, "difficulty": "mudah", "filename": "kenalan.js",
-    "art": {"kind": "board", "title": "KARTU KENALAN", "name": "Nosi", "value": "15"},
-    "story": "Kelasmu membuat papan kenalan digital. Setiap siswa menulis program kecil yang menampilkan kartu perkenalan. Kali ini kamu membuatkan kartu untuk Nosi.",
-    "steps": [f"Tampilkan {ic('Halo, aku Nosi')}.", f"Tampilkan umur Nosi dengan <b>menghitung</b> {ic('2025 - 2010')}, bukan mengetik 15.",
+    "art": {"kind": "board", "title": "KARTU KENALAN", "name": "Orvi", "value": "15"},
+    "story": "Kelasmu membuat papan kenalan digital. Setiap siswa menulis program kecil yang menampilkan kartu perkenalan. Kali ini kamu membuatkan kartu untuk Orvi.",
+    "steps": [f"Tampilkan {ic('Halo, aku Orvi')}.", f"Tampilkan umur Orvi dengan <b>menghitung</b> {ic('2025 - 2010')}, bukan mengetik 15.",
               "Pastikan output persis 2 baris."],
-    "starter": "// Kartu perkenalan Nosi\n// 1. Tampilkan: Halo, aku Nosi\n// 2. Tampilkan hasil hitungan 2025 - 2010\n\n",
+    "starter": "// Kartu perkenalan Orvi\n// 1. Tampilkan: Halo, aku Orvi\n// 2. Tampilkan hasil hitungan 2025 - 2010\n\n",
     "tests": [
-        {"id": "t1", "name": f"Baris 1: {mono('Halo, aku Nosi')}", "kind": "stdout_line", "line": 1, "equals": "Halo, aku Nosi", "fail": 'baris 1: "${__logs[0]}"', "hidden": False, "weight": 1},
+        {"id": "t1", "name": f"Baris 1: {mono('Halo, aku Orvi')}", "kind": "stdout_line", "line": 1, "equals": "Halo, aku Orvi", "fail": 'baris 1: "${__logs[0]}"', "hidden": False, "weight": 1},
         {"id": "t2", "name": "Umur dihitung, bukan diketik", "kind": "source_regex", "pattern": r"2025\s*-\s*2010", "fail": "tidak ada hitungan 2025 - 2010", "hidden": False, "weight": 1},
         {"id": "t3", "name": "Baris 2 adalah 15", "kind": "stdout_line", "line": 2, "equals": "15", "fail": 'baris 2: "${__logs[1]}"', "hidden": False, "weight": 1},
         {"id": "t4", "name": "Output persis 2 baris", "kind": "stdout_count", "equals": 2, "fail": "ada ${__logs.length} baris output", "hidden": True, "weight": 1},

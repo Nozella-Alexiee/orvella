@@ -5,7 +5,7 @@ import { api, ApiError } from '../api/client';
 import { useMe } from '../api/hooks';
 import type { Me } from '../api/types';
 import { Icon } from '../design/Icon';
-import { Nosi, type Mood } from '../design/Nosi';
+import { Orvi, type Mood } from '../design/Orvi';
 import { toast } from '../design/toast';
 import { Avatar, cx, Modal, Switch } from '../design/ui';
 import { burst, confetti, pop, shake, sound, xpFloat, type MotionLevel } from '../fx';
@@ -99,20 +99,20 @@ export default function Pengaturan() {
           <section className="set-sec" id="motion">
             <h2>Animasi &amp; suara</h2><p className="t-sm t-muted">Animasi di Orvella selalu menandakan sesuatu. Pilih seberapa ramai yang nyaman untukmu.</p>
             <div className="intensity" role="radiogroup">
-              {([['full', 'sparkles', 'Penuh', 'Partikel, konfeti, tilt, Nosi bergerak'], ['calm', 'wind', 'Kalem', 'Transisi halus saja, tanpa efek ramai'], ['off', 'pause', 'Mati', 'Hanya warna dan teks. Mengikuti “kurangi gerakan”.']] as const).map(([m, ic, l, s]) => (
+              {([['full', 'sparkles', 'Penuh', 'Partikel, konfeti, tilt, Orvi bergerak'], ['calm', 'wind', 'Kalem', 'Transisi halus saja, tanpa efek ramai'], ['off', 'pause', 'Mati', 'Hanya warna dan teks. Mengikuti “kurangi gerakan”.']] as const).map(([m, ic, l, s]) => (
                 <button key={m} role="radio" aria-checked={p.motion === m} aria-pressed={p.motion === m} onClick={() => setIntensity(m, l)}><Icon name={ic} className="t-accent" /><b>{l}</b><span className="t-xs t-muted">{s}</span></button>
               ))}
             </div>
             <div className="preview-zone">
-              <Nosi mood={mood} bump={bump} force />
+              <Orvi mood={mood} bump={bump} force />
               <button ref={okRef} className="btn btn-ok btn-lg btn-press" onClick={() => { burst(okRef.current); pop(okRef.current); setMood('happy'); setBump(b => b + 1); xpFloat(okRef.current, '+10 XP'); sound('ok'); }}>Coba: jawaban benar</button>
               <button ref={noRef} className="btn btn-secondary btn-lg btn-press" onClick={() => { shake(noRef.current); setMood('oops'); setBump(b => b + 1); sound('no'); }}>Coba: jawaban salah</button>
               <button className="btn btn-ghost btn-lg" onClick={() => { confetti(); setMood('cheer'); setBump(b => b + 1); sound('done'); }}>Coba: fase selesai</button>
             </div>
             <div className="set-row mt-2"><div><div className="t-h4">Suara efek</div><div className="t-sm t-muted">Bunyi pendek saat benar, salah, dan selesai.</div></div>
               <Switch checked={p.sound} label="Suara efek" onChange={v => { p.setSound(v); if (v) sound('ok'); }} /></div>
-            <div className="set-row"><div><div className="t-h4">Tampilkan Nosi</div><div className="t-sm t-muted">Maskot di pelajaran. Petunjuk tetap tersedia walau Nosi disembunyikan.</div></div>
-              <Switch checked={p.nosi} label="Tampilkan Nosi" onChange={v => { p.setNosi(v); patch({ prefs: { nosi: v } }); }} /></div>
+            <div className="set-row"><div><div className="t-h4">Tampilkan Orvi</div><div className="t-sm t-muted">Maskot di pelajaran. Petunjuk tetap tersedia walau Orvi disembunyikan.</div></div>
+              <Switch checked={p.orvi} label="Tampilkan Orvi" onChange={v => { p.setOrvi(v); patch({ prefs: { orvi: v } }); }} /></div>
           </section>
 
           {learner && (

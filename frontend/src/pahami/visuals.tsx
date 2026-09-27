@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import type { Visual } from '../api/types';
 import { Icon } from '../design/Icon';
-import type { Mood } from '../design/Nosi';
+import type { Mood } from '../design/Orvi';
 import { cx } from '../design/ui';
 import { burst, flyTo, pop, rise, shake } from '../fx';
 import { fill } from '../lib/calc';

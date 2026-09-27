@@ -77,7 +77,7 @@ class User(Base):
     goal: Mapped[str] = mapped_column(String(40), default="")
     daily_goal_min: Mapped[int] = mapped_column(Integer, default=20)
     assist_cap: Mapped[int] = mapped_column(Integer, default=6)  # mentor-set hint cap for Perkuat / Playground
-    prefs: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)  # nosi, reminders, mentor_sees_wrong, language
+    prefs: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)  # orvi, reminders, mentor_sees_wrong, language
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
     last_active_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

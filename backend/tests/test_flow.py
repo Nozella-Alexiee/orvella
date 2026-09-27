@@ -111,9 +111,9 @@ def test_full_chapter(client):
     # Challenge (L1 only): a wrong program, then the right one
     ch = client.get("/api/chapters/1/challenge").json()
     assert all("kind" not in t for t in ch["challenge"]["tests"])
-    bad = client.post("/api/chapters/1/challenge/run", json={"code": 'console.log("Halo, aku Nosi")\nconsole.log(15)'}).json()
+    bad = client.post("/api/chapters/1/challenge/run", json={"code": 'console.log("Halo, aku Orvi")\nconsole.log(15)'}).json()
     assert bad["passed"] == 3 and not bad["all_pass"]
-    good = client.post("/api/chapters/1/challenge/run", json={"code": 'console.log("Halo, aku Nosi");\nconsole.log(2025 - 2010);'}).json()
+    good = client.post("/api/chapters/1/challenge/run", json={"code": 'console.log("Halo, aku Orvi");\nconsole.log(2025 - 2010);'}).json()
     assert good["all_pass"] and good["chapter_done"] and good["next_chapter"]["number"] == 2
     assert client.get("/api/chapters/2").status_code == 200  # Bab 2 unlocked
     home = client.get("/api/home").json()

@@ -7,7 +7,7 @@ import type { ChapterRef } from '../api/types';
 import { CodeEditor } from '../code/CodeEditor';
 import { runLocal, type LocalRun } from '../code/runLocal';
 import { Icon } from '../design/Icon';
-import { Nosi } from '../design/Nosi';
+import { Orvi } from '../design/Orvi';
 import { cx, LoadError, Modal, SaveState, Skel } from '../design/ui';
 import { pop, shake } from '../fx';
 import { Html, clean } from '../lib/html';
@@ -145,7 +145,7 @@ export default function Playground() {
             </Link>
           ))}
           <div className="eyebrow mt-6" style={{ padding: '0 12px' }}>Tentang playground</div>
-          <p className="t-xs t-faint mt-2" style={{ padding: '0 12px', lineHeight: 1.6 }}>Ngoding bebas tanpa nilai. Semua bantuan Nosi terbuka. Kamu bisa melampirkan bab kalau ingin petunjuk yang nyambung.</p>
+          <p className="t-xs t-faint mt-2" style={{ padding: '0 12px', lineHeight: 1.6 }}>Ngoding bebas tanpa nilai. Semua bantuan Orvi terbuka. Kamu bisa melampirkan bab kalau ingin petunjuk yang nyambung.</p>
         </aside>
 
         {!nb ? <section><Skel h={34} w={260} /><Skel h={48} w="70%" className="mt-4" /><Skel h={160} r={16} className="mt-6" /></section> : (
@@ -170,7 +170,7 @@ export default function Playground() {
 
             {!nb.cells.length ? (
               <div className="card mt-6"><div className="empty" style={{ padding: '56px 24px' }}>
-                <Nosi size="lg" mood="happy" />
+                <Orvi size="lg" mood="happy" />
                 <div className="t-h3 mt-3">Kertas kosong. Mau coba apa?</div>
                 <p>Tulis kode apa saja lalu tekan jalankan. Tidak ada nilai, tidak ada yang salah.</p>
                 <div className="row gap-2 mt-4 wrap center">
@@ -208,9 +208,9 @@ export default function Playground() {
                             )}
                             {r?.error && r.diag && (
                               <div className="diag">
-                                <Nosi size="sm" mood="think" force />
+                                <Orvi size="sm" mood="think" force />
                                 <div className="t-sm">
-                                  <span className="eyebrow" style={{ color: 'var(--kuis-ink)' }}>Nosi · penjelasan (L2)</span>
+                                  <span className="eyebrow" style={{ color: 'var(--kuis-ink)' }}>Orvi · penjelasan (L2)</span>
                                   {r.diag.available ? <Html as="div" className="mt-1" html={r.diag.text} />
                                     : <div className="mt-1">{r.diag.reason === 'capped' ? 'Mentormu membatasi penjelasan di playground. Pesan error di atas tetap akurat.' : 'Penjelasan belum tersedia saat ini. Pesan error di atas tetap akurat, dan petunjuk tertulis masih bisa dibuka.'}</div>}
                                   {r.diag.fix && (

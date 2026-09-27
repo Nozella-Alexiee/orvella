@@ -1,213 +1,236 @@
-﻿/* =========================================================================
-   Orvella — Design Tokens  (v2.0 · "Soft Playful Intellect")
-   Single source of truth. Components must reference SEMANTIC tokens only
-   (never raw hex). Two first-class themes:
-     • Paper  — light, default           → :root
-     • Ink    — dark, warm neutrals      → :root[data-theme="ink"]
-   Theme resolution (see README): saved preference → prefers-color-scheme → Paper.
-   Any element can be a theme "island": <div data-theme="ink"> … </div>.
-   Learning phases (Pahami · Perkuat · Kuis · Uji) each get -ink/-fill/-soft/-line;
-   components read them through --ph-* scoped by [data-phase] (components.css).
+/* =========================================================================
+   Orvella — Design Tokens ("Ceria hangat" + Malam)
+   Sumber desain: design/mockups/css/tokens.css. Nama token semantik lama
+   (--bg, --surface, --text, --accent, --pahami-*, ...) dipertahankan supaya
+   semua komponen ikut berganti; token khas Orvella (--marigold, --lilac,
+   --lang-*, --code-*, --orvi-*) ditambahkan di bawahnya.
+   Tema: Terang = :root  ·  Malam = :root[data-theme="ink"] (diset oleh prefs.ts)
    ========================================================================= */
 
-
 :root,
-[data-theme="paper"] {  /* also usable as a "paper island" */
+[data-theme="paper"] {
   color-scheme: light;
 
-  /* ---- Surfaces ------------------------------------------------------- */
-  --bg: #F7F6F2;               /* app canvas — warm paper */
-  --surface: #FFFFFF;          /* panels, cards, inputs */
-  --surface-raised: #FFFFFF;   /* popovers, palette, modals (+ shadow) */
-  --surface-sunken: #F0EEE8;   /* wells, code blocks in prose, table headers */
-  --surface-hover: #F3F1EC;    /* row / item hover */
-  --surface-active: #ECE9E2;   /* pressed / selected-neutral */
-  --overlay: #1F1E1B;          /* modal scrim, used at 32% */
+  /* ---- Permukaan ------------------------------------------------------ */
+  --bg: #FDF4E3;               /* susu hangat */
+  --surface: #FFFBF4;
+  --surface-raised: #FFFCF7;
+  --surface-sunken: #F6E8CC;
+  --surface-hover: #FAEDD5;
+  --surface-active: #F3E2C1;
+  --overlay: #1E1C45;
 
-  /* ---- Lines ---------------------------------------------------------- */
-  --border: #E6E3DB;
-  --border-strong: #D3CFC4;
-  --divider: #EDEBE5;
+  /* ---- Garis ---------------------------------------------------------- */
+  --border: #EBDABB;
+  --border-strong: #D8C19A;
+  --divider: #F0E2C6;
 
-  /* ---- Text ----------------------------------------------------------- */
-  --text: #1F1E1B;             /* ink — never pure black */
-  --text-muted: #5C5A53;
-  --text-faint: #8A877E;       /* meta only, ≥3:1 — never body copy */
-  --text-inverse: #F7F6F2;
+  /* ---- Teks ----------------------------------------------------------- */
+  --text: #1E1C45;             /* nila tua */
+  --text-muted: #4A4770;
+  --text-faint: #6A6588;
+  --text-inverse: #FFF8EA;
 
-  /* ---- Accent: Ink Indigo -------------------------------------------- */
-  --accent: #3E4C8A;
-  --accent-hover: #34417A;
-  --accent-soft: #E7E9F4;
-  --accent-line: #C5CBE6;
+  /* ---- Aksen: lilac (tautan, fokus, progres). Tombol utama memakai --btn-bg */
+  --accent: #4B3FCF;
+  --accent-hover: #3E33B5;
+  --accent-soft: #E9E5FF;
+  --accent-line: #CEC6F8;
   --on-accent: #FFFFFF;
 
-  /* ---- Semantic ------------------------------------------------------- */
-  --success: #36704B;  --success-soft: #E5EFE8;  --success-line: #BFD6C6;   /* sage  */
-  --warning: #8F6414;  --warning-soft: #F6EEDC;  --warning-line: #E4D0A4;   /* ochre — also Hints */
-  --danger:  #B0452E;  --danger-soft:  #F7E7E1;  --danger-line:  #E6C2B6;   /* clay  */
+  /* ---- Merek ---------------------------------------------------------- */
+  --marigold: #FFB224; --marigold-deep: #EE8A00; --marigold-soft: #FFE6AE; --marigold-ink: #7A4200;
+  --lilac: #7466EC; --lilac-soft: #E9E5FF; --lilac-ink: #4633C0;
+  --pip: #EEE9FF; --pip-shade: #C8BDF4;
+  --btn-bg: #1E1C45; --btn-ink: #FFF8EA; --btn-lip: #0F0E2B;
+
+  /* ---- Semantik ------------------------------------------------------- */
+  --success: #0B6A4C;  --success-soft: #D3F3E6;  --success-line: #97DDC3;
+  --warning: #7A4200;  --warning-soft: #FFE6AE;  --warning-line: #F5CF7A;
+  --danger:  #AE2A1B;  --danger-soft:  #FFE1DA;  --danger-line:  #FCB4A8;
   --info: var(--accent); --info-soft: var(--accent-soft);
 
+  /* ---- Fase: Pahami → Perkuat → Kuis → Uji ---------------------------- */
+  --pahami-ink: #0B5AA6;  --pahami-fill: #3E9BF0;  --pahami-soft: #DDEEFE;  --pahami-line: #A8D2FA;
+  --perkuat-ink: #0B6A4C; --perkuat-fill: #1FB488; --perkuat-soft: #D3F3E6; --perkuat-line: #97DDC3;
+  --kuis-ink: #5A2BC7;    --kuis-fill: #8D5CF6;    --kuis-soft: #ECE4FF;    --kuis-line: #CBB8FB;
+  --uji-ink: #AE2A1B;     --uji-fill: #FF6A55;     --uji-soft: #FFE1DA;     --uji-line: #FCB4A8;
+  --xp: #EE8A00;
 
-  /* ---- Learning phases: Pahami → Perkuat → Kuis → Uji ------------------
-     -ink  : text/icons on surface or -soft (≥4.5:1)
-     -fill : rings, bars, big shapes (≥3:1 on surface)
-     -soft : tinted backgrounds · -line : tinted borders */
-  --pahami-ink: #3E4C8A;  --pahami-fill: #5563C9;  --pahami-soft: #EAECF8;  --pahami-line: #C9CEEE;
-  --perkuat-ink: #2F6843; --perkuat-fill: #4A9265; --perkuat-soft: #E3F0E7; --perkuat-line: #BCD9C4;
-  --kuis-ink: #83550A;    --kuis-fill: #B7790C;    --kuis-soft: #FAF0DB;    --kuis-line: #EDD6A6;
-  --uji-ink: #A23E28;     --uji-fill: #D0603F;     --uji-soft: #FBE9E3;     --uji-line: #F0C6B9;
-  --xp: #B7790C;          /* XP, streak flame — shares Kuis amber */
+  --mode-project: #1F988A;
 
-  /* ---- Project accent (slate teal) ------------------------------------ */
-  --mode-project: #2F6773;
+  /* ---- Bahasa --------------------------------------------------------- */
+  --lang-python: #3470C9; --lang-python-2: #FFD447; --lang-javascript: #EDC21B; --lang-html: #EE5F2C;
+  --lang-css: #7A4FD6; --lang-c: #4B7392; --lang-cpp: #3353C3; --lang-rust: #B4461C; --lang-java: #D63B3B;
+  --lang-go: #10A0C4; --lang-sql: #1F988A; --lang-kotlin: #B13FCC; --lang-php: #6C7CC2;
 
-  /* ---- Code cards + syntax ("Orvella Paper") --------------------------- */
-  --editor-bg: #FDFCFA;
-  --editor-selection: #DCE0F2;
-  --syn-text: #2A2925;
-  --syn-keyword: #3E4C8A;
-  --syn-string: #36704B;
-  --syn-number: #8F6414;
-  --syn-function: #A2442C;
-  --syn-property: #2F6773;
-  --syn-comment: #858279;
-  --syn-punct: #6B6860;
+  /* ---- Kartu kode: "papan tulis" nila di kedua tema --------------------- */
+  --editor-bg: #1F1C47;
+  --editor-bg-2: #28255A;
+  --editor-line: #37336C;
+  --editor-dim: #9B95C4;
+  --editor-selection: #423D86;
+  /* sintaks di permukaan terang (blok Parsons, pilihan jawaban, token); papan kode memakai palet di bawah */
+  --syn-text: #1E1C45;
+  --syn-keyword: #5A2BC7;
+  --syn-string: #0B6A4C;
+  --syn-number: #A04E00;
+  --syn-function: #0B5AA6;
+  --syn-property: #7A4200;
+  --syn-comment: #6A6588;
+  --syn-punct: #4A4770;
+  --syn-type: #AE2A1B;
 
-  /* ---- Data viz (categorical, in order) ------------------------------- */
-  --viz-1: #3E4C8A; --viz-2: #3F7A55; --viz-3: #B0822A; --viz-4: #B0452E; --viz-5: #2F6773;
-  --viz-track: #ECE9E2;
+  /* ---- Orvi ----------------------------------------------------------- */
+  --orvi-hi: #FFF3C9; --orvi-mid: #FFC53D; --orvi-lo: #F28C00; --orvi-face: #2A1F4E; --orvi-cheek: #FF7E62;
+  --orvi-tint: #7466EC; --orvi-glow-op: .42;
+  --sheen: rgb(255 255 255 / .42);
+  --sh-rgb: 94 62 16;
 
-  /* ---- Focus ---------------------------------------------------------- */
-  --focus-ring: #3E4C8A;
+  /* ---- Data viz ------------------------------------------------------- */
+  --viz-1: #4B3FCF; --viz-2: #1FB488; --viz-3: #EE8A00; --viz-4: #FF6A55; --viz-5: #3E9BF0;
+  --viz-track: #F0E1C3;
 
-  /* ---- Elevation (borders first; shadow only for floating layers) ----- */
+  --focus-ring: #7466EC;
+
+  /* ---- Elevasi "clay" ------------------------------------------------- */
   --shadow-none: none;
-  --shadow-pop: 0 1px 2px rgba(31, 30, 27, .04), 0 8px 24px -6px rgba(31, 30, 27, .10);
-  --shadow-modal: 0 2px 4px rgba(31, 30, 27, .04), 0 24px 48px -12px rgba(31, 30, 27, .18);
+  --shadow-1: 0 1px 2px rgb(var(--sh-rgb) / .10), 0 2px 6px -2px rgb(var(--sh-rgb) / .10);
+  --shadow-clay: inset 0 1px 0 rgb(255 255 255 / .75), inset 0 -3px 0 rgb(var(--sh-rgb) / .05), 0 2px 4px rgb(var(--sh-rgb) / .07), 0 14px 30px -12px rgb(var(--sh-rgb) / .22);
+  --shadow-pop: 0 24px 50px -18px rgb(var(--sh-rgb) / .35), 0 4px 10px rgb(var(--sh-rgb) / .08);
+  --shadow-modal: 0 2px 4px rgb(var(--sh-rgb) / .06), 0 30px 60px -16px rgb(var(--sh-rgb) / .35);
+  --glow-marigold: 0 0 0 6px rgb(255 178 36 / .18), 0 10px 30px -6px rgb(255 160 20 / .45);
 
   /* =====================================================================
-     Theme-independent scales
+     Skala yang tidak bergantung tema
      ===================================================================== */
-
-  /* Typography */
-  --font-serif: 'Newsreader', 'Iowan Old Style', Georgia, serif;
-  --font-sans: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-display: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', 'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-display); /* nama lama: judul besar kini memakai Bricolage */
+  --font-sans: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   --fs-11: 11px;  --fs-12: 12px;  --fs-13: 13px;  --fs-14: 14px;  --fs-16: 16px;
   --fs-18: 18px;  --fs-22: 22px;  --fs-28: 28px;  --fs-36: 36px;  --fs-48: 48px;  --fs-64: 64px;
 
-  --lh-tight: 1.15;   /* display */
-  --lh-snug: 1.3;     /* headings */
-  --lh-ui: 1.45;      /* UI text */
-  --lh-prose: 1.65;   /* lesson reading */
-  --lh-code: 1.6;     /* editor: 13px / 20.8px */
+  --lh-tight: 1.05;
+  --lh-snug: 1.25;
+  --lh-ui: 1.5;
+  --lh-prose: 1.65;
+  --lh-code: 1.7;
 
-  --fw-regular: 400; --fw-medium: 500; --fw-semibold: 600;
-  --tracking-display: -0.02em;
-  --tracking-label: 0.06em;  /* mono uppercase labels */
-  --measure: 68ch;
+  --fw-regular: 400; --fw-medium: 600; --fw-semibold: 700; --fw-bold: 800;
+  --tracking-display: -0.035em;
+  --tracking-label: 0.1em;
+  --measure: 66ch;
 
-  /* Spacing — 4px base */
   --space-0: 0;     --space-0-5: 2px; --space-1: 4px;  --space-1-5: 6px; --space-2: 8px;
   --space-3: 12px;  --space-4: 16px;  --space-5: 20px; --space-6: 24px;  --space-8: 32px;
   --space-10: 40px; --space-12: 48px; --space-16: 64px; --space-24: 96px;
 
-  /* Radius */
-  --radius-xs: 4px;   /* chips, kbd, badges */
-  --radius-sm: 6px;   /* buttons, inputs, tabs */
-  --radius-md: 8px;   /* panels, cards, menus */
-  --radius-lg: 12px;  /* modals, palette */
-  --radius-xl: 16px;  /* lesson cards, code cards */
-  --radius-2xl: 20px; /* lesson stage, hero cards */
+  --radius-xs: 6px;
+  --radius-sm: 11px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 24px;
+  --radius-2xl: 30px;
   --radius-full: 999px;
 
-  /* Sizing */
-  --control-sm: 28px; --control-md: 32px; --control-lg: 40px; /* + .btn-lg 44 · .btn-xl 52 in components.css */
-  --sidebar-w: 248px;     /* admin sidebar */
-  --topbar-h: 64px;       /* learner/mentor top nav */
+  --control-sm: 32px; --control-md: 40px; --control-lg: 46px;
+  --sidebar-w: 252px;
+  --topbar-h: 68px;
 
-  /* Motion */
-  --dur-instant: 80ms;   /* press */
-  --dur-fast: 120ms;     /* hover, color */
-  --dur-base: 180ms;     /* tabs, panels, collapse */
-  --dur-slow: 240ms;     /* overlays, palette, toasts */
-  --dur-fill: 400ms;     /* progress & test-count fills */
-  --ease-out: cubic-bezier(.2, .8, .2, 1);
+  --dur-instant: 80ms;
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 260ms;
+  --dur-fill: 420ms;
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
   --ease-in-out: cubic-bezier(.65, 0, .35, 1);
   --ease-exit: cubic-bezier(.4, 0, 1, 1);
-  /* Springs (CSS approximations; real app uses motion springs — see MOTION.md) */
-  --spring-gentle: cubic-bezier(.34, 1.25, .64, 1);   /* stiffness 170, damping 22 */
-  --spring-bouncy: cubic-bezier(.34, 1.56, .64, 1);   /* stiffness 300, damping 14 */
-  --spring-snappy: cubic-bezier(.2, .9, .3, 1.08);    /* stiffness 500, damping 30 */
+  --spring-gentle: cubic-bezier(.34, 1.25, .64, 1);
+  --spring-bouncy: cubic-bezier(.34, 1.56, .64, 1);
+  --spring-snappy: cubic-bezier(.2, .9, .3, 1.08);
   --dur-120: 120ms; --dur-200: 200ms; --dur-320: 320ms; --dur-600: 600ms;
+  --dur-3: 380ms; --ease-spring: var(--spring-bouncy); --font-ui: var(--font-sans);
 
-  /* Z-index */
   --z-base: 0; --z-sticky: 10; --z-dropdown: 30; --z-overlay: 40; --z-modal: 50; --z-palette: 60; --z-toast: 70;
 }
 
 :root[data-theme="ink"],
-[data-theme="ink"] {  /* also usable as an "ink island" on any element */
+[data-theme="ink"] {
   color-scheme: dark;
 
-  --bg: #16171B;
-  --surface: #1C1D22;
-  --surface-raised: #23242A;
-  --surface-sunken: #121316;
-  --surface-hover: #222329;
-  --surface-active: #292A31;
-  --overlay: #000000;
+  --bg: #14132C;
+  --surface: #1D1B3D;
+  --surface-raised: #232147;
+  --surface-sunken: #100F25;
+  --surface-hover: #242250;
+  --surface-active: #2B2860;
+  --overlay: #05040F;
 
-  --border: #2B2D34;
-  --border-strong: #3A3C44;
-  --divider: #25272D;
+  --border: #312E5E;
+  --border-strong: #47437D;
+  --divider: #28264F;
 
-  --text: #E9E7E2;
-  --text-muted: #A6A39B;
-  --text-faint: #7C7A73;
-  --text-inverse: #16171B;
+  --text: #F8F1E4;
+  --text-muted: #CAC3E2;
+  --text-faint: #A29CC4;
+  --text-inverse: #1E1C45;
 
-  --accent: #9AA6E6;
-  --accent-hover: #AEB8EC;
-  --accent-soft: #262A40;
-  --accent-line: #3A4170;
-  --on-accent: #16171B;
+  --accent: #A99FFF;
+  --accent-hover: #BDB5FF;
+  --accent-soft: #2B2660;
+  --accent-line: #4A4390;
+  --on-accent: #1E1C45;
 
-  --success: #7DBB8E;  --success-soft: #1E2B23;  --success-line: #2F4A38;
-  --warning: #D9A955;  --warning-soft: #2F2717;  --warning-line: #4F4020;
-  --danger:  #E58268;  --danger-soft:  #34201B;  --danger-line:  #573228;
+  --marigold: #FFBC3B; --marigold-deep: #FFA41A; --marigold-soft: #3A2C17; --marigold-ink: #FFD27A;
+  --lilac: #9A8FFF; --lilac-soft: #2B2660; --lilac-ink: #C4BCFF;
+  --pip: #E6E0FF; --pip-shade: #A99BEA;
+  --btn-bg: #FFBC3B; --btn-ink: #1E1C45; --btn-lip: #B96A00;
 
-  --mode-project: #7FB8C2;
+  --success: #86E6C4;  --success-soft: #103A31;  --success-line: #1C6552;
+  --warning: #FFD27A;  --warning-soft: #3A2C17;  --warning-line: #6B5020;
+  --danger:  #FFB2A6;  --danger-soft:  #44201E;  --danger-line:  #7A3530;
 
-  --pahami-ink: #A9B3F0;  --pahami-fill: #7F8CE6;  --pahami-soft: #23274A;  --pahami-line: #3A4178;
-  --perkuat-ink: #8CCB9F; --perkuat-fill: #5FAF79; --perkuat-soft: #1C2E23; --perkuat-line: #2F4D39;
-  --kuis-ink: #EBBC62;    --kuis-fill: #D9A13A;    --kuis-soft: #33280F;    --kuis-line: #56431C;
-  --uji-ink: #F29479;     --uji-fill: #E0704F;     --uji-soft: #3A221B;     --uji-line: #5E3427;
-  --xp: #D9A13A;
+  --pahami-ink: #9CCDFF;  --pahami-fill: #57AAF5;  --pahami-soft: #152D4D;  --pahami-line: #24507F;
+  --perkuat-ink: #86E6C4; --perkuat-fill: #34C99A; --perkuat-soft: #103A31; --perkuat-line: #1C6552;
+  --kuis-ink: #CDB9FF;    --kuis-fill: #A07BFF;    --kuis-soft: #2A1F57;    --kuis-line: #4B378F;
+  --uji-ink: #FFB2A6;     --uji-fill: #FF7D6A;     --uji-soft: #44201E;     --uji-line: #7A3530;
+  --xp: #FFBC3B;
 
-  --editor-bg: #18191D;
-  --editor-selection: #2E3452;
-  --syn-text: #DAD7D0;
-  --syn-keyword: #9AA6E6;
-  --syn-string: #8CC49B;
-  --syn-number: #DDB05F;
-  --syn-function: #E8907A;
-  --syn-property: #7FB8C2;
-  --syn-comment: #7C7A73;
-  --syn-punct: #9A978F;
+  --mode-project: #3BC0AE;
 
-  --viz-1: #9AA6E6; --viz-2: #7DBB8E; --viz-3: #D9A955; --viz-4: #E58268; --viz-5: #7FB8C2;
-  --viz-track: #2B2D34;
+  --lang-javascript: #F2CD35; --lang-c: #6F97B8; --lang-cpp: #6B86F0; --lang-rust: #E07446;
+  --lang-python: #5A93E8; --lang-css: #9E7BF0; --lang-sql: #3BC0AE; --lang-php: #919EE0;
 
-  --focus-ring: #9AA6E6;
+  --editor-bg: #0E0D24;
+  --editor-bg-2: #1A1840;
+  --editor-line: #2C2960;
+  --editor-selection: #37327A;
 
-  --shadow-pop: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px -6px rgba(0, 0, 0, .5);
-  --shadow-modal: 0 2px 4px rgba(0, 0, 0, .3), 0 24px 48px -12px rgba(0, 0, 0, .6);
+  --orvi-glow-op: .62;
+  --sheen: rgb(255 255 255 / .10);
+  --sh-rgb: 4 3 18;
+
+  --viz-1: #A99FFF; --viz-2: #34C99A; --viz-3: #FFBC3B; --viz-4: #FF7D6A; --viz-5: #57AAF5;
+  --viz-track: #2B2858;
+
+  --focus-ring: #FFBC3B;
+
+  --shadow-clay: inset 0 1px 0 rgb(255 255 255 / .06), inset 0 -3px 0 rgb(0 0 0 / .18), 0 2px 4px rgb(0 0 0 / .25), 0 16px 34px -12px rgb(0 0 0 / .55);
+  --shadow-pop: 0 24px 50px -18px rgb(0 0 0 / .6), 0 4px 10px rgb(0 0 0 / .3);
+  --shadow-modal: 0 2px 4px rgb(0 0 0 / .3), 0 30px 60px -16px rgb(0 0 0 / .7);
 }
 
 [data-theme="ink"]:not(:root), [data-theme="paper"]:not(:root) { color: var(--text); }
 
+/* Papan kode: palet sintaks terang-di-atas-gelap, di kedua tema */
+:root[data-theme="ink"],
+.codecard, .slot-code, .bugcode, .cm-host, .codeblock, .editor2, .pv-code {
+  --syn-text: #F4EEFF; --syn-keyword: #C9A5FF; --syn-string: #9BE7B4; --syn-number: #FFB86B; --syn-function: #8CC8FF;
+  --syn-property: #FFD27A; --syn-comment: #9993C2; --syn-punct: #CFC8EA; --syn-type: #FF9DB5;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  :root { --dur-instant: 0ms; --dur-fast: 0ms; --dur-base: 0ms; --dur-slow: 0ms; --dur-fill: 0ms; --dur-120: 0ms; --dur-200: 0ms; --dur-320: 0ms; --dur-600: 0ms; }
+  :root:not([data-motion="full"]) { --dur-fill: 0ms; --dur-600: 0ms; }
 }

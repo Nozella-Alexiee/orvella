@@ -1,13 +1,43 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { HighlightStyle, indentUnit, syntaxHighlighting } from '@codemirror/language';
+import { HighlightStyle, indentUnit, StreamLanguage, syntaxHighlighting } from '@codemirror/language';
+import type { Extension } from '@codemirror/state';
 import { EditorView, Decoration, keymap, placeholder as cmPlaceholder, type DecorationSet } from '@codemirror/view';
 import { Prec, RangeSetBuilder, StateField, StateEffect, EditorState } from '@codemirror/state';
 import { tags as t } from '@lezer/highlight';
 import { cx } from '../design/ui';
 
-/* CodeMirror 6 styled like the Orvella code cards — deliberately not an IDE: no minimap, no tabs, no gutter icons. */
+/* CodeMirror 6 bergaya kartu kode Orvella ("papan tulis") — sengaja bukan IDE: tanpa minimap, tab, atau ikon gutter.
+   Paket bahasa dimuat sesuai kebutuhan supaya bundel awal tetap ringan. */
+export const EDITOR_LANGS = ['javascript', 'python', 'c', 'cpp', 'rust', 'java', 'go', 'php', 'sql', 'html', 'css', 'kotlin'] as const;
+const loaders: Record<string, () => Promise<Extension>> = {
+  javascript: () => import('@codemirror/lang-javascript').then(m => m.javascript()),
+  python: () => import('@codemirror/lang-python').then(m => m.python()),
+  c: () => import('@codemirror/lang-cpp').then(m => m.cpp()),
+  cpp: () => import('@codemirror/lang-cpp').then(m => m.cpp()),
+  rust: () => import('@codemirror/lang-rust').then(m => m.rust()),
+  java: () => import('@codemirror/lang-java').then(m => m.java()),
+  go: () => import('@codemirror/lang-go').then(m => m.go()),
+  php: () => import('@codemirror/lang-php').then(m => m.php()),
+  sql: () => import('@codemirror/lang-sql').then(m => m.sql()),
+  html: () => import('@codemirror/lang-html').then(m => m.html()),
+  css: () => import('@codemirror/lang-css').then(m => m.css()),
+  kotlin: () => import('@codemirror/legacy-modes/mode/clike').then(m => StreamLanguage.define(m.kotlin)),
+};
+const cache = new Map<string, Extension>();
+function useLanguage(lang: string) {
+  const [ext, setExt] = useState<Extension | null>(() => cache.get(lang) || null);
+  useEffect(() => {
+    let live = true;
+    const hit = cache.get(lang);
+    if (hit) { setExt(hit); return; }
+    (loaders[lang] || loaders.javascript)().then(e => { cache.set(lang, e); if (live) setExt(e); });
+    return () => { live = false; };
+  }, [lang]);
+  return ext;
+}
+const WIDE_INDENT = new Set(['python', 'c', 'cpp', 'rust', 'java', 'go', 'php', 'kotlin']);
+
 const orvellaHighlight = HighlightStyle.define([
   { tag: [t.keyword, t.definitionKeyword, t.modifier, t.controlKeyword, t.operatorKeyword, t.bool, t.null], class: 'k' },
   { tag: [t.string, t.special(t.string), t.regexp], class: 's' },
@@ -16,6 +46,8 @@ const orvellaHighlight = HighlightStyle.define([
   { tag: [t.standard(t.variableName), t.propertyName], class: 'p' },
   { tag: [t.comment, t.lineComment, t.blockComment], class: 'c' },
   { tag: [t.punctuation, t.operator, t.bracket, t.separator], class: 'pn' },
+  { tag: [t.typeName, t.className, t.namespace, t.macroName, t.tagName], class: 'ty' },
+  { tag: [t.attributeName], class: 'p' },
 ]);
 
 const theme = EditorView.theme({ '&': { backgroundColor: 'transparent' } });
@@ -39,28 +71,30 @@ const badField = StateField.define<DecorationSet>({
   provide: f => EditorView.decorations.from(f),
 });
 
-export function CodeEditor({ value, onChange, onRun, badLine, small, minHeight, readOnly, placeholder, label, runKey = 'Mod-Enter' }: {
+export function CodeEditor({ value, onChange, onRun, badLine, small, minHeight, readOnly, placeholder, label, runKey = 'Mod-Enter', lang = 'javascript' }: {
   value: string; onChange?: (v: string) => void; onRun?: () => void; badLine?: number | null; small?: boolean; minHeight?: number;
-  readOnly?: boolean; placeholder?: string; label: string; runKey?: 'Mod-Enter' | 'Shift-Enter';
+  readOnly?: boolean; placeholder?: string; label: string; runKey?: 'Mod-Enter' | 'Shift-Enter'; lang?: string;
 }) {
+  const langExt = useLanguage(lang);
+  const unit = WIDE_INDENT.has(lang) ? '    ' : '  ';
   const runRef = useRef(onRun);
   runRef.current = onRun;
   const view = useRef<EditorView | null>(null);
   const extensions = useMemo(() => [
-    javascript(),
+    ...(langExt ? [langExt] : []),
     syntaxHighlighting(orvellaHighlight),
     theme,
-    indentUnit.of('  '),
-    EditorState.tabSize.of(2),
+    indentUnit.of(unit),
+    EditorState.tabSize.of(unit.length),
     badField,
     EditorView.contentAttributes.of({ 'aria-label': label }),
     // above basicSetup's own keymap (which binds Mod-Enter to "insert blank line")
     Prec.highest(keymap.of([
       { key: runKey, run: () => { runRef.current?.(); return true; } },
-      { key: 'Tab', run: v => { v.dispatch(v.state.replaceSelection('  ')); return true; } },
+      { key: 'Tab', run: v => { v.dispatch(v.state.replaceSelection(unit)); return true; } },
     ])),
     ...(placeholder ? [cmPlaceholder(placeholder)] : []),
-  ], [label, runKey, placeholder]);
+  ], [label, runKey, placeholder, langExt, unit]);
   useEffect(() => { view.current?.dispatch({ effects: setBad.of(badLine ?? null) }); }, [badLine]);
   return (
     <div className={cx('cm-host', small && 'is-sm')}>

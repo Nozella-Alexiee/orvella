@@ -8,7 +8,7 @@ export type Person = { id: number; name: string; initials: string; avatar: strin
 
 export type Me = Person & {
   email: string; title: string; onboarded: boolean; goal: string; daily_goal_min: number; assist_cap: number;
-  prefs: { nosi?: boolean; reminders?: boolean; mentor_sees_wrong?: boolean; language?: string };
+  prefs: { orvi?: boolean; reminders?: boolean; mentor_sees_wrong?: boolean; language?: string };
   class: { id: number; name: string } | null; org: string | null;
   streak: number; xp_week: number; xp_total: number; today_minutes: number; unread: number; joined: string | null;
 };

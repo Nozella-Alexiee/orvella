@@ -1,5 +1,5 @@
 import type { Scene as SceneT } from '../api/types';
-import type { Mood } from '../design/Nosi';
+import type { Mood } from '../design/Orvi';
 import { PhaseTag } from '../design/ui';
 import { Html } from '../lib/html';
 import { IntroObjectives, IntroSide, Reveal, VisualView } from './visuals';

@@ -1,0 +1,98 @@
+/* Orvella — Orvi, efek, ikon bahasa (dari design/mockups/css/components.css) */
+/* ============================== ORVI ============================== */
+.orvi { display: inline-block; line-height: 0; --orvi-tint: var(--lilac); vertical-align: middle; }
+.orvi-svg { overflow: visible; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.orvi-svg.is-static { cursor: inherit; }
+.o-shadow { fill: rgb(var(--sh-rgb) / .17); transform-box: fill-box; transform-origin: center; }
+.o-glow { opacity: var(--orvi-glow-op); transform-box: fill-box; transform-origin: center; }
+.o-ring { fill: none; stroke: var(--orvi-tint); stroke-width: 3.4; }
+.o-ring-back { opacity: .4; }
+.o-ring-front { opacity: .95; }
+.o-rim { fill: none; stroke: rgb(255 255 255 / .4); stroke-width: 3; stroke-linecap: round; }
+.o-shine { fill: #fff; opacity: .62; }
+.o-shine2 { fill: #fff; opacity: .78; }
+.o-cheek { fill: var(--orvi-cheek); opacity: .42; transition: opacity .3s; }
+.o-iris { fill: var(--orvi-face); }
+.o-glint { fill: #fff; }
+.o-happy, .o-shut { fill: none; stroke: var(--orvi-face); stroke-width: 3.8; stroke-linecap: round; opacity: 0; transition: opacity .12s; }
+.o-open { transform-box: fill-box; transform-origin: center; transition: transform .28s var(--ease-spring), opacity .12s; }
+[data-eyes="happy"] .o-open, [data-eyes="shut"] .o-open { opacity: 0; }
+[data-eyes="happy"] .o-happy, [data-eyes="shut"] .o-shut { opacity: 1; }
+[data-eyes="wide"] .o-open { transform: scale(1.22); }
+[data-eyes="narrow"] .o-open { transform: scaleY(.7); }
+.o-brow { fill: none; stroke: var(--orvi-face); stroke-width: 3.1; stroke-linecap: round; opacity: 0; transform-box: fill-box; transform-origin: center; transition: opacity .2s, transform .35s var(--ease-spring); }
+[data-mood="think"] .o-brow-l { opacity: 1; transform: translateY(-5px) rotate(-10deg); }
+[data-mood="think"] .o-brow-r { opacity: 1; transform: translateY(-1px); }
+[data-mood="oops"] .o-brow { opacity: 1; transform: translateY(-8px); }
+[data-mood="focus"] .o-brow-l { opacity: 1; transform: translateY(3px) rotate(16deg); }
+[data-mood="focus"] .o-brow-r { opacity: 1; transform: translateY(3px) rotate(-16deg); }
+[data-mood="happy"] .o-cheek, [data-mood="cheer"] .o-cheek { opacity: .72; }
+[data-mood="sleep"] .o-cheek { opacity: .3; }
+.o-mouth { fill: none; stroke: var(--orvi-face); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+.o-mouth.is-filled { fill: var(--orvi-face); }
+.o-pip-body { fill: var(--pip); stroke: color-mix(in oklab, var(--pip-shade) 55%, var(--orvi-tint)); stroke-width: 1.6; }
+.o-crater { fill: var(--pip-shade); }
+.o-pip-face circle { fill: var(--orvi-face); }
+.o-trail { fill: var(--orvi-tint); }
+.o-think circle { fill: var(--surface); stroke: var(--border-strong); stroke-width: 1.6; }
+.o-zzz text { font: 800 17px var(--font-display); fill: var(--text-faint); }
+.o-spark { fill: var(--marigold); }
+.orvi--xs .o-ring { stroke-width: 7.5; }
+.orvi--xs .o-cheek, .orvi--xs .o-trail, .orvi--xs .o-crater, .orvi--xs .o-pip-face, .orvi--xs .o-rim, .orvi--xs .o-shine2, .orvi--xs .o-shadow { display: none; }
+.orvi--sm .o-ring { stroke-width: 5; }
+.orvi--sm .o-trail, .orvi--sm .o-shadow { display: none; }
+
+/* Balon ucapan Orvi */
+.orvi-say {
+  position: absolute; z-index: 6; width: max-content; max-width: min(250px, 70vw);
+  padding: 10px 14px; border-radius: 18px;
+  background: var(--surface); color: var(--text); border: 1.5px solid var(--border-strong);
+  box-shadow: var(--shadow-pop); font: 650 .9rem/1.42 var(--font-ui); letter-spacing: -.003em;
+  opacity: 0; pointer-events: none; text-wrap: pretty;
+}
+.orvi-say.is-on { opacity: 1; }
+.orvi-say[data-side="right"] { left: calc(100% - 8px); top: 8%; border-bottom-left-radius: 6px; transform-origin: 0 100%; }
+.orvi-say[data-side="left"] { right: calc(100% - 8px); top: 8%; border-bottom-right-radius: 6px; transform-origin: 100% 100%; }
+.orvi-say[data-side="top"] { bottom: calc(100% - 2px); left: 50%; translate: -50% 0; border-radius: 18px; transform-origin: 50% 100%; }
+.orvi-say[data-side="bottom"] { top: calc(100% + 4px); left: 50%; translate: -50% 0; transform-origin: 50% 0; }
+
+/* Pip yang terbang keluar */
+.pip-flyer { position: fixed; left: 0; top: 0; z-index: 9000; pointer-events: none; line-height: 0; filter: drop-shadow(0 6px 8px rgb(var(--sh-rgb) / .28)); }
+.pip-flyer svg { overflow: visible; }
+.pip-cargo {
+  position: absolute; left: 50%; top: 100%; translate: -50% 6px;
+  padding: 4px 10px; border-radius: 10px; background: var(--marigold); color: #1E1C45;
+  font: 800 .88rem/1.25 var(--font-mono); white-space: nowrap; box-shadow: 0 4px 0 #C86F00;
+}
+.is-pointed { outline: 3px dashed var(--lilac); outline-offset: 5px; }
+
+/* ============================== FX ============================== */
+.fx-ring { position: fixed; width: 34px; height: 34px; margin: -17px 0 0 -17px; border: 3px solid; border-radius: 50%; pointer-events: none; z-index: 9100; }
+.fx-particles { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9500; }
+.fx-xp {
+  position: fixed; left: 0; top: 0; z-index: 9200; pointer-events: none; white-space: nowrap;
+  padding: 6px 13px; border-radius: 999px; background: var(--marigold); color: #1E1C45;
+  font: 800 .95rem/1.2 var(--font-display); box-shadow: 0 4px 0 #C86F00, var(--shadow-pop);
+}
+.fx-curtain { position: fixed; inset: 0; z-index: 9700; pointer-events: none; }
+.has-sheen { position: relative; }
+.has-sheen::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 3;
+  background: radial-gradient(380px circle at var(--gx, 50%) var(--gy, 0%), var(--sheen), transparent 48%);
+  opacity: 0; transition: opacity var(--dur-3);
+}
+.has-sheen:hover::after { opacity: 1; }
+.is-shook { outline: 3px solid var(--uji-fill); outline-offset: 2px; }
+
+
+/* ============================== IKON BAHASA ============================== */
+.lang-ico { display: inline-grid; place-items: center; flex: none; line-height: 0; }
+.lang-ico img { width: 100%; height: 100%; object-fit: contain; }
+:root[data-theme="ink"] .lang-ico.is-mono img { filter: invert(1) brightness(1.6); }
+.lang-chip { --lc: var(--lilac); display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 13px 0 6px; border-radius: 999px;
+  background: color-mix(in oklab, var(--lc) 10%, var(--surface)); border: 1.5px solid color-mix(in oklab, var(--lc) 30%, transparent);
+  font-weight: 750; font-size: var(--fs-13); color: var(--text); white-space: nowrap; line-height: 1; }
+.lang-chip .lang-ico { width: 22px; height: 22px; }
+.lang-chip.is-lg { height: 42px; padding: 0 16px 0 8px; font-size: var(--fs-14); }
+.lang-chip.is-lg .lang-ico { width: 28px; height: 28px; }
+.btn .ripple { position: absolute; border-radius: 50%; pointer-events: none; background: currentColor; z-index: -1; }

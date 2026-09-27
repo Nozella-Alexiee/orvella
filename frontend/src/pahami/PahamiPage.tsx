@@ -6,7 +6,7 @@ import { api } from '../api/client';
 import { useApi, useRefreshMe } from '../api/hooks';
 import type { PhaseMeta, PlayerHeader, Scene } from '../api/types';
 import { Icon } from '../design/Icon';
-import { Nosi, type Mood } from '../design/Nosi';
+import { Orvi, type Mood } from '../design/Orvi';
 import { PhaseRing } from '../design/PhaseRing';
 import { toast } from '../design/toast';
 import { LoadError, Skel } from '../design/ui';
@@ -139,7 +139,7 @@ function PahamiDone({ id, res, scenes, minutes }: { id: string; res: DoneRes; sc
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <DoneOverlay labelledBy="done-t">
-      <Nosi size="xl" mood="cheer" />
+      <Orvi size="xl" mood="cheer" />
       <div className="eyebrow mt-4">Fase 1 dari 4 selesai</div>
       <h2 id="done-t" className="big-serif mt-2" style={{ fontSize: 44 }}>Kamu sudah <em>paham</em>.</h2>
       <p className="t-muted mt-3">{scenes} scene · {minutes} menit · <b style={{ color: 'var(--xp)' }}>+<span ref={xpRef}>0</span> XP</b></p>
