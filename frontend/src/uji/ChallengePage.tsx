@@ -5,9 +5,11 @@ import '../player/player.css';
 import { api, ApiError } from '../api/client';
 import { useApi, useRefreshMe } from '../api/hooks';
 import type { ChapterRef, PhaseMeta, PlayerHeader } from '../api/types';
-import { CodeEditor } from '../code/CodeEditor';
+import { CodeEditor, type EditorDiag } from '../code/CodeEditor';
 import { TestRobots, type Robot } from '../code/TestRobots';
 import { Icon } from '../design/Icon';
+import { LangIcon } from '../design/LangIcon';
+import { LANG_BY_ID } from '../lib/langs';
 import { Orvi, type Mood } from '../design/Orvi';
 import { PhaseRing } from '../design/PhaseRing';
 import { toast } from '../design/toast';
@@ -18,11 +20,12 @@ import { useAutosave, useHeartbeat, useLockRedirect } from '../lib/hooks';
 import { DoneOverlay, PhaseBar, PlayerShell, PlayerTop } from '../player/Player';
 
 type Challenge = { title: string; minutes: number; difficulty: string; filename: string; story: string; steps: string[]; starter: string;
-  art?: { kind: string; title: string; name: string; value: string }; tests: { id: string; name: string; hidden: boolean }[] };
+  art?: { kind: string; title: string; name: string; value: string }; language?: string;
+  tests: { id: string; name: string; hidden: boolean; stdin?: string; expect?: string }[] };
 type Data = PlayerHeader & { challenge: Challenge; code: string; attempts: number; solved: boolean; mentor: string | null; kuis_score: number | null };
 type RunErr = { name: string; message: string; line: number | null } | null;
 type Outcome = { passed: number; total: number; all_pass: boolean; attempt: number; chapter_done: boolean; xp: number; next_chapter?: ChapterRef | null; mastery?: number; xp_week?: number };
-type Event = { type: 'queued'; tests: string[]; logs: string[]; error: RunErr } | { type: 'running'; id: string } | { type: 'result'; id: string; pass: boolean; detail: string; ms: number; name?: string }
+type Event = { type: 'queued'; tests: string[]; logs: string[]; error: RunErr; diagnostics?: EditorDiag[] } | { type: 'running'; id: string } | { type: 'result'; id: string; pass: boolean; detail: string; ms: number; name?: string }
   | ({ type: 'done' } & Outcome) | { type: 'error'; message: string };
 
 const wait = (ms: number) => new Promise(r => setTimeout(r, motion() === 'off' ? 0 : ms));
@@ -55,6 +58,7 @@ export default function ChallengePage() {
   const [robots, setRobots] = useState<Robot[]>([]);
   const [logs, setLogs] = useState<string[] | null>(null);
   const [err, setErr] = useState<RunErr>(null);
+  const [diags, setDiags] = useState<EditorDiag[]>([]);
   const [running, setRunning] = useState(false);
   const [mood, setMood] = useState<Mood>('think');
   const [bump, setBump] = useState(0);
@@ -89,7 +93,7 @@ export default function ChallengePage() {
     for (const ev of events) {
       if (ev.type === 'error') { toast({ kind: 'danger', icon: 'circle-alert', title: 'Tes belum bisa dijalankan', body: ev.message }); return; }
       if (ev.type === 'queued') {
-        setErr(ev.error); setLogs(ev.logs);
+        setErr(ev.error); setLogs(ev.logs); setDiags(ev.diagnostics || []);
         setRobots(rs => rs.map(r => ({ ...r, state: 'queued', detail: undefined })));
       }
       if (ev.type === 'running') { setRobots(rs => rs.map(r => (r.id === ev.id ? { ...r, state: 'running' } : r))); await wait(420); }
@@ -126,8 +130,8 @@ export default function ChallengePage() {
         });
       } catch {
         // WebSocket unavailable (proxy/offline): same result over HTTP
-        const r = await api.post<Outcome & { logs: string[]; error: RunErr; results: { id: string; pass: boolean; detail: string; ms: number; name: string }[] }>(`/api/chapters/${id}/challenge/run`, { code });
-        events = [{ type: 'queued', tests: r.results.map(x => x.id), logs: r.logs, error: r.error },
+        const r = await api.post<Outcome & { logs: string[]; error: RunErr; diagnostics?: EditorDiag[]; results: { id: string; pass: boolean; detail: string; ms: number; name: string }[] }>(`/api/chapters/${id}/challenge/run`, { code });
+        events = [{ type: 'queued', tests: r.results.map(x => x.id), logs: r.logs, error: r.error, diagnostics: r.diagnostics },
           ...r.results.flatMap(x => [{ type: 'running', id: x.id } as Event, { type: 'result', ...x } as Event]), { type: 'done', ...r }];
       }
       await play(events);
@@ -145,6 +149,8 @@ export default function ChallengePage() {
   if (!d || code === null) return <PlayerShell phase="uji"><header className="player-top"><span /><Skel h={30} w="100%" style={{ maxWidth: 760, justifySelf: 'center' }} /><span /></header><div className="focus"><Skel h={460} r={20} /><Skel h={460} r={16} /></div></PlayerShell>;
   const ch = d.challenge;
   const bad = err?.line ?? null;
+  const lang = ch.language || 'javascript';
+  const examples = ch.tests.filter(t => !t.hidden && t.stdin !== undefined).slice(0, 3);
 
   return (
     <PlayerShell phase="uji">
@@ -157,16 +163,29 @@ export default function ChallengePage() {
           <h1 className="big-serif mt-3" style={{ fontSize: 30 }}>{ch.title}</h1>
           <Html as="p" className="t-muted mt-2" style={{ lineHeight: 1.6 }} html={ch.story} />
           <div className="brief-steps">{ch.steps.map((s, i) => <div key={i}><Html html={s} /></div>)}</div>
+          {examples.length > 0 && (
+            <div className="stack gap-2 mt-4">
+              <span className="eyebrow">Contoh</span>
+              {examples.map(t => (
+                <div key={t.id} className="io-ex">
+                  <div><span className="t-label">Input</span><pre>{t.stdin || '(kosong)'}</pre></div>
+                  <div><span className="t-label">Output</span><pre>{t.expect}</pre></div>
+                </div>
+              ))}
+            </div>
+          )}
           <div className="lock-note"><Icon name="lock" size={14} /><span>Bantuan terkunci selama Uji. Baris error tetap ditandai (L1).</span></div>
         </aside>
         <section className="stack gap-4" style={{ minWidth: 0 }}>
           <div className="codecard" ref={cardRef}>
             <div className="cc-head">
-              <span className="cc-file"><span className="lang">JS</span>{ch.filename}</span>
+              <span className="cc-file"><LangIcon id={lang} size={18} />{ch.filename}</span>
+              {lang !== 'javascript' && <span className="t-xs" style={{ color: 'var(--editor-dim)' }}>{LANG_BY_ID[lang]?.rt}</span>}
               <span style={{ marginLeft: 'auto' }}><SaveState state={saveState === 'saved' ? 'idle' : saveState} /></span>
-              <button className="btn btn-ghost btn-sm" onClick={() => { setCode(ch.starter); scheduleSave(ch.starter); setErr(null); setLogs(null); }}><Icon name="rotate-ccw" />Ulang</button>
+              <button className="btn btn-ghost btn-sm" onClick={() => { setCode(ch.starter); scheduleSave(ch.starter); setErr(null); setDiags([]); setLogs(null); }}><Icon name="rotate-ccw" />Ulang</button>
             </div>
-            <CodeEditor value={code} onChange={v => { setCode(v); setErr(null); scheduleSave(v); }} onRun={run} badLine={bad} minHeight={320} label={`Editor kode ${ch.filename}`} />
+            <CodeEditor value={code} lang={lang} onChange={v => { setCode(v); setErr(null); setDiags([]); scheduleSave(v); }} onRun={run} badLine={bad} diagnostics={diags}
+              minHeight={320} label={`Editor kode ${ch.filename}`} />
             <div className="cc-out" aria-live="polite">
               {logs === null && !err && <span className="t-xs t-faint">Output muncul di sini setelah kamu menjalankan tes.</span>}
               {logs?.map((l, i) => <span className="out-bubble" key={i + l} style={{ animationDelay: `${i * 120}ms` }}><span className="p">›</span>{l}</span>)}

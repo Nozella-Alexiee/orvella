@@ -309,6 +309,7 @@ class Submission(Base):
     milestone: Mapped[int | None] = mapped_column(Integer)
     title: Mapped[str] = mapped_column(String(160), default="")
     filename: Mapped[str] = mapped_column(String(80), default="main.js")
+    lang: Mapped[str] = mapped_column(String(20), default="javascript", server_default="javascript")
     code: Mapped[str] = mapped_column(Text)
     attempt_no: Mapped[int] = mapped_column(Integer, default=1)
     tests_passed: Mapped[int] = mapped_column(Integer, default=0)
@@ -367,6 +368,10 @@ class Notebook(Base):
     title: Mapped[str] = mapped_column(String(160), default="Notebook tanpa judul")
     attached_chapter_id: Mapped[int | None] = mapped_column(ForeignKey("chapters.id", ondelete="SET NULL"))
     cells: Mapped[list[dict[str, Any]]] = mapped_column(JSON, default=list)  # [{id, type: code|note, src}]
+    # notebook = JS cells (runs in the browser) · program = one file in any language · web = fullstack workspace
+    kind: Mapped[str] = mapped_column(String(16), default="notebook", server_default="notebook")
+    lang: Mapped[str] = mapped_column(String(20), default="javascript", server_default="javascript")
+    files: Mapped[dict[str, Any] | None] = mapped_column(JSON, default=dict)  # program: {code, stdin} · web: {stack, files: {path: text}}
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
 
@@ -394,6 +399,14 @@ class Notification(Base):
     link: Mapped[str] = mapped_column(String(200), default="")
     read: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+class AppSetting(Base):
+    """Small key/value settings edited by admins (e.g. key "runtime": enabled languages and limits)."""
+    __tablename__ = "app_settings"
+    key: Mapped[str] = mapped_column(String(40), primary_key=True)
+    value: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
 
 
 class ContentReport(Base):

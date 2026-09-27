@@ -7,6 +7,7 @@
   Notebook, NotebookPen, Pause, Pencil, Play, Plus, Diff, Puzzle, Quote, Repeat, RotateCcw, Save, School, Search, Send, Settings, Shapes,
   Shield, ShieldCheck, SlidersHorizontal, Smartphone, Sparkles, SquareFunction, Stethoscope, SunMoon, Swords, Target, Terminal, Text, Timer,
   Trash2, TriangleAlert, Type, Upload, User, UserPlus, Users, WifiOff, Wind, X, Zap, type LucideIcon,
+  Activity, ArrowDown, ArrowUp, ArrowUpRight, AtSign, BadgeCheck, Braces, Calendar, CalendarClock, CheckCheck, ChevronLeft, CircleDot, CirclePlay, ClipboardPaste, Columns2, Cpu, Crown, Database, EyeOff, File, FileCode, FilePlus, FileText, FileX, Film, Folder, FolderOpen, FolderPlus, Gauge, GitCompare, Globe, Hammer, Heading, History, Image, Import, Inbox, Keyboard, Link2, ListOrdered, Maximize2, Medal, MemoryStick, MessagesSquare, Minus, PanelLeft, PanelRight, PenLine, Pin, Power, Presentation, Printer, QrCode, Radio, RefreshCw, Reply, Rocket, Server, Share2, ShieldAlert, Square, Star, Table, Tablet, Trophy, Tv, Undo2, Video, WandSparkles, Wrench, Youtube,
 } from 'lucide-react';
 
 const ICONS: Record<string, LucideIcon> = {
@@ -27,6 +28,7 @@ const ICONS: Record<string, LucideIcon> = {
   'sliders-horizontal': SlidersHorizontal, smartphone: Smartphone, sparkles: Sparkles, 'function-square': SquareFunction, stethoscope: Stethoscope,
   'sun-moon': SunMoon, swords: Swords, target: Target, terminal: Terminal, text: Text, timer: Timer, 'trash-2': Trash2, 'triangle-alert': TriangleAlert,
   type: Type, upload: Upload, user: User, 'user-plus': UserPlus, users: Users, 'wifi-off': WifiOff, wind: Wind, x: X, zap: Zap,
+  'square': Square, 'refresh-cw': RefreshCw, 'globe': Globe, 'database': Database, 'folder': Folder, 'file': File, 'file-plus': FilePlus, 'cpu': Cpu, 'hammer': Hammer, 'memory-stick': MemoryStick, 'keyboard': Keyboard, 'panel-left': PanelLeft, 'chevron-left': ChevronLeft, 'tablet': Tablet, 'maximize-2': Maximize2, 'power': Power, 'server': Server, 'folder-open': FolderOpen, 'file-code': FileCode, 'video': Video, 'tv': Tv, 'qr-code': QrCode, 'radio': Radio, 'trophy': Trophy, 'medal': Medal, 'share-2': Share2, 'printer': Printer, 'messages-square': MessagesSquare, 'check-check': CheckCheck, 'git-compare': GitCompare, 'badge-check': BadgeCheck, 'wand-sparkles': WandSparkles, 'circle-play': CirclePlay, 'youtube': Youtube, 'list-ordered': ListOrdered, 'table': Table, 'heading': Heading, 'image': Image, 'film': Film, 'clipboard-paste': ClipboardPaste, 'import': Import, 'history': History, 'presentation': Presentation, 'crown': Crown, 'rocket': Rocket, 'wrench': Wrench, 'circle-dot': CircleDot, 'panel-right': PanelRight, 'columns-2': Columns2, 'arrow-up-right': ArrowUpRight, 'minus': Minus, 'undo-2': Undo2, 'folder-plus': FolderPlus, 'file-x': FileX, 'star': Star, 'inbox': Inbox, 'reply': Reply, 'at-sign': AtSign, 'link-2': Link2, 'shield-alert': ShieldAlert, 'activity': Activity, 'gauge': Gauge, 'arrow-up': ArrowUp, 'arrow-down': ArrowDown, 'pin': Pin, 'eye-off': EyeOff, 'calendar-clock': CalendarClock, 'calendar': Calendar, 'file-text': FileText, 'pen-line': PenLine, 'braces': Braces,
 };
 
 export const iconNames = Object.keys(ICONS);

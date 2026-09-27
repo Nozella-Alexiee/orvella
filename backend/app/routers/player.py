@@ -711,7 +711,11 @@ def _grade(db: Session, user: User, ch: Chapter, s: ExamSession, content: dict[s
             if not ans:
                 earned, ok = 0, False
             else:
-                res = runner.run(str(ans), q.get("tests", []))
+                try:
+                    res = runner.run_tests(q.get("lang"), str(ans), q.get("tests", []))
+                except runner.RunnerUnavailable:
+                    res = {"results": [{"id": t["id"], "pass": False, "detail": "runner tidak tersedia", "ms": 0} for t in q.get("tests", [])],
+                           "error": {"name": "Runner", "message": "Runner kode tidak tersedia saat dinilai.", "line": None}}
                 passed = sum(1 for r in res["results"] if r["pass"])
                 n = max(1, len(res["results"]))
                 earned = round(pts * passed / n)
@@ -800,7 +804,7 @@ def run_challenge(db: Session, user: User, ch: Chapter, code: str) -> tuple[dict
     prog, content = require_phase(db, user, ch, "uji")
     chal = content.get("challenge") or {}
     tests = chal.get("tests", [])
-    res = runner.run(code, tests)
+    res = runner.run_tests(chal.get("language"), code, tests, user.id)
     passed = sum(1 for r in res["results"] if r["pass"])
     all_pass = passed == len(tests) and len(tests) > 0
     n = 1 + (db.scalar(select(func.count()).select_from(Attempt).where(Attempt.user_id == user.id, Attempt.chapter_id == ch.id,
@@ -809,7 +813,10 @@ def run_challenge(db: Session, user: User, ch: Chapter, code: str) -> tuple[dict
                    answer={"code": code, "passed": passed, "total": len(tests), "error": res.get("error")}, version=prog.version))
     st = learning.player_state(db, user, ch, "challenge")
     learning.save_state(st, {**st.data, "code": code})
-    outcome: dict[str, Any] = {"passed": passed, "total": len(tests), "all_pass": all_pass, "attempt": n, "chapter_done": False, "xp": 0}
+    pts_total = sum(int(t.get("pts", 1)) for t in tests) or 1
+    pts_got = sum(int(t.get("pts", 1)) for t, r in zip(tests, res["results"]) if r["pass"])
+    outcome: dict[str, Any] = {"passed": passed, "total": len(tests), "all_pass": all_pass, "attempt": n, "chapter_done": False, "xp": 0,
+                               "score": round(100 * pts_got / pts_total)}
     by_id = {t["id"]: t for t in tests}
     for r in res["results"]:
         r["name"] = by_id.get(r["id"], {}).get("name", "")
@@ -818,7 +825,8 @@ def run_challenge(db: Session, user: User, ch: Chapter, code: str) -> tuple[dict
         learning.touch_mastery(db, user, ch.path_id, chal.get("concepts", []), 5, "Challenge lulus")
         res2 = learning.complete_phase(db, user, ch, "uji", 100)
         sub = Submission(user_id=user.id, kind="challenge", chapter_id=ch.id, title=f"Challenge · Bab {ch.number} · {chal.get('title', '')}",
-                         filename=chal.get("filename", "main.js"), code=code, attempt_no=n, tests_passed=passed, tests_total=len(tests))
+                         filename=chal.get("filename", "main.js"), code=code, attempt_no=n, tests_passed=passed, tests_total=len(tests),
+                         lang=chal.get("language") or "javascript")
         db.add(sub)
         klass = db.get(Klass, user.class_id) if user.class_id else None
         if klass and klass.mentor_id:
@@ -837,8 +845,12 @@ def run_challenge(db: Session, user: User, ch: Chapter, code: str) -> tuple[dict
 @router.post("/chapters/{chapter_id}/challenge/run")
 def challenge_run(chapter_id: int, body: DraftIn, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict[str, Any]:
     ch = get_chapter(db, chapter_id)
-    res, outcome = run_challenge(db, user, ch, body.code)
-    return {"logs": res["logs"], "error": res["error"], "results": res["results"], **outcome, "xp_week": activity.week_xp(db, user.id)}
+    try:
+        res, outcome = run_challenge(db, user, ch, body.code)
+    except runner.RunnerUnavailable as e:
+        raise HTTPException(503, str(e)) from e
+    return {"logs": res["logs"], "error": res["error"], "results": res["results"], "diagnostics": res.get("diagnostics", []),
+            **outcome, "xp_week": activity.week_xp(db, user.id)}
 
 
 class ReportIn(BaseModel):
@@ -880,7 +892,8 @@ async def challenge_ws(ws: WebSocket, chapter_id: int) -> None:
             except runner.RunnerUnavailable as e:
                 await ws.send_json({"type": "error", "message": str(e)})
                 continue
-            await ws.send_json({"type": "queued", "tests": [r["id"] for r in res["results"]], "logs": res["logs"], "error": res["error"]})
+            await ws.send_json({"type": "queued", "tests": [r["id"] for r in res["results"]], "logs": res["logs"], "error": res["error"],
+                                "diagnostics": res.get("diagnostics", [])})
             for r in res["results"]:
                 await ws.send_json({"type": "running", "id": r["id"]})
                 await ws.send_json({"type": "result", **r})

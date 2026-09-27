@@ -25,7 +25,7 @@ secret() { LC_ALL=C tr -dc 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ2345
 
 env_value() { [ -f "$ENV_FILE" ] && grep -E "^$1=" "$ENV_FILE" | head -n1 | cut -d= -f2- || true; }
 
-tunnel_url() { compose logs --no-color tunnel 2>&1 | grep -Eo "$URL_PATTERN" | tail -n1 || true; }
+tunnel_url() { compose logs --no-color "${1:-tunnel}" 2>&1 | grep -Eo "$URL_PATTERN" | tail -n1 || true; }
 
 require_docker() {
   if ! command -v docker >/dev/null 2>&1; then
@@ -44,28 +44,47 @@ require_docker() {
 }
 
 init_env() {
-  [ -f "$ENV_FILE" ] && return
-  umask 077
-  cat >"$ENV_FILE" <<EOF
+  if [ ! -f "$ENV_FILE" ]; then
+    umask 077
+    cat >"$ENV_FILE" <<EOF
 # Dibuat otomatis oleh scripts/tunnel.sh. Jangan dibagikan.
 POSTGRES_PASSWORD=$(secret 24)
 SECRET_KEY=$(secret 48)
 DEMO_PASSWORD=$(secret 12)
 APP_PORT=8000
+PREVIEW_PORT=8301
 TUNNEL_PROTOCOL=auto
 COOKIE_SECURE=true
 EOF
-  echo "${D}File .env dibuat dengan password acak.${N}"
+    echo "${D}File .env dibuat dengan password acak.${N}"
+  fi
+  # kunci yang ditambahkan belakangan (runner, pratinjau, MariaDB)
+  for key in RUNNER_TOKEN PREVIEW_SECRET MYSQL_ROOT_PASSWORD; do
+    grep -q "^$key=" "$ENV_FILE" || echo "$key=$(secret 40)" >>"$ENV_FILE"
+  done
+  grep -q "^PREVIEW_PORT=" "$ENV_FILE" || echo "PREVIEW_PORT=8301" >>"$ENV_FILE"
+}
+
+build_sandbox() {
+  local missing=0
+  for n in py node php c rust go jvm; do docker image inspect "orvella-sbx-$n:latest" >/dev/null 2>&1 || missing=1; done
+  if [ "$missing" = 1 ]; then
+    echo "${D}Membangun image sandbox bahasa (sekali saja, bisa 5-10 menit)...${N}"
+    ./scripts/build-sandbox.sh
+  fi
 }
 
 show_info() {
-  local port demo
+  local port pport demo preview
   port="$(env_value APP_PORT)"; port="${port:-8000}"
+  pport="$(env_value PREVIEW_PORT)"; pport="${pport:-8301}"
   demo="$(env_value DEMO_PASSWORD)"
+  preview="$(tunnel_url tunnel-preview)"
   echo
   echo "${G}Orvella sudah online${N}"
-  echo "  Publik : ${C}$1${N}"
-  echo "  Lokal  : http://localhost:$port"
+  echo "  Publik    : ${C}$1${N}"
+  echo "  Pratinjau : ${C}${preview:-belum ada}${N}  (hasil proyek web siswa, otomatis dipakai aplikasi)"
+  echo "  Lokal     : http://localhost:$port  ·  pratinjau http://localhost:$pport"
   echo
   echo "  Akun demo (siapa pun yang punya URL bisa mencoba masuk, jadi jaga password ini):"
   echo "    admin  sekar@smksig.sch.id"
@@ -81,6 +100,7 @@ require_docker
 case "$CMD" in
   start)
     init_env
+    build_sandbox
     echo "${D}Membangun dan menjalankan container (pertama kali bisa beberapa menit)...${N}"
     compose up -d --build
     echo "${D}Menunggu URL dari Cloudflare...${N}"

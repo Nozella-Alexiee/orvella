@@ -69,11 +69,15 @@ def exam_question_public(q: dict[str, Any]) -> dict[str, Any]:
 
 
 def challenge_public(ch: dict[str, Any]) -> dict[str, Any]:
-    out = {k: v for k, v in ch.items() if k != "tests"}
-    out["tests"] = [
-        {"id": t["id"], "name": ("Tes tersembunyi" if t.get("hidden") else t["name"]), "hidden": bool(t.get("hidden"))}
-        for t in ch.get("tests", [])
-    ]
+    out = {k: v for k, v in ch.items() if k not in ("tests", "solution")}
+    out["language"] = ch.get("language") or "javascript"
+    tests = []
+    for t in ch.get("tests", []):
+        row = {"id": t["id"], "name": ("Tes tersembunyi" if t.get("hidden") else t.get("name") or t["id"]), "hidden": bool(t.get("hidden"))}
+        if t.get("kind") == "io" and not t.get("hidden"):  # visible stdin/stdout tests double as examples
+            row["stdin"], row["expect"] = t.get("stdin", ""), t.get("expect", "")
+        tests.append(row)
+    out["tests"] = tests
     return out
 
 

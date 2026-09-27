@@ -5,7 +5,11 @@ import type { Extension } from '@codemirror/state';
 import { EditorView, Decoration, keymap, placeholder as cmPlaceholder, type DecorationSet } from '@codemirror/view';
 import { Prec, RangeSetBuilder, StateField, StateEffect, EditorState } from '@codemirror/state';
 import { tags as t } from '@lezer/highlight';
+import { setDiagnostics, type Diagnostic } from '@codemirror/lint';
 import { cx } from '../design/ui';
+
+/** Compiler message for the editor: squiggle under the spot + tooltip on hover. */
+export type EditorDiag = { line: number | null; col?: number | null; severity: 'error' | 'warning'; message: string };
 
 /* CodeMirror 6 bergaya kartu kode Orvella ("papan tulis") — sengaja bukan IDE: tanpa minimap, tab, atau ikon gutter.
    Paket bahasa dimuat sesuai kebutuhan supaya bundel awal tetap ringan. */
@@ -23,6 +27,7 @@ const loaders: Record<string, () => Promise<Extension>> = {
   html: () => import('@codemirror/lang-html').then(m => m.html()),
   css: () => import('@codemirror/lang-css').then(m => m.css()),
   kotlin: () => import('@codemirror/legacy-modes/mode/clike').then(m => StreamLanguage.define(m.kotlin)),
+  text: () => Promise.resolve([]),
 };
 const cache = new Map<string, Extension>();
 function useLanguage(lang: string) {
@@ -71,9 +76,23 @@ const badField = StateField.define<DecorationSet>({
   provide: f => EditorView.decorations.from(f),
 });
 
-export function CodeEditor({ value, onChange, onRun, badLine, small, minHeight, readOnly, placeholder, label, runKey = 'Mod-Enter', lang = 'javascript' }: {
-  value: string; onChange?: (v: string) => void; onRun?: () => void; badLine?: number | null; small?: boolean; minHeight?: number;
-  readOnly?: boolean; placeholder?: string; label: string; runKey?: 'Mod-Enter' | 'Shift-Enter'; lang?: string;
+function toCm(doc: EditorState['doc'], diags: EditorDiag[]): Diagnostic[] {
+  const out: Diagnostic[] = [];
+  for (const d of diags) {
+    if (!d.line || d.line > doc.lines) continue;
+    const line = doc.line(d.line);
+    const from = Math.min(line.to, line.from + Math.max(0, (d.col || 1) - 1));
+    const word = /^[\w$]+/.exec(doc.sliceString(from, line.to));
+    const to = d.col ? Math.max(from + 1, from + (word ? word[0].length : 1)) : line.to;
+    out.push({ from: d.col ? from : line.from + (line.text.length - line.text.trimStart().length), to: Math.min(to, line.to) || from,
+      severity: d.severity, message: d.message, source: d.severity === 'error' ? 'error' : 'peringatan' });
+  }
+  return out;
+}
+
+export function CodeEditor({ value, onChange, onRun, badLine, small, minHeight, maxHeight, readOnly, placeholder, label, runKey = 'Mod-Enter', lang = 'javascript', diagnostics }: {
+  value: string; onChange?: (v: string) => void; onRun?: () => void; badLine?: number | null; small?: boolean; minHeight?: number; maxHeight?: number;
+  readOnly?: boolean; placeholder?: string; label: string; runKey?: 'Mod-Enter' | 'Shift-Enter'; lang?: string; diagnostics?: EditorDiag[] | null;
 }) {
   const langExt = useLanguage(lang);
   const unit = WIDE_INDENT.has(lang) ? '    ' : '  ';
@@ -96,6 +115,10 @@ export function CodeEditor({ value, onChange, onRun, badLine, small, minHeight, 
     ...(placeholder ? [cmPlaceholder(placeholder)] : []),
   ], [label, runKey, placeholder, langExt, unit]);
   useEffect(() => { view.current?.dispatch({ effects: setBad.of(badLine ?? null) }); }, [badLine]);
+  useEffect(() => {
+    const v = view.current;
+    if (v) v.dispatch(setDiagnostics(v.state, toCm(v.state.doc, diagnostics || [])));
+  }, [diagnostics]);
   return (
     <div className={cx('cm-host', small && 'is-sm')}>
       <CodeMirror
@@ -105,10 +128,15 @@ export function CodeEditor({ value, onChange, onRun, badLine, small, minHeight, 
         readOnly={readOnly}
         editable={!readOnly}
         theme="none"
-        onCreateEditor={v => { view.current = v; if (badLine) v.dispatch({ effects: setBad.of(badLine) }); }}
+        onCreateEditor={v => {
+          view.current = v;
+          if (badLine) v.dispatch({ effects: setBad.of(badLine) });
+          if (diagnostics?.length) v.dispatch(setDiagnostics(v.state, toCm(v.state.doc, diagnostics)));
+        }}
         basicSetup={{ lineNumbers: true, foldGutter: false, highlightActiveLine: true, highlightActiveLineGutter: true, autocompletion: false,
           bracketMatching: true, closeBrackets: true, indentOnInput: true, searchKeymap: false, lintKeymap: false, highlightSelectionMatches: false, dropCursor: false }}
         minHeight={minHeight ? `${minHeight}px` : undefined}
+        maxHeight={maxHeight ? `${maxHeight}px` : undefined}
       />
     </div>
   );

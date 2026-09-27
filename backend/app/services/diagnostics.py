@@ -47,9 +47,12 @@ def nearest(name: str, candidates: list[str], max_dist: int = 2) -> str | None:
     return best
 
 
-def diagnose(code: str, error: dict[str, Any], scope_code: str = "", assist_cap: int = 6) -> dict[str, Any]:
+def diagnose(code: str, error: dict[str, Any], scope_code: str = "", assist_cap: int = 6, lang: str = "javascript") -> dict[str, Any]:
     if assist_cap < 2:
         return {"available": False, "reason": "capped"}
+    if lang != "javascript":
+        from .explain import explain
+        return explain(lang, code, error, assist_cap)
     name, msg = error.get("name", ""), error.get("message", "")
     line = error.get("line")
     lines = code.split("\n")

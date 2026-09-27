@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from ..db import get_db
 from ..models import Chapter, Klass, Message, Notebook, Project, ProjectProgress, ReviewComment, Submission, User, now
 from ..security import current_user
-from ..services import activity, diagnostics, learning, runner
+from ..services import activity, diagnostics, learning, runner, runtime, stacks
 from ..views import ago, person
 
 router = APIRouter(prefix="/api", tags=["workspace"])
@@ -27,6 +27,40 @@ TEMPLATES = {
 }
 
 
+# Starter programs for the "Program" playground (one file, any language) and the stdin that goes with them.
+STARTERS: dict[str, tuple[str, str]] = {
+    "python": ('# input() membaca kotak Input, satu baris setiap kali\n'
+               'nama = input()\nprint(f"Halo, {nama}! Selamat datang di Orvella.")\n\nfor i in range(1, 4):\n    print(f"Hitung {i}")\n', "Orvi"),
+    "javascript": ('// Input dibaca dari kotak Input (satu baris per nilai)\n'
+                   'const input = require("fs").readFileSync(0, "utf8").trim().split("\\n");\n'
+                   'const nama = input[0] || "teman";\nconsole.log(`Halo, ${nama}! Selamat datang di Orvella.`);\n', "Orvi"),
+    "php": ('<?php\n$nama = trim(fgets(STDIN)) ?: "teman";\necho "Halo, $nama! Selamat datang di Orvella.\\n";\n', "Orvi"),
+    "c": ('#include <stdio.h>\n\nint main(void) {\n    char nama[50];\n    scanf("%49s", nama);\n'
+          '    printf("Halo, %s! Selamat datang di Orvella.\\n", nama);\n    return 0;\n}\n', "Orvi"),
+    "cpp": ('#include <iostream>\n#include <string>\nusing namespace std;\n\nint main() {\n    string nama;\n    cin >> nama;\n'
+            '    cout << "Halo, " << nama << "! Selamat datang di Orvella." << endl;\n    return 0;\n}\n', "Orvi"),
+    "rust": ('use std::io;\n\nfn main() {\n    let mut nama = String::new();\n    io::stdin().read_line(&mut nama).unwrap();\n'
+             '    println!("Halo, {}! Selamat datang di Orvella.", nama.trim());\n}\n', "Orvi"),
+    "go": ('package main\n\nimport "fmt"\n\nfunc main() {\n\tvar nama string\n\tfmt.Scan(&nama)\n'
+           '\tfmt.Printf("Halo, %s! Selamat datang di Orvella.\\n", nama)\n}\n', "Orvi"),
+    "java": ('import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n'
+             '        Scanner in = new Scanner(System.in);\n        String nama = in.next();\n'
+             '        System.out.println("Halo, " + nama + "! Selamat datang di Orvella.");\n    }\n}\n', "Orvi"),
+    "kotlin": ('fun main() {\n    val nama = readln()\n    println("Halo, $nama! Selamat datang di Orvella.")\n}\n', "Orvi"),
+    "sql": ("-- Database baru dibuat setiap kali dijalankan (SQLite di memori)\n"
+            "CREATE TABLE siswa (id INTEGER PRIMARY KEY, nama TEXT, nilai INTEGER);\n"
+            "INSERT INTO siswa (nama, nilai) VALUES ('Ana', 90), ('Budi', 78), ('Citra', 85);\n\n"
+            "SELECT nama, nilai FROM siswa WHERE nilai >= 80 ORDER BY nilai DESC;\n", ""),
+    "html": ('<!doctype html>\n<html>\n<head>\n  <style>\n    body { font-family: system-ui, sans-serif; background: #FFF8EC; color: #2B2350; padding: 24px; }\n'
+             '    .halo { color: #E8930C; }\n    button { font: inherit; padding: 8px 16px; border-radius: 10px; border: 0; background: #2B2350; color: #fff; }\n'
+             '  </style>\n</head>\n<body>\n  <h1 class="halo">Halo, Orvella!</h1>\n  <p>Ubah kode ini dan lihat hasilnya langsung.</p>\n'
+             '  <button onclick="this.textContent = \'Diklik!\'">Klik aku</button>\n</body>\n</html>\n', ""),
+    "css": ('.halo {\n  color: #E8930C;\n  font-size: 2.5rem;\n}\n\n.kartu {\n  padding: 16px 20px;\n  border-radius: 16px;\n'
+            '  background: #fff;\n  box-shadow: 0 6px 0 #2B235022;\n}\n', ""),
+}
+PROGRAM_LANGS = tuple(STARTERS)
+
+
 def _new_id() -> str:
     import secrets
     return secrets.token_hex(4)
@@ -35,7 +69,8 @@ def _new_id() -> str:
 def _nb_view(db: Session, nb: Notebook) -> dict[str, Any]:
     ch = db.get(Chapter, nb.attached_chapter_id) if nb.attached_chapter_id else None
     return {"id": nb.id, "title": nb.title, "cells": nb.cells or [], "updated": ago(nb.updated_at),
-            "attached": learning.chapter_ref(ch) if ch else None}
+            "attached": learning.chapter_ref(ch) if ch else None, "kind": nb.kind or "notebook", "lang": nb.lang or "javascript",
+            "files": nb.files or {}}
 
 
 def _get_nb(db: Session, user: User, nb_id: int) -> Notebook:
@@ -50,20 +85,39 @@ def notebooks(user: User = Depends(current_user), db: Session = Depends(get_db))
     rows = db.scalars(select(Notebook).where(Notebook.user_id == user.id).order_by(Notebook.updated_at.desc()))
     pm = learning.progress_map(db, user.id)
     attachable = [learning.chapter_ref(db.get(Chapter, cid)) for cid in pm]
-    return {"items": [{"id": n.id, "title": n.title, "updated": ago(n.updated_at)} for n in rows],
+    return {"items": [{"id": n.id, "title": n.title, "updated": ago(n.updated_at), "kind": n.kind or "notebook", "lang": n.lang or "javascript"}
+                      for n in rows],
             "attachable": sorted(attachable, key=lambda c: c["number"]), "assist_cap": user.assist_cap}
 
 
 class NotebookIn(BaseModel):
     title: str | None = None
     template: str | None = None
+    kind: str = Field(default="notebook", pattern="^(notebook|program|web)$")
+    lang: str = "javascript"
+    stack: str | None = None
 
 
 @router.post("/notebooks")
 def create_notebook(body: NotebookIn, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict[str, Any]:
-    tpl = TEMPLATES.get(body.template or "")
-    cells = [{**c, "id": _new_id()} for c in (tpl["cells"] if tpl else [])]
-    nb = Notebook(user_id=user.id, title=(body.title or (tpl["title"] if tpl else "Notebook tanpa judul"))[:160], cells=cells)
+    if body.kind == "web":
+        stack = body.stack or "static"
+        if stack not in stacks.STACKS:
+            raise HTTPException(400, "Stack tidak dikenal.")
+        nb = Notebook(user_id=user.id, title=(body.title or f"Proyek {stacks.STACKS[stack]['name']}")[:160], cells=[], kind="web", lang=stack,
+                      files={"stack": stack, "files": stacks.template(stack)})
+    elif body.kind == "program":
+        if body.lang not in PROGRAM_LANGS:
+            raise HTTPException(400, "Bahasa tidak dikenal.")
+        code, stdin = STARTERS[body.lang]
+        label = runtime.LABELS.get(body.lang, body.lang.upper())
+        nb = Notebook(user_id=user.id, title=(body.title or f"Program {label} baru")[:160], cells=[], kind="program", lang=body.lang,
+                      files={"code": code, "stdin": stdin})
+    else:
+        tpl = TEMPLATES.get(body.template or "")
+        cells = [{**c, "id": _new_id()} for c in (tpl["cells"] if tpl else [])]
+        nb = Notebook(user_id=user.id, title=(body.title or (tpl["title"] if tpl else "Notebook tanpa judul"))[:160], cells=cells,
+                      kind="notebook", lang="javascript", files={})
     db.add(nb)
     db.commit()
     return _nb_view(db, nb)
@@ -77,6 +131,8 @@ def get_notebook(nb_id: int, user: User = Depends(current_user), db: Session = D
 class NotebookUpdate(BaseModel):
     title: str | None = Field(default=None, max_length=160)
     cells: list[dict[str, Any]] | None = None
+    files: dict[str, Any] | None = None
+    lang: str | None = None
     attached_chapter_id: int | None = None
     detach: bool = False
 
@@ -93,6 +149,10 @@ def update_notebook(nb_id: int, body: NotebookUpdate, user: User = Depends(curre
                 continue
             clean.append({"id": str(c.get("id") or _new_id())[:16], "type": c["type"], "src": str(c.get("src", ""))[:20000]})
         nb.cells = clean
+    if body.files is not None and nb.kind == "program":
+        nb.files = {"code": str(body.files.get("code", ""))[:runner.MAX_CODE_CHARS], "stdin": str(body.files.get("stdin", ""))[:8000]}
+    if body.lang and nb.kind == "program" and body.lang in PROGRAM_LANGS:
+        nb.lang = body.lang
     if body.detach:
         nb.attached_chapter_id = None
     elif body.attached_chapter_id is not None:
@@ -107,7 +167,13 @@ def update_notebook(nb_id: int, body: NotebookUpdate, user: User = Depends(curre
 
 @router.delete("/notebooks/{nb_id}")
 def delete_notebook(nb_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict[str, bool]:
-    db.delete(_get_nb(db, user, nb_id))
+    nb = _get_nb(db, user, nb_id)
+    if nb.kind == "web" and runner.configured():
+        try:  # stop the server and drop the project's files and database
+            runner.call("DELETE", f"/projects/p{nb.id}")
+        except runner.RunnerUnavailable:
+            pass
+    db.delete(nb)
     db.commit()
     return {"ok": True}
 
@@ -117,12 +183,56 @@ class DiagnoseIn(BaseModel):
     error: dict[str, Any]
     scope_code: str = ""
     where: str = "playground"  # playground | perkuat | pahami
+    lang: str = "javascript"
 
 
 @router.post("/diagnose")
 def diagnose(body: DiagnoseIn, user: User = Depends(current_user)) -> dict[str, Any]:
     cap = user.assist_cap if body.where in ("playground", "perkuat") else 6
-    return diagnostics.diagnose(body.code, body.error, body.scope_code, cap)
+    return diagnostics.diagnose(body.code, body.error, body.scope_code, cap, body.lang)
+
+
+# ------------------------------------------------------------ run any language
+@router.get("/langs")
+def langs(user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict[str, Any]:
+    conf = runtime.get(db)
+    return {"runner": runner.configured(), "langs": [{"id": l, "enabled": l not in conf["disabled"]} for l in runner.LANG_IDS],
+            "starters": {k: {"code": v[0], "stdin": v[1]} for k, v in STARTERS.items()}}
+
+
+class RunIn(BaseModel):
+    lang: str
+    code: str = Field(max_length=runner.MAX_CODE_CHARS)
+    stdin: str = Field(default="", max_length=8000)
+
+
+def run_view(res: dict[str, Any]) -> dict[str, Any]:
+    r = res.get("run") or {}
+    comp = res.get("compile")
+    return {"ok": res.get("ok", False), "stdout": runner.lines(r.get("stdout", "")), "stderr": (r.get("stderr") or "")[:8000],
+            "exit": r.get("exit"), "ms": r.get("ms"), "mem_kb": r.get("mem_kb"), "timeout": bool(r.get("timeout")), "oom": bool(r.get("oom")),
+            "truncated": bool(r.get("truncated")),
+            "compile": {"ok": comp.get("ok"), "ms": comp.get("ms"), "stderr": (comp.get("stderr") or comp.get("stdout") or "")[:8000]} if comp else None,
+            "error": res.get("error"), "diagnostics": res.get("diagnostics", []), "total_ms": res.get("ms")}
+
+
+@router.post("/run")
+def run_program(body: RunIn, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict[str, Any]:
+    if body.lang not in runner.LANG_IDS:
+        raise HTTPException(400, "Bahasa ini tidak dijalankan di server.")
+    enabled, timeout, memory = runtime.limits(db, body.lang)
+    if not enabled:
+        raise HTTPException(409, "Bahasa ini sedang dinonaktifkan oleh admin.")
+    try:
+        runner.check_rate(user.id)
+        res = runner.execute(body.lang, body.code, body.stdin, timeout=timeout, memory=memory)
+    except runner.RateLimited as e:
+        raise HTTPException(429, str(e)) from e
+    except runner.RunnerUnavailable as e:
+        raise HTTPException(503, str(e)) from e
+    activity.record_activity(db, user, 0)
+    db.commit()
+    return run_view(res)
 
 
 # ------------------------------------------------------------------ projects

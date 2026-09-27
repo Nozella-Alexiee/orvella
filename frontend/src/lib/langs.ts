@@ -5,7 +5,7 @@ export type Lang = { id: string; name: string; rt: string; ext: string; kind: La
 export const LANGS: Lang[] = [
   { id: 'python', name: 'Python', rt: 'Python 3.13', ext: 'py', kind: 'run', icon: 'python-original',
     hello: 'nama = "Orvella"\nprint(f"Halo, {nama}!")', out: 'Halo, Orvella!' },
-  { id: 'javascript', name: 'JavaScript', rt: 'Node 22', ext: 'js', kind: 'run', icon: 'javascript-original',
+  { id: 'javascript', name: 'JavaScript', rt: 'Node 24', ext: 'js', kind: 'run', icon: 'javascript-original',
     hello: 'const nama = "Orvella";\nconsole.log(`Halo, ${nama}!`);', out: 'Halo, Orvella!' },
   { id: 'html', name: 'HTML', rt: 'HTML5', ext: 'html', kind: 'web', icon: 'html5-original',
     hello: '<h1 class="halo">Halo, Orvella!</h1>\n<p>Halaman pertamaku.</p>', out: 'Halo, Orvella!' },
@@ -15,20 +15,26 @@ export const LANGS: Lang[] = [
     hello: '#include <stdio.h>\n\nint main(void) {\n    printf("Halo, Orvella!\\n");\n    return 0;\n}', out: 'Halo, Orvella!' },
   { id: 'cpp', name: 'C++', rt: 'GCC 14 · C++20', ext: 'cpp', kind: 'compile', icon: 'cplusplus-original',
     hello: '#include <iostream>\n\nint main() {\n    std::cout << "Halo, Orvella!\\n";\n}', out: 'Halo, Orvella!' },
-  { id: 'rust', name: 'Rust', rt: 'Rust 1.86', ext: 'rs', kind: 'compile', icon: 'rust-original', mono: true,
+  { id: 'rust', name: 'Rust', rt: 'Rust 1.87', ext: 'rs', kind: 'compile', icon: 'rust-original', mono: true,
     hello: 'fn main() {\n    let nama = "Orvella";\n    println!("Halo, {}!", nama);\n}', out: 'Halo, Orvella!' },
   { id: 'java', name: 'Java', rt: 'OpenJDK 21', ext: 'java', kind: 'compile', icon: 'java-original',
     hello: 'class Main {\n    public static void main(String[] a) {\n        System.out.println("Halo, Orvella!");\n    }\n}', out: 'Halo, Orvella!' },
-  { id: 'go', name: 'Go', rt: 'Go 1.24', ext: 'go', kind: 'compile', icon: 'go-original',
+  { id: 'go', name: 'Go', rt: 'Go 1.25', ext: 'go', kind: 'compile', icon: 'go-original',
     hello: 'package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Halo, Orvella!")\n}', out: 'Halo, Orvella!' },
-  { id: 'sql', name: 'SQL', rt: 'SQLite 3', ext: 'sql', kind: 'query', icon: 'sqlite-original',
-    hello: "SELECT 'Halo, Orvella!' AS sapaan;", out: ' sapaan\n----------------\n Halo, Orvella!\n(1 baris)' },
+  { id: 'sql', name: 'SQL', rt: 'SQLite 3.40', ext: 'sql', kind: 'query', icon: 'sqlite-original',
+    hello: "SELECT 'Halo, Orvella!' AS sapaan;", out: '     sapaan\n----------------\n Halo, Orvella!\n(1 baris)' },
   { id: 'kotlin', name: 'Kotlin', rt: 'Kotlin 2.1', ext: 'kt', kind: 'compile', icon: 'kotlin-original',
     hello: 'fun main() {\n    println("Halo, Orvella!")\n}', out: 'Halo, Orvella!' },
   { id: 'php', name: 'PHP', rt: 'PHP 8.4', ext: 'php', kind: 'run', icon: 'php-original',
     hello: '<?php\n$nama = "Orvella";\necho "Halo, $nama!";', out: 'Halo, Orvella!' },
 ];
 export const LANG_BY_ID: Record<string, Lang> = Object.fromEntries(LANGS.map(l => [l.id, l]));
+/** Bahasa yang dijalankan di server (runner). HTML & CSS dipratinjau langsung di browser. */
+export const SERVER_LANGS = new Set(['python', 'javascript', 'php', 'c', 'cpp', 'rust', 'go', 'java', 'kotlin', 'sql']);
+export const COMPILED = new Set(['c', 'cpp', 'rust', 'go', 'java', 'kotlin']);
+export const FILE_OF: Record<string, string> = { python: 'main.py', javascript: 'main.js', php: 'main.php', c: 'main.c', cpp: 'main.cpp',
+  rust: 'main.rs', go: 'main.go', java: 'Main.java', kotlin: 'main.kt', sql: 'main.sql', html: 'index.html', css: 'style.css' };
+
 export const KIND_LABEL: Record<LangKind, string> = { run: 'langsung jalan', compile: 'dikompilasi', web: 'pratinjau langsung', query: 'kueri ke tabel' };
 
 /** Ikon tambahan untuk stack fullstack. */

@@ -460,3 +460,35 @@ def add_concept(body: ConceptIn, me: User = Depends(admin_only), db: Session = D
     db.add(c)
     db.commit()
     return {"key": c.key, "name": c.name}
+
+
+# ------------------------------------------------------------------ runtime
+@router.get("/runtime")
+def runtime_status(versions: bool = False, me: User = Depends(admin_only), db: Session = Depends(get_db)) -> dict[str, Any]:
+    from ..services import runner, runtime
+    st = runner.status(versions=versions)
+    conf = runtime.get(db)
+    by_id = {l["id"]: l for l in (st or {}).get("langs", [])}
+    langs = []
+    for lid in runner.LANG_IDS:
+        info = by_id.get(lid, {})
+        langs.append({"id": lid, "name": runtime.LABELS[lid], "enabled": lid not in conf["disabled"],
+                      "available": bool(info.get("available")), "version": info.get("version", ""),
+                      "compiled": bool(info.get("compiled")), "timeout": conf["timeout"].get(lid), "memory": conf["memory"].get(lid),
+                      "default_timeout": info.get("run_timeout"), "default_memory": info.get("run_mem")})
+    return {"runner": st is not None, "configured": runner.configured(), "queue": (st or {}).get("queue"),
+            "sessions": (st or {}).get("sessions"), "limits": (st or {}).get("limits"), "langs": langs}
+
+
+class RuntimeIn(BaseModel):
+    disabled: list[str] = Field(default_factory=list)
+    timeout: dict[str, float] = Field(default_factory=dict)
+    memory: dict[str, int] = Field(default_factory=dict)
+
+
+@router.put("/runtime")
+def runtime_update(body: RuntimeIn, me: User = Depends(admin_only), db: Session = Depends(get_db)) -> dict[str, Any]:
+    from ..services import runtime
+    value = runtime.put(db, body.disabled, body.timeout, body.memory)
+    db.commit()
+    return value

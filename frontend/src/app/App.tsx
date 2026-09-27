@@ -29,6 +29,7 @@ const Admin = lazy(() => import('../admin/AdminPage'));
 const Builder = lazy(() => import('../admin/BuilderPage'));
 const ChapterList = lazy(() => import('../admin/ChapterList'));
 const People = lazy(() => import('../admin/PeoplePage'));
+const Runtime = lazy(() => import('../admin/RuntimePage'));
 const NotFound = lazy(() => import('../pages/NotFound'));
 
 function RequireAuth({ roles, children }: { roles?: string[]; children: ReactNode }) {
@@ -120,6 +121,7 @@ export function App() {
               <Route path="/admin/bab" element={<ChapterList />} />
               <Route path="/admin/bab/:id" element={<Builder />} />
               <Route path="/admin/pengguna" element={<People />} />
+              <Route path="/admin/runtime" element={<Runtime />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

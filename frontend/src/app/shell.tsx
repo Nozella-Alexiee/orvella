@@ -145,7 +145,7 @@ export function AdminSidebar() {
       ['kuis', 'zap', 'Bank soal Kuis', '/admin/bab?fokus=kuis', fmt(c?.kuis)], ['challenge', 'swords', 'Challenge', '/admin/bab?fokus=challenge', fmt(c?.challenge)],
       ['ulangan', 'timer', 'Ulangan', '/admin/bab?fokus=ulangan', fmt(c?.ulangan)], ['proyek', 'folder-kanban', 'Proyek', '/admin/bab?fokus=proyek', fmt(c?.proyek)]]],
     ['Orang', [['users', 'users', 'Pengguna', '/admin/pengguna'], ['mentors', 'graduation-cap', 'Mentor', '/admin/pengguna?peran=mentor'], ['org', 'building-2', 'Kelas', '/admin/pengguna?tab=kelas']]],
-    ['Sistem', [['settings', 'settings', 'Pengaturan', '/pengaturan']]],
+    ['Sistem', [['runtime', 'cpu', 'Runtime kode', '/admin/runtime'], ['settings', 'settings', 'Pengaturan', '/pengaturan']]],
   ];
   const full = loc.pathname + loc.search;
   const isActive = (to: string) => (to.includes('?') ? full === to : loc.pathname === to && (!loc.search || to !== '/admin/bab' || !loc.search.includes('fokus')));

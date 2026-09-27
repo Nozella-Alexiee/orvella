@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .config import settings
 from .db import Base, _is_sqlite, engine
-from .routers import admin, auth, learner, mentor, player, workspace
+from .routers import admin, auth, learner, mentor, player, webproj, workspace
 from .services.runner import RunnerUnavailable
 
 # PostgreSQL is managed by Alembic (python -m app.migrate). A local SQLite dev database is created on the fly.
@@ -14,7 +14,7 @@ if _is_sqlite:
 
 app = FastAPI(title="Orvella API", version="1.0.0")
 
-for r in (auth.router, learner.router, player.router, player.ws_router, workspace.router, mentor.router, admin.router):
+for r in (auth.router, learner.router, player.router, player.ws_router, workspace.router, webproj.router, mentor.router, admin.router):
     app.include_router(r)
 
 

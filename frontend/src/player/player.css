@@ -98,3 +98,7 @@
 .badge-medal { width: 132px; height: 132px; margin: 0 auto; position: relative; display: grid; place-items: center; }
 .badge-medal .pring { position: absolute; inset: 0; }
 .robot .report { margin-left: 8px; font-size: 11px; }
+.io-ex { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; border-radius: 14px; overflow: hidden; background: var(--editor-line); }
+.io-ex > div { background: var(--editor-bg); padding: 8px 12px; }
+.io-ex .t-label { color: var(--editor-dim); }
+.io-ex pre { margin: 4px 0 0; font-family: var(--font-mono); font-size: 13px; color: #F4EEFF; white-space: pre-wrap; }
