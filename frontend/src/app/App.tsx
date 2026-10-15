@@ -5,22 +5,12 @@ import { queryClient, useMe } from '../api/hooks';
 import { AdminLayout, AppNav, CommandPalette } from './shell';
 import { ToastStack } from '../design/toast';
 import { Boot, homeFor } from './common';
+import { osRouteElements } from '../os/registry';
 
-const Landing = lazy(() => import('../pages/landing/LandingPage'));
+const Landing = lazy(() => import('../pages/landing/LandingOS'));
+const OsLayout = lazy(() => import('../os/OsLayout').then(m => ({ default: m.OsLayout })));
 const Auth = lazy(() => import('../pages/Auth'));
 const Onboarding = lazy(() => import('../pages/Onboarding'));
-const Beranda = lazy(() => import('../pages/Beranda'));
-const Peta = lazy(() => import('../pages/Peta'));
-const Bab = lazy(() => import('../pages/Bab'));
-const Progres = lazy(() => import('../pages/Progres'));
-const Pengaturan = lazy(() => import('../pages/Pengaturan'));
-const Playground = lazy(() => import('../pages/Playground'));
-const Proyek = lazy(() => import('../pages/Proyek'));
-const Pahami = lazy(() => import('../pahami/PahamiPage'));
-const Perkuat = lazy(() => import('../perkuat/PerkuatPage'));
-const Kuis = lazy(() => import('../kuis/KuisPage'));
-const Ulangan = lazy(() => import('../uji/UlanganPage'));
-const Challenge = lazy(() => import('../uji/ChallengePage'));
 const Mentor = lazy(() => import('../mentor/MentorPage'));
 const Siswa = lazy(() => import('../mentor/SiswaPage'));
 const Roster = lazy(() => import('../mentor/RosterPage'));
@@ -30,10 +20,17 @@ const Builder = lazy(() => import('../admin/BuilderPage'));
 const ChapterList = lazy(() => import('../admin/ChapterList'));
 const People = lazy(() => import('../admin/PeoplePage'));
 const Runtime = lazy(() => import('../admin/RuntimePage'));
-const Jalur = lazy(() => import('../pages/Jalur'));
+const Log = lazy(() => import('../admin/LogPage'));
+const LupaSandi = lazy(() => import('../pages/LupaSandi'));
+const ResetSandi = lazy(() => import('../pages/LupaSandi').then(m => ({ default: m.ResetSandi })));
+const Privasi = lazy(() => import('../pages/legal/Legal').then(m => ({ default: m.Privasi })));
+const Syarat = lazy(() => import('../pages/legal/Legal').then(m => ({ default: m.Syarat })));
 const StudioHome = lazy(() => import('../studio/StudioPages').then(m => ({ default: m.StudioHome })));
 const StudioPath = lazy(() => import('../studio/StudioPages').then(m => ({ default: m.StudioPath })));
 const NotFound = lazy(() => import('../pages/NotFound'));
+const KolabJoin = lazy(() => import('../pages/KolabJoin'));
+const LiveSetup = lazy(() => import('../live/LiveHost').then(m => ({ default: m.LiveSetup })));
+const LiveScreen = lazy(() => import('../live/LiveHost').then(m => ({ default: m.LiveScreen })));
 
 function RequireAuth({ roles, children }: { roles?: string[]; children: ReactNode }) {
   const { data: me, isLoading } = useMe();
@@ -41,13 +38,11 @@ function RequireAuth({ roles, children }: { roles?: string[]; children: ReactNod
   if (isLoading) return <Boot />;
   if (!me) return <Navigate to={`/masuk?next=${encodeURIComponent(loc.pathname + loc.search)}`} replace />;
   if (me.role === 'learner' && !me.onboarded && !loc.pathname.startsWith('/mulai')) return <Navigate to="/mulai/tujuan" replace />;
-  if (roles && !roles.includes(me.role)) return <Navigate to={homeFor(me.role)} replace />;
+  // superadmin lolos di semua halaman yang mengizinkan admin
+  if (roles && !roles.includes(me.role) && !(me.role === 'superadmin' && roles.includes('admin'))) return <Navigate to={homeFor(me.role)} replace />;
   return <>{children}</>;
 }
 
-function LearnerLayout() {
-  return <RequireAuth roles={['learner', 'mentor', 'admin']}><AppNav role="learner" /><Suspense fallback={<Boot />}><Outlet /></Suspense></RequireAuth>;
-}
 function MentorLayout() {
   return <RequireAuth roles={['mentor', 'admin']}><AppNav role="mentor" /><Suspense fallback={<Boot />}><Outlet /></Suspense></RequireAuth>;
 }
@@ -57,16 +52,14 @@ function AdminShell() {
 function StudioShell() {
   return <RequireAuth roles={['mentor', 'admin']}><Suspense fallback={<Boot />}><Outlet /></Suspense></RequireAuth>;
 }
-function PlayerLayout() {
-  return <RequireAuth><Suspense fallback={<Boot />}><Outlet /></Suspense></RequireAuth>;
-}
 
 function SessionWatcher() {
   const nav = useNavigate();
   useEffect(() => {
     const f = () => {
       queryClient.setQueryData(['/api/me'], null);
-      if (!/^\/(masuk|daftar)?$/.test(location.pathname)) nav(`/masuk?next=${encodeURIComponent(location.pathname)}`);
+      // halaman publik (tanpa login) tidak dilempar ke /masuk
+      if (!/^\/(masuk|daftar|lupa-sandi|reset-sandi\/[^/]+|privasi|syarat)?$/.test(location.pathname)) nav(`/masuk?next=${encodeURIComponent(location.pathname)}`);
     };
     addEventListener('orvella:unauthorized', f);
     return () => removeEventListener('orvella:unauthorized', f);
@@ -91,36 +84,23 @@ export function App() {
             <Route path="/" element={<Landing />} />
             <Route path="/masuk" element={<Auth mode="login" />} />
             <Route path="/daftar" element={<Auth mode="register" />} />
+            <Route path="/lupa-sandi" element={<LupaSandi />} />
+            <Route path="/reset-sandi/:token" element={<ResetSandi />} />
+            <Route path="/privasi" element={<Privasi />} />
+            <Route path="/syarat" element={<Syarat />} />
             <Route path="/mulai/:step" element={<RequireAuth roles={['learner']}><Onboarding /></RequireAuth>} />
+            <Route path="/s/:kode" element={<RequireAuth><KolabJoin /></RequireAuth>} />
+            <Route path="/kuis-langsung/:pin/layar" element={<RequireAuth roles={['mentor', 'admin']}><LiveScreen /></RequireAuth>} />
 
-            <Route element={<LearnerLayout />}>
-              <Route path="/beranda" element={<Beranda />} />
-              <Route path="/peta" element={<Navigate to="/peta/saya" replace />} />
-              <Route path="/jalur" element={<Jalur />} />
-              <Route path="/peta/:pathId" element={<Peta />} />
-              <Route path="/bab/:id" element={<Bab />} />
-              <Route path="/playground" element={<Playground />} />
-              <Route path="/playground/:notebookId" element={<Playground />} />
-              <Route path="/proyek" element={<Proyek />} />
-              <Route path="/proyek/:projectId" element={<Proyek />} />
-              <Route path="/progres" element={<Progres />} />
-              <Route path="/pengaturan" element={<Pengaturan />} />
-            </Route>
-
-            <Route element={<PlayerLayout />}>
-              <Route path="/bab/:id/pahami" element={<Pahami />} />
-              <Route path="/bab/:id/perkuat" element={<Perkuat />} />
-              <Route path="/bab/:id/kuis" element={<Kuis />} />
-              <Route path="/kuis-harian" element={<Kuis daily />} />
-              <Route path="/bab/:id/uji/ulangan" element={<Ulangan />} />
-              <Route path="/bab/:id/uji/challenge" element={<Challenge />} />
-            </Route>
+            {/* Siswa (dan staf yang membuka /beranda): Orvella OS. Rute yang sama juga jadi jendela; ?ui=klasik membuka tampilan lama. */}
+            <Route element={<OsLayout />}>{osRouteElements()}</Route>
 
             <Route element={<MentorLayout />}>
               <Route path="/mentor" element={<Mentor />} />
               <Route path="/mentor/siswa" element={<Roster />} />
               <Route path="/mentor/siswa/:userId" element={<Siswa />} />
               <Route path="/mentor/review" element={<ReviewQueue />} />
+              <Route path="/mentor/kuis-langsung" element={<LiveSetup />} />
               <Route path="/studio" element={<StudioHome />} />
               <Route path="/studio/jalur/:id" element={<StudioPath />} />
             </Route>
@@ -134,6 +114,7 @@ export function App() {
               <Route path="/admin/bab/:id" element={<Builder />} />
               <Route path="/admin/pengguna" element={<People />} />
               <Route path="/admin/runtime" element={<Runtime />} />
+              <Route path="/admin/log" element={<Log />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

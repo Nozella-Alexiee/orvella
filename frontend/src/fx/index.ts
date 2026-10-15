@@ -148,7 +148,7 @@ export function flyTo(src: El, dst: El, { dur = 700 } = {}): Promise<void> {
 }
 
 // ---------- Suara (bawaan mati; Pengaturan › Suara). Disintesis lewat WebAudio. ----------
-export type SoundKind = 'ok' | 'no' | 'done' | 'tick' | 'tap' | 'pop' | 'whoosh' | 'level';
+export type SoundKind = 'ok' | 'no' | 'done' | 'tick' | 'tap' | 'pop' | 'whoosh' | 'level' | 'open' | 'min' | 'snap' | 'drop' | 'cheer' | 'err';
 let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
 export const soundOn = () => store.get('orvella-sound') === 'on';
@@ -178,6 +178,13 @@ const SOUNDS: Record<SoundKind, (t: number) => void> = {
   whoosh: t => noise(t, .35, { vol: .06, from: 300, to: 3200 }),
   level: t => { [523, 659, 784, 1047, 1319].forEach((f, i) => tone(t + i * .07, f, .26, { type: 'triangle', vol: .09 })); noise(t + .3, .4, { vol: .03, from: 4000, to: 9000 }); },
   done: t => SOUNDS.level(t),
+  // Orvella OS: jendela, seret-lepas, sorakan
+  open: t => { tone(t, 330, .16, { to: 660, vol: .06, type: 'triangle' }); noise(t, .18, { vol: .025, from: 600, to: 2600 }); },
+  min: t => { tone(t, 660, .2, { to: 220, vol: .06, type: 'triangle' }); noise(t, .22, { vol: .025, from: 2600, to: 500 }); },
+  snap: t => { tone(t, 180, .08, { vol: .12, to: 120 }); tone(t + .02, 1400, .04, { vol: .03, type: 'square' }); },
+  drop: t => { tone(t, 520, .07, { to: 260, vol: .1 }); tone(t + .06, 390, .12, { vol: .06, type: 'triangle' }); },
+  cheer: t => { [880, 1175, 1568].forEach((f, i) => tone(t + i * .05, f, .18, { vol: .06 })); noise(t + .1, .3, { vol: .02, from: 5000, to: 9000 }); },
+  err: t => tone(t, 150, .18, { type: 'sawtooth', vol: .05, to: 110 }),
 };
 export function sound(kind: SoundKind) {
   if (!soundOn()) return;

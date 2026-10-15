@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router';
+import { HelpQueue } from '../os/Bantuan';
+import { Link, useSearchParams } from 'react-router';
 import { api } from '../api/client';
 import { useApi } from '../api/hooks';
 import type { ChapterRef, Person } from '../api/types';
@@ -71,9 +72,11 @@ export default function MentorPage() {
           <p className="t-muted mt-2">{k.total} siswa · {d.path.title} · minggu ke-{d.week}</p></div>
         <div className="row gap-2">
           <select className="select" style={{ width: 180 }} aria-label="Kelas" value={d.class.id} onChange={e => setParams({ kelas: e.target.value })}>{d.classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
+          <Link className="btn btn-lg" to="/mentor/kuis-langsung"><Icon name="presentation" />Kuis langsung</Link>
           <button className="btn btn-primary btn-lg btn-press" onClick={() => setAssign(true)}><Icon name="clipboard-plus" />Beri tugas</button>
         </div>
       </div>
+      <HelpQueue />
 
       <div className="kpis">
         <div className="kpi"><span className="eyebrow">Siswa aktif minggu ini</span><div className="stat-value mt-2"><Tick to={k.active} /><small>/ {k.total}</small></div></div>

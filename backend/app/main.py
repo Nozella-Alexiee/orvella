@@ -5,16 +5,30 @@ from fastapi.staticfiles import StaticFiles
 
 from .config import settings
 from .db import Base, _is_sqlite, engine
-from .routers import admin, auth, learner, mentor, player, studio, webproj, workspace
+import asyncio
+from contextlib import asynccontextmanager
+
+from .routers import admin, auth, bantuan, desk, duel, google, kolab, learner, livequiz, mentor, orvi, player, sandbox, social, studio, webproj, workspace
+from .services.presence import sweeper
 from .services.runner import RunnerUnavailable
 
 # PostgreSQL is managed by Alembic (python -m app.migrate). A local SQLite dev database is created on the fly.
 if _is_sqlite:
     Base.metadata.create_all(engine)
 
-app = FastAPI(title="Orvella API", version="1.0.0")
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    from .services.presence import hub
+    hub.loop = asyncio.get_running_loop()  # route sync mendorong pesan realtime lewat loop ini
+    task = asyncio.create_task(sweeper())  # drops silent presence connections
+    yield
+    task.cancel()
 
-for r in (auth.router, learner.router, player.router, player.ws_router, workspace.router, webproj.router, studio.router, mentor.router, admin.router):
+
+app = FastAPI(title="Orvella API", version="1.0.0", lifespan=lifespan)
+
+for r in (auth.router, learner.router, player.router, player.ws_router, workspace.router, webproj.router, sandbox.router, social.router,
+          social.ws_router, studio.router, mentor.router, admin.router, desk.router, google.router, kolab.router, kolab.ws_router, duel.router, bantuan.router, livequiz.router, livequiz.ws_router, orvi.router):
     app.include_router(r)
 
 

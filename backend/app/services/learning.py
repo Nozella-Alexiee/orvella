@@ -250,3 +250,4 @@ def snapshot_mastery(db: Session, user: User, path_id: int) -> None:
 
 def notify(db: Session, user_id: int, kind: str, title: str, body: str = "", link: str = "") -> None:
     db.add(Notification(user_id=user_id, kind=kind, title=title, body=body, link=link))
+    db.info.setdefault("push", set()).add(user_id)  # dikirim ke klien yang online setelah commit (services/presence.py)

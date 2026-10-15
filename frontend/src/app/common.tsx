@@ -4,4 +4,7 @@ export function Boot() {
   return <div className="boot" aria-busy="true"><Orvi mood="think" size="lg" force /></div>;
 }
 
-export const homeFor = (role?: string) => (role === 'admin' ? '/admin' : role === 'mentor' ? '/mentor' : '/beranda');
+/** superadmin = admin + ngatur admin lain dan batas Orvi AI. */
+export const isAdmin = (role?: string) => role === 'admin' || role === 'superadmin';
+/** Semua peran mendarat di desktop; halaman Admin/Mentor dibuka dari menu Orvella atau Spotlight. */
+export const homeFor = (_role?: string) => '/beranda';

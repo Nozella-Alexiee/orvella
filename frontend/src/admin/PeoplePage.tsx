@@ -7,8 +7,31 @@ import { Icon } from '../design/Icon';
 import { toast } from '../design/toast';
 import { Avatar, LoadError, Modal, Skel } from '../design/ui';
 
-type Users = { items: (Person & { email: string; class: string; active: string; xp: number })[]; classes: { id: number; name: string; mentor: Person | null }[] };
-const ROLE: Record<string, string> = { learner: 'Siswa', mentor: 'Mentor', admin: 'Admin' };
+type Row = Person & { email: string; class: string; active: string; xp: number; ai_limit: number | null; ai_effective: number | null; editable: boolean; self?: boolean };
+type Users = {
+  items: Row[]; classes: { id: number; name: string; mentor: Person | null }[];
+  me: { role: string; assignable: string[] }; ai: { limit: number; window_hours: number };
+};
+const ROLE: Record<string, string> = { learner: 'Siswa', mentor: 'Mentor', admin: 'Admin', superadmin: 'Superadmin' };
+const LOCKED = 'Cuma superadmin yang bisa ngatur admin.';
+
+/** Batas Orvi AI per orang (cuma superadmin): ikut bawaan, tanpa batas, atau angka sendiri. */
+function AiCell({ u, ai, onSave }: { u: Row; ai: Users['ai']; onSave: (body: object) => void }) {
+  const mode = u.ai_limit === null ? 'def' : u.ai_limit === -1 ? 'inf' : 'num';
+  const [n, setN] = useState(String(u.ai_limit !== null && u.ai_limit >= 0 ? u.ai_limit : ai.limit));
+  if (u.role === 'superadmin') return <span className="t-sm t-muted">Tanpa batas</span>;
+  const saveNum = () => { const v = Math.round(Number(n)); if (Number.isFinite(v) && v >= 0 && v <= 1000 && v !== u.ai_limit) onSave({ ai_limit: v }); };
+  return (
+    <span className="row gap-1">
+      <select className="select" style={{ width: 150 }} value={mode} aria-label={`Batas Orvi AI ${u.name}`}
+        onChange={e => { const m = e.target.value; if (m === 'def') onSave({ ai_default: true }); else if (m === 'inf') onSave({ ai_limit: -1 }); else onSave({ ai_limit: Math.round(Number(n)) || ai.limit }); }}>
+        <option value="def">Bawaan ({ai.limit}/{ai.window_hours} jam)</option><option value="inf">Tanpa batas</option><option value="num">Atur sendiri</option>
+      </select>
+      {mode === 'num' && <input className="input" style={{ width: 72 }} type="number" min={0} max={1000} value={n} aria-label={`Jumlah pertanyaan ${u.name}`}
+        onChange={e => setN(e.target.value)} onBlur={saveNum} onKeyDown={e => { if (e.key === 'Enter') saveNum(); }} />}
+    </span>
+  );
+}
 
 export default function PeoplePage() {
   const [params, setParams] = useSearchParams();
@@ -24,9 +47,11 @@ export default function PeoplePage() {
   if (q.error) return <div className="page page-wide"><LoadError onRetry={() => q.refetch()} /></div>;
   const rows = (q.data?.items || []).filter(u => !search || (u.name + u.email).toLowerCase().includes(search.toLowerCase()));
   const mentors = (q.data?.items || []).filter(u => u.role === 'mentor');
+  const assignable = q.data?.me.assignable || ['learner', 'mentor'];
+  const isSuper = q.data?.me.role === 'superadmin';
   const patch = async (uid: number, body: object) => {
     try { await api.patch(`/api/admin/users/${uid}`, body); q.refetch(); toast({ kind: 'success', icon: 'check', title: 'Disimpan' }); }
-    catch (e) { toast({ kind: 'danger', icon: 'circle-alert', title: e instanceof ApiError ? e.message : 'Gagal menyimpan' }); }
+    catch (e) { toast({ kind: 'danger', icon: 'circle-alert', title: e instanceof ApiError ? e.message : 'Gagal menyimpan' }); q.refetch(); }
   };
   const create = async () => {
     try {
@@ -56,14 +81,18 @@ export default function PeoplePage() {
         <section className="card" style={{ overflow: 'hidden' }}>
           <div className="p-5 row between wrap gap-3">
             <div className="input-group" style={{ width: 260 }}><Icon name="search" /><input placeholder="Cari nama atau email" value={search} onChange={e => setSearch(e.target.value)} aria-label="Cari pengguna" /></div>
-            <div className="row gap-1">{([['', 'Semua'], ['learner', 'Siswa'], ['mentor', 'Mentor'], ['admin', 'Admin']] as const).map(([r, l]) => <button key={r} className="chip" aria-pressed={role === r} onClick={() => setParams(r ? { peran: r } : {})}>{l}</button>)}</div>
+            <div className="row gap-1">{([['', 'Semua'], ['learner', 'Siswa'], ['mentor', 'Mentor'], ['admin', 'Admin'], ['superadmin', 'Superadmin']] as const).map(([r, l]) => <button key={r} className="chip" aria-pressed={role === r} onClick={() => setParams(r ? { peran: r } : {})}>{l}</button>)}</div>
           </div>
-          <div style={{ overflowX: 'auto' }}><table className="table"><thead><tr><th>Nama</th><th>Email</th><th>Peran</th><th>Kelas</th><th>Aktif</th><th className="t-right">XP</th></tr></thead><tbody>
+          <div style={{ overflowX: 'auto' }}><table className="table"><thead><tr><th>Nama</th><th>Email</th><th>Peran</th><th>Kelas</th>{isSuper && <th>Batas Orvi AI</th>}<th>Aktif</th><th className="t-right">XP</th></tr></thead><tbody>
             {rows.map(u => (
               <tr key={u.id}>
                 <td><span className="row"><Avatar p={u} size="sm" />{u.name}</span></td><td className="t-sm t-muted">{u.email}</td>
-                <td><select className="select" style={{ width: 110 }} value={u.role} onChange={e => patch(u.id, { role: e.target.value })} aria-label={`Peran ${u.name}`}>{Object.entries(ROLE).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></td>
-                <td><select className="select" style={{ width: 130 }} value={q.data!.classes.find(c => c.name === u.class)?.id ?? ''} onChange={e => patch(u.id, { class_id: Number(e.target.value) || 0 })} aria-label={`Kelas ${u.name}`}><option value="">–</option>{q.data!.classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></td>
+                <td>{u.editable
+                  ? <select className="select" style={{ width: 110 }} value={u.role} onChange={e => patch(u.id, { role: e.target.value })} aria-label={`Peran ${u.name}`}>
+                      {assignable.map(k => <option key={k} value={k}>{ROLE[k]}</option>)}</select>
+                  : <span className="row gap-1 t-sm" title={u.role === 'superadmin' ? 'Akun superadmin cuma bisa diubah lewat server.' : LOCKED}><Icon name="lock" size={14} />{ROLE[u.role] || u.role}</span>}</td>
+                <td><select className="select" style={{ width: 130 }} disabled={!u.editable && !u.self} value={q.data!.classes.find(c => c.name === u.class)?.id ?? ''} onChange={e => patch(u.id, { class_id: Number(e.target.value) || 0 })} aria-label={`Kelas ${u.name}`}><option value="">–</option>{q.data!.classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></td>
+                {isSuper && <td><AiCell key={`${u.id}:${u.ai_limit}`} u={u} ai={q.data!.ai} onSave={b => void patch(u.id, b)} /></td>}
                 <td className="t-sm t-muted">{u.active}</td><td className="num">{u.xp}</td>
               </tr>
             ))}
@@ -77,9 +106,10 @@ export default function PeoplePage() {
             <div className="field" key={k}><label className="field-label" htmlFor={`u-${k}`}>{l}</label><input id={`u-${k}`} className={`input${err[k] ? ' is-invalid' : ''}`} type={t} value={form[k]} onChange={e => setForm({ ...form, [k]: e.target.value })} autoComplete="off" />{err[k] && <span className="field-error">{err[k]}</span>}</div>
           ))}
           <div className="grid grid-2">
-            <div className="field"><label className="field-label" htmlFor="u-role">Peran</label><select id="u-role" className="select" value={form.role} onChange={e => setForm({ ...form, role: e.target.value })}>{Object.entries(ROLE).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div>
+            <div className="field"><label className="field-label" htmlFor="u-role">Peran</label><select id="u-role" className="select" value={form.role} onChange={e => setForm({ ...form, role: e.target.value })}>{assignable.map(k => <option key={k} value={k}>{ROLE[k]}</option>)}</select></div>
             <div className="field"><label className="field-label" htmlFor="u-class">Kelas</label><select id="u-class" className="select" value={form.class_id} onChange={e => setForm({ ...form, class_id: e.target.value })}><option value="">–</option>{q.data?.classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
           </div>
+          {!isSuper && <span className="t-xs t-faint">{LOCKED}</span>}
           {err._ && <span className="field-error">{err._}</span>}
         </div>
       </Modal>

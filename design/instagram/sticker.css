@@ -1,0 +1,90 @@
+/* =====================================================================
+   Orvella · gaya "Stiker pop" untuk Instagram.
+   Kertas krem, stiker die-cut (tepi putih tebal + garis nila + bayangan tegas), warna 4 fase,
+   huruf brand v1: Bricolage Grotesque (judul), Plus Jakarta Sans (teks), JetBrains Mono (kode).
+   ===================================================================== */
+@font-face { font-family: 'Bricolage'; font-weight: 200 800; font-stretch: 75% 100%; src: url('fonts-v1/bricolage-grotesque-normal-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Bricolage'; font-weight: 200 800; font-stretch: 75% 100%; src: url('fonts-v1/bricolage-grotesque-normal-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1E00-1E9F, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'Jakarta'; font-weight: 200 800; src: url('fonts-v1/plus-jakarta-sans-normal-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Jakarta'; font-weight: 200 800; src: url('fonts-v1/plus-jakarta-sans-normal-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1E00-1E9F, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'Mono'; font-weight: 100 800; src: url('fonts-v1/jetbrains-mono-normal-latin.woff2') format('woff2'); }
+
+:root {
+  --cream: #FDF4E3; --cream-2: #F6E8CC; --line: #EBDABB;
+  --ink: #1E1C45; --ink-2: #4A4770; --ink-3: #6A6588;
+  --marigold: #FFB224; --marigold-deep: #EE8A00; --marigold-soft: #FFE6AE;
+  --lilac: #7466EC; --lilac-soft: #E9E5FF; --pip: #EEE9FF; --pip-shade: #C8BDF4;
+  --blue: #3E9BF0; --mint: #1FB488; --grape: #8D5CF6; --coral: #FF6A55; --pink: #FF7EB6;
+  --blue-soft: #DDEEFE; --mint-soft: #D3F3E6; --grape-soft: #ECE4FF; --coral-soft: #FFE1DA;
+  --code-bg: #1F1C47; --syn-k: #C9A5FF; --syn-s: #9BE7B4; --syn-n: #FFB86B; --syn-f: #8CC8FF; --syn-c: #9993C2;
+  /* Orvi (untuk vendor/orvi.css) */
+  --orvi-hi: #FFF3C9; --orvi-mid: #FFC53D; --orvi-lo: #F28C00; --orvi-face: #2A1F4E; --orvi-cheek: #FF7E62;
+  --orvi-tint: #1E1C45; --orvi-glow-op: 0; --lilac-orvi: #7466EC; --sh-rgb: 30 28 69; --win-solid: #fff; --line-2: #D8C19A; --ink-orvi: #6A6588;
+  --font-display: 'Bricolage', 'Trebuchet MS', sans-serif; --font-ui: 'Jakarta', system-ui, sans-serif; --font-mono: 'Mono', ui-monospace, monospace;
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --t: 10px;   /* tebal tepi putih stiker */
+  --o: 4px;    /* tebal garis nila */
+}
+* { box-sizing: border-box; margin: 0; }
+html, body { background: var(--cream); }
+body { font-family: var(--font-ui); color: var(--ink); -webkit-font-smoothing: antialiased; }
+
+/* ---------------- kertas ---------------- */
+.paper { position: relative; overflow: hidden; background-color: var(--cream);
+  background-image:
+    radial-gradient(circle at 1px 1px, rgb(30 28 69 / .09) 1.6px, transparent 2px),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' seed='7'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .35  0 0 0 0 .2  0 0 0 .09 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 44px 44px, 220px 220px; }
+
+/* ---------------- stiker ---------------- */
+/* die-cut untuk bentuk bebas (SVG Orvi, teks): tepi putih, garis nila, bayangan tegas */
+.die { filter:
+  drop-shadow(var(--t) 0 0 #fff) drop-shadow(calc(var(--t) * -1) 0 0 #fff) drop-shadow(0 var(--t) 0 #fff) drop-shadow(0 calc(var(--t) * -1) 0 #fff)
+  drop-shadow(var(--o) 0 0 var(--ink)) drop-shadow(calc(var(--o) * -1) 0 0 var(--ink)) drop-shadow(0 var(--o) 0 var(--ink)) drop-shadow(0 calc(var(--o) * -1) 0 var(--ink))
+  drop-shadow(10px 12px 0 var(--ink)); }
+.die.sm { --t: 7px; --o: 3px; }
+.die.lg { --t: 14px; --o: 5px; }
+.die.soft { filter:
+  drop-shadow(var(--t) 0 0 #fff) drop-shadow(calc(var(--t) * -1) 0 0 #fff) drop-shadow(0 var(--t) 0 #fff) drop-shadow(0 calc(var(--t) * -1) 0 #fff)
+  drop-shadow(var(--o) 0 0 var(--ink)) drop-shadow(calc(var(--o) * -1) 0 0 var(--ink)) drop-shadow(0 var(--o) 0 var(--ink)) drop-shadow(0 calc(var(--o) * -1) 0 var(--ink)); }
+
+/* stiker kotak: isi berwarna, tepi putih, garis nila, bayangan tegas */
+.stk { position: relative; display: inline-flex; align-items: center; gap: .4em; background: var(--c, #fff); color: var(--fg, var(--ink));
+  border: var(--t) solid #fff; border-radius: 34px; box-shadow: 0 0 0 var(--o) var(--ink), 12px 14px 0 var(--o) var(--ink); }
+.stk.pill { border-radius: 999px; }
+.stk.sm { --t: 7px; --o: 3px; box-shadow: 0 0 0 var(--o) var(--ink), 8px 10px 0 var(--o) var(--ink); }
+
+/* judul raksasa */
+.big { font-family: var(--font-display); font-weight: 800; font-stretch: 82%; letter-spacing: -.02em; line-height: .86; text-transform: uppercase; }
+.hl { display: inline-block; padding: 0 .12em .04em; background: var(--marigold); border-radius: .14em; transform: rotate(-2deg); }
+
+/* selotip washi */
+.tape { position: absolute; width: 190px; height: 58px; border-radius: 4px; opacity: .85; mix-blend-mode: multiply;
+  background: repeating-linear-gradient(135deg, var(--tc, #FFD27A) 0 16px, color-mix(in oklab, var(--tc, #FFD27A) 80%, #fff) 16px 32px);
+  box-shadow: 0 2px 0 rgb(30 28 69 / .08); clip-path: polygon(3% 0, 97% 4%, 100% 50%, 96% 100%, 4% 96%, 0 50%); }
+
+/* kartu kode */
+.code { background: var(--code-bg); color: #F4EEFF; font-family: var(--font-mono); border-radius: 30px; padding: 30px 36px; flex-direction: column; align-items: flex-start; gap: 0; }
+.code .ln { display: flex; gap: 26px; white-space: pre; }
+.code .n { color: #6E69A3; min-width: 1ch; }
+.k { color: var(--syn-k); } .s { color: var(--syn-s); } .num { color: var(--syn-n); } .f { color: var(--syn-f); } .cm { color: var(--syn-c); font-style: italic; }
+
+/* monogram bahasa (bukan logo resmi) */
+.mono { display: grid; place-items: center; font-family: var(--font-mono); font-weight: 800; letter-spacing: -.05em; color: #fff; background: var(--c); }
+
+/* Orvi sebagai stiker: tanpa cahaya & bayangan lantai */
+.orvi-stk { display: inline-block; line-height: 0; }
+.orvi-stk .o-glow, .orvi-stk .o-shadow { display: none; }
+.orvi-stk .o-ring { stroke-width: 6; }
+.orvi-stk .o-ring-back { opacity: 1; }
+.orvi-stk .orvi-svg { width: 100%; height: 100%; overflow: visible; }
+
+/* coretan */
+.doodle { position: absolute; pointer-events: none; overflow: visible; }
+.doodle path, .doodle circle { fill: none; stroke: var(--ink); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+.spark { position: absolute; width: 60px; height: 60px; }
+.spark path { fill: var(--sc, var(--marigold)); stroke: var(--ink); stroke-width: 4; stroke-linejoin: round; }

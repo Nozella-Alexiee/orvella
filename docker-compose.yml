@@ -41,8 +41,39 @@ services:
       ORVELLA_PREVIEW_PORT: ${PREVIEW_PORT:-8301}
       ORVELLA_PREVIEW_PUBLIC_URL: ${PREVIEW_PUBLIC_URL:-}
       ORVELLA_PREVIEW_METRICS: http://tunnel-preview:2000
+      # Masuk dengan Google (kosong = tombol Google menampilkan "belum aktif")
+      ORVELLA_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      ORVELLA_GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      ORVELLA_PUBLIC_URL: ${PUBLIC_URL:-}
+      # email keluar (lupa kata sandi); kosong = link reset cuma ditulis ke log
+      ORVELLA_SMTP_HOST: ${SMTP_HOST:-}
+      ORVELLA_SMTP_PORT: ${SMTP_PORT:-587}
+      ORVELLA_SMTP_USER: ${SMTP_USER:-}
+      ORVELLA_SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      ORVELLA_SMTP_FROM: ${SMTP_FROM:-}
+      ORVELLA_GROQ_API_KEY: ${GROQ_API_KEY:-}
+      ORVELLA_CEREBRAS_API_KEY: ${CEREBRAS_API_KEY:-}
+      ORVELLA_GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      # mesin cari untuk Orvi AI (alat cari_web); kosong = Orvi tanpa internet
+      ORVELLA_SEARCH_URL: http://searxng:8080
     ports:
       - "${APP_PORT:-8000}:8000"
+
+  # Mesin pencari open source untuk Orvi AI (Google, Bing, DuckDuckGo, Wikipedia, ...). Tanpa port publik:
+  # cuma app yang memanggilnya. Setelan di ./searxng/settings.yml.
+  searxng:
+    image: searxng/searxng:latest
+    restart: unless-stopped
+    environment:
+      SEARXNG_SECRET: ${SEARXNG_SECRET:?isi SEARXNG_SECRET di file .env}
+      SEARXNG_BASE_URL: http://searxng:8080/
+    volumes:
+      - ./searxng/settings.yml:/etc/searxng/settings.yml:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null 'http://127.0.0.1:8080/healthz' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   # Runs learner code in throwaway sandbox containers (orvella-sbx-*). The only service with the docker
   # socket; it has no published port and only ever touches containers labelled orvella.sandbox=1.

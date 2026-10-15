@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Orvella · foto profil IG</title>
+<!--
+  1080 × 1080. IG memotong foto profil jadi lingkaran, jadi isi dijaga di dalam lingkaran tengah.
+  ?v=a  Orvi (senang) + Pip di langit malam  (disarankan)
+  ?v=b  ikon aplikasi resmi: tanda logo 56% di latar nila (BRAND.md)
+  ?guide=1 menampilkan lingkaran potong untuk dicek
+-->
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="vendor/orvi.css">
+<style>
+  :root {
+    --orvi-hi: #FFF3C9; --orvi-mid: #FFC53D; --orvi-lo: #F28C00; --orvi-face: #2A1F4E; --orvi-cheek: #FF7E62;
+    --orvi-tint: #8C74FF; --orvi-glow-op: .62; --pip: #EEE9FF; --pip-shade: #C8BDF4; --lilac: #8C74FF;
+    --sh-rgb: 0 0 0; --win-solid: #1A173A; --line-2: rgb(255 255 255 / .17); --ink-3: #A6A0D6; --sun: #FFC247;
+    --font-display: "Unbounded Variable", sans-serif;
+  }
+  * { margin: 0; box-sizing: border-box; }
+  body { width: 1080px; height: 1080px; overflow: hidden; background: #1E1C45; }
+  .pp { position: relative; width: 1080px; height: 1080px; overflow: hidden; display: grid; place-items: center; }
+  .pp.a { background: radial-gradient(560px 560px at 50% 46%, #3A2C8F 0%, #221757 45%, #0B0A22 100%); }
+  .pp.a::before { content: ""; position: absolute; inset: 0;
+    background: radial-gradient(300px 260px at 22% 78%, rgb(255 95 168 / .30), transparent 70%), radial-gradient(360px 300px at 80% 20%, rgb(122 92 255 / .35), transparent 70%),
+                radial-gradient(280px 240px at 78% 82%, rgb(46 211 161 / .20), transparent 70%); }
+  .stars { position: absolute; inset: 0; }
+  .stars i { position: absolute; border-radius: 50%; background: #fff; }
+  .pp.a .orvi-box { position: relative; width: 820px; height: 820px; margin-top: 30px; }
+  .pp.b { background: #1E1C45; color: #F8F1E4; }
+  .pp.b svg.mark { width: 605px; height: 605px; }   /* tanda 56% dari 1080 */
+  .guide { position: absolute; inset: 0; border-radius: 50%; box-shadow: 0 0 0 2000px rgb(255 0 80 / .25); outline: 3px dashed #ff0050; }
+</style>
+</head>
+<body>
+<div class="pp" id="pp"><div class="stars" id="stars"></div></div>
+<script src="vendor/lucide.min.js"></script>
+<script src="vendor/orvi.js"></script>
+<script src="common.js"></script>
+<script>
+(async () => {
+  const q = new URLSearchParams(location.search), v = q.get('v') || 'a', pp = document.getElementById('pp');
+  pp.classList.add(v);
+  if (v === 'a') {
+    const rnd = seeded(7), st = document.getElementById('stars');
+    for (let i = 0; i < 90; i++) {
+      const s = document.createElement('i'), r = rnd() * 3 + 1.2;
+      Object.assign(s.style, { left: rnd() * 1080 + 'px', top: rnd() * 1080 + 'px', width: r + 'px', height: r + 'px', opacity: .25 + rnd() * .55 });
+      st.appendChild(s);
+    }
+    pp.insertAdjacentHTML('beforeend', '<div class="orvi-box" data-orvi="happy" data-pip=".55"></div>');
+  } else {
+    pp.insertAdjacentHTML('beforeend', '<svg class="mark" viewBox="-62 -62 124 124" data-t=".7"></svg>');
+  }
+  if (q.get('guide')) pp.insertAdjacentHTML('beforeend', '<div class="guide"></div>');
+  paintCommon();
+  await ready();
+})();
+</script>
+</body>
+</html>

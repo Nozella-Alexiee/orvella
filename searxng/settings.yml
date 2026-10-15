@@ -1,0 +1,16 @@
+# Mesin pencari untuk Orvi AI (alat cari_web). Cuma bisa diakses dari dalam jaringan docker compose.
+# Kunci rahasianya dari env SEARXNG_SECRET (diisi di .env root).
+use_default_settings: true
+general:
+  instance_name: "Orvella"
+  enable_metrics: false
+server:
+  limiter: false        # tidak terbuka ke publik; pembatasan per pengguna ada di backend (routers/orvi.py)
+  image_proxy: false
+  public_instance: false
+search:
+  safe_search: 1        # sedang: pengguna Orvella banyak pelajar
+  default_lang: "id-ID"
+  formats:
+    - html
+    - json

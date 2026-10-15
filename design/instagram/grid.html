@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Orvella · grid puzzle 9 post (Stiker pop)</title>
+<!--
+  Satu kanvas 3240 × 4320 = 3 × 3 kotak 1080 × 1440 (rasio 3:4, sama dengan grid profil IG).
+  render.mjs memotongnya jadi grid-r1c1.png … grid-r3c3.png. Urutan unggah ada di POSTING.md.
+-->
+<link rel="stylesheet" href="vendor/orvi.css">
+<link rel="stylesheet" href="sticker.css">
+<style>
+  body { width: 3240px; height: 4320px; overflow: hidden; }
+  #g { position: relative; width: 3240px; height: 4320px; }
+  .a { position: absolute; }
+  .guide #g::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(90deg, transparent 1079px, #f0f 1079px 1081px, transparent 1081px 2159px, #f0f 2159px 2161px, transparent 2161px),
+                linear-gradient(transparent 1439px, #f0f 1439px 1441px, transparent 1441px 2879px, #f0f 2879px 2881px, transparent 2881px); }
+  .giant .o-ring-g, .giant .o-pip, .giant .o-trail, .giant .o-back, .giant .o-front { display: none; }
+  .word { font-size: 250px; }
+  .sub { font: 700 44px/1.3 var(--font-ui); color: var(--ink-2); }
+  .lbl { font: 800 40px/1 var(--font-ui); padding: 18px 34px; }
+  .lbl b { font-family: var(--font-display); font-stretch: 85%; font-weight: 800; }
+  .no { display: inline-grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: #fff; color: var(--ink); font: 800 36px var(--font-display); }
+  .bubble { font: 800 120px/1 var(--font-display); font-stretch: 80%; padding: 26px 56px 34px; border-radius: 60px 60px 60px 16px; }
+  .play { width: 250px; height: 250px; border-radius: 50%; display: grid; place-items: center; }
+  .play svg { width: 110px; height: 110px; margin-left: 16px; fill: #fff; stroke: none; }
+</style>
+</head>
+<body>
+<div id="g" class="paper"></div>
+<script src="vendor/lucide.min.js"></script>
+<script src="vendor/orvi.js"></script>
+<script src="stickers.js"></script>
+<script>
+(async () => {
+  const g = document.getElementById('g'), S = window.STK, R = S.seeded(2026);
+  if (new URLSearchParams(location.search).get('guide')) document.body.classList.add('guide');
+  const put = (x, y, html, style = '', cls = '') => g.insertAdjacentHTML('beforeend', `<div class="a ${cls}" style="left:${x}px;top:${y}px;${style}">${html}</div>`);
+
+  // ---- cincin orbit raksasa, berpusat di Orvi (bagian belakang dulu)
+  const CX = 1620, CY = 1780, RX = 1560, RY = 430, ROT = -14;
+  const ring = (clip) => `<svg class="a" style="left:0;top:0;width:3240px;height:4320px;overflow:visible" viewBox="0 0 3240 4320">
+    <defs><clipPath id="front${clip}"><rect x="-2000" y="0" width="4000" height="2000"/></clipPath></defs>
+    <g transform="translate(${CX} ${CY}) rotate(${ROT})" ${clip ? `clip-path="url(#front${clip})"` : ''}>
+      <ellipse rx="${RX}" ry="${RY}" fill="none" stroke="#1E1C45" stroke-width="54" transform="translate(12 16)"/>
+      <ellipse rx="${RX}" ry="${RY}" fill="none" stroke="#1E1C45" stroke-width="54"/>
+      <ellipse rx="${RX}" ry="${RY}" fill="none" stroke="#fff" stroke-width="44"/>
+      <ellipse rx="${RX}" ry="${RY}" fill="none" stroke="#7466EC" stroke-width="22"/>
+    </g></svg>`;
+  g.insertAdjacentHTML('beforeend', ring(''));
+
+  // ---- Orvi raksasa: kubah muncul di baris 1, wajah di kotak tengah
+  const SIZE = 1900;
+  put(CX - SIZE / 2, CY - SIZE / 2, S.orvi('happy', SIZE, { cls: 'die lg giant' }));
+  g.insertAdjacentHTML('beforeend', ring('1'));    // separuh depan cincin menutup badan bawah
+  // Pip menumpang di cincin (kanan atas, dekat batas kotak 1-3 / 2-3)
+  const pipAt = (t) => { const a = ROT * Math.PI / 180, x = RX * Math.cos(t), y = RY * Math.sin(t); return [CX + x * Math.cos(a) - y * Math.sin(a), CY + x * Math.sin(a) + y * Math.cos(a)]; };
+  const [px, py] = pipAt(-0.62);
+  put(px - 95, py - 95, `<svg width="190" height="190" viewBox="-14 -14 28 28" class="die"><circle r="10" fill="#EEE9FF" stroke="#1E1C45" stroke-width="1.6"/>
+    <circle cx="-3.6" cy="-3.6" r="2.3" fill="#C8BDF4"/><circle cx="4" cy="-4.6" r="1.2" fill="#C8BDF4"/><circle cx="-3" cy="2.2" r="1.35" fill="#2A1F4E"/><circle cx="3.2" cy="2.2" r="1.35" fill="#2A1F4E"/></svg>`);
+
+  // ================= baris 1 =================
+  // r1c1 · "Stop hafalan."
+  put(90, 150, `<div class="big word die">Stop</div>`, 'transform:rotate(-3deg)');
+  put(110, 400, `<div class="big word die" style="font-size:210px"><span class="hl">hafalan.</span></div>`, 'transform:rotate(2deg)');
+  put(150, 720, `<span class="stk pill lbl" style="--c:var(--coral);--fg:#fff"><b>anti copas</b></span>`, 'transform:rotate(-5deg)');
+  put(560, 820, `<p class="sub" style="width:440px">Ngoding itu soal ngerti alurnya, bukan ngapalin sintaks.</p>`, 'transform:rotate(1deg)');
+  // r1c2 · wordmark + "Hai!" + kubah Orvi
+  put(1200, 170, `<span class="stk" style="padding:26px 44px;gap:22px;font:800 118px/1 var(--font-display);font-stretch:82%;letter-spacing:-.045em">${S.logo(128)}orvella</span>`, 'transform:rotate(-2deg)');
+  put(1640, 560, `<span class="stk bubble" style="--c:var(--marigold)">Hai!</span>`, 'transform:rotate(6deg)');
+  // r1c3 · "Baru ngoding."
+  put(2270, 150, `<div class="big word die">Mulai</div>`, 'transform:rotate(2deg)');
+  put(2230, 400, `<div class="big word die" style="font-size:230px"><span class="hl" style="background:var(--mint);color:#fff">ngerti.</span></div>`, 'transform:rotate(-2deg)');
+  put(2780, 740, `<span class="stk" style="--c:var(--code-bg);--fg:#FFD27A;padding:18px 30px;font:800 88px/1 var(--font-mono)">&lt;/&gt;</span>`, 'transform:rotate(8deg)');
+  put(2290, 760, `<p class="sub" style="width:440px">Jalanin kodenya, lihat isi memorinya gerak.</p>`, 'transform:rotate(-1deg)');
+
+  // ================= baris 2 =================
+  // r2c1 · sampul carousel kuis
+  put(80, 1560, `<div class="big die" style="font-size:190px">Tebak</div>`, 'transform:rotate(-3deg)');
+  put(80, 1740, `<div class="big die" style="font-size:190px"><span class="hl" style="background:var(--grape);color:#fff">output</span></div>`, 'transform:rotate(1deg)');
+  put(80, 1930, `<div class="big die" style="font-size:190px">-nya?</div>`, 'transform:rotate(-1deg)');
+  put(120, 2230, `<div class="stk code" style="--t:12px;font-size:52px;line-height:1.55;border-radius:34px">
+      <div class="ln"><span class="n">1</span><span>x <span class="k">=</span> <span class="num">4</span></span></div>
+      <div class="ln"><span class="n">2</span><span>x <span class="k">=</span> x <span class="k">*</span> <span class="num">2</span></span></div>
+      <div class="ln"><span class="n">3</span><span><span class="f">print</span>(x)</span></div></div>`, 'transform:rotate(-2deg)');
+  [['A', '4'], ['B', '8'], ['C', 'x * 2']].forEach(([k, v], i) => put(690 + (i % 2) * 30, 2250 + i * 120, `<span class="stk pill sm lbl" style="--c:#fff;font-size:40px"><span class="no" style="width:54px;height:54px;font-size:30px;background:var(--grape-soft)">${k}</span><span style="font-family:var(--font-mono);font-weight:700">${v}</span></span>`, `transform:rotate(${[3, -2, 2][i]}deg)`));
+  put(650, 2640, `<span class="stk pill lbl" style="--c:var(--coral);--fg:#fff">Geser <svg data-i="arrow-right" width="42" height="42" stroke-width="3"></svg></span>`, 'transform:rotate(4deg)');
+  // r2c2 · sampul Reels: wajah Orvi + tombol putar
+  put(1500, 2440, `<span class="stk play" style="--c:var(--coral)"><svg data-i="play" style="fill:#fff"></svg></span>`, 'transform:rotate(-4deg)');
+  put(1150, 2720, `<span class="stk pill lbl" style="--c:#fff;font-size:44px">Kenalan sama <b>Orvi</b></span>`, 'transform:rotate(2deg)');
+  // r2c3 · 12 bahasa
+  put(2260, 1560, `<div class="big die" style="font-size:210px">12</div>`, 'transform:rotate(-4deg)');
+  put(2520, 1600, `<div class="big die" style="font-size:118px;line-height:.9">bahasa<br><span style="color:var(--mint)">jalan</span></div>`, 'transform:rotate(3deg)');
+  const monoPos = [[2270, 1990], [2470, 1960], [2680, 2000], [2890, 1980], [2300, 2200], [2510, 2230], [2720, 2190], [2930, 2220], [2280, 2440], [2500, 2460], [2710, 2430], [2920, 2460]];
+  monoPos.forEach(([x, y], i) => put(x, y, S.mono(i, 158, Math.round((R() - .5) * 16))));
+  put(2300, 2690, `<p class="sub" style="width:820px">Python, JS, C++, Rust, sampai PHP. Dijalanin beneran, bukan simulasi.</p>`);
+
+  // ================= baris 3 =================
+  // r3c1 · 4 fase
+  put(90, 3000, `<div class="big die" style="font-size:230px">4 fase</div>`, 'transform:rotate(-3deg)');
+  put(110, 3250, `<p class="sub">per bab: ngerti, latihan, kuis, tantangan.</p>`);
+  [['Pahami', 'var(--blue)'], ['Perkuat', 'var(--mint)'], ['Kuis', 'var(--grape)'], ['Uji', 'var(--coral)']].forEach(([t, c], i) =>
+    put(130 + i * 70, 3420 + i * 190, `<span class="stk pill lbl" style="--c:${c};--fg:#fff;font-size:54px"><span class="no" style="width:78px;height:78px;font-size:44px">${i + 1}</span><b>${t}</b></span>`, `transform:rotate(${[-4, 3, -2, 4][i]}deg)`));
+  // r3c2 · SEGERA HADIR
+  put(1150, 3080, `<div class="stk" style="--c:var(--marigold);padding:40px 46px 50px;border-radius:44px;display:block"><div class="big" style="font-size:230px;line-height:.84">Segera<br>hadir.</div></div>`, 'transform:rotate(-4deg)');
+  put(1250, 3650, `<p class="sub" style="width:760px;text-align:center">Lagi dirakit. Tunggu tanggal mainnya.</p>`);
+  put(1240, 3900, `<span class="stk pill lbl" style="--c:var(--ink);--fg:#fff">coming soon · 2026</span>`, 'transform:rotate(3deg)');
+  // r3c3 · handle + notifikasi
+  put(2290, 3060, `<span class="stk" style="--c:#fff;padding:30px;border-radius:40px"><svg data-i="bell-ring" width="150" height="150" stroke-width="2.4" style="color:var(--coral)"></svg></span>`, 'transform:rotate(-8deg)');
+  put(2280, 3380, `<div class="big die" style="font-size:150px;text-transform:none;letter-spacing:-.04em">@orvella<br>.labs</div>`, 'transform:rotate(-2deg)');
+  put(2300, 3760, `<span class="stk pill lbl" style="--c:var(--lilac);--fg:#fff;font-size:50px">Follow &amp; nyalakan notifikasi</span>`, 'transform:rotate(2deg)');
+  put(2320, 3950, `<p class="sub" style="width:820px">Biar kamu yang duluan nyobain.</p>`);
+
+  // ---- penyambung antar kotak: jejak Pip (titik-titik), kilau, selotip di batas kotak
+  g.insertAdjacentHTML('beforeend', `<svg class="a" style="left:0;top:0;width:3240px;height:4320px" viewBox="0 0 3240 4320"><path d="M 980 4200 C 1300 4020, 1500 4270, 1900 4160 S 2350 4050, 2650 4260 S 3000 4290, 3240 4200" fill="none" stroke="#1E1C45" stroke-width="12" stroke-linecap="round" stroke-dasharray="2 34"/></svg>`);
+  [[1030, 1360, 110, '#FFB224', 12], [2110, 1380, 90, '#FF7EB6', -10], [1040, 2820, 100, '#1FB488', 8], [2120, 2830, 120, '#FFB224', -6], [480, 1395, 80, '#3E9BF0', 0], [2700, 2860, 84, '#8D5CF6', 14],
+   [150, 1300, 70, '#FF6A55', 0], [3080, 1350, 76, '#FFB224', 20], [1600, 4160, 70, '#7466EC', 0], [900, 2960, 64, '#FFB224', 0]].forEach(([x, y, s, c, r]) => g.insertAdjacentHTML('beforeend', S.spark(x, y, s, c, r)));
+  [[960, 1405, -8, '#FFD27A'], [2080, 2850, 10, '#9BE7B4', 170], [300, 2850, 4, '#C9A5FF'], [2600, 1410, -6, '#FFB5AC']].forEach(([x, y, r, c, w]) => g.insertAdjacentHTML('beforeend', S.tape(x, y, r, c, w || 190)));
+
+  S.icons();
+  await S.ready();
+})();
+</script>
+</body>
+</html>

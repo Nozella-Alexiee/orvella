@@ -1,5 +1,6 @@
 import { forwardRef, type ReactNode } from 'react';
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
+import { HelpButton } from '../os/Bantuan';
 import type { PhaseId, PhaseMeta } from '../api/types';
 import { Icon } from '../design/Icon';
 import { Orvi, type Mood } from '../design/Orvi';
@@ -37,10 +38,13 @@ export function PlayerTop({ exitTo, center, right, xp, streak, mood, bump, xpRef
   exitTo: string; center: ReactNode; right?: ReactNode; xp?: number; streak?: number; mood?: Mood; bump?: number;
   xpRef?: React.Ref<HTMLSpanElement>;
 }) {
+  const { pathname } = useLocation();
+  const helpAt = /\/perkuat$/.test(pathname) ? 'perkuat' : /\/uji\//.test(pathname) ? 'uji' : null;  // angkat tangan di Perkuat & Uji
   return (
     <header className="player-top">
       <Link to={exitTo} className="btn btn-ghost btn-icon" aria-label="Keluar ke halaman bab"><Icon name="x" size={20} /></Link>
       {center}
+      {helpAt && <HelpButton context={helpAt} refPath={pathname} className="hide-sm pt-help" />}
       {right ?? (
         <div className="row gap-3 pt-right">
           {streak !== undefined && <span className="stat-chip"><Flame />{streak}</span>}

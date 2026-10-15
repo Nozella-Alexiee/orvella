@@ -9,6 +9,12 @@ import pytest
 # Set ORVELLA_TEST_DATABASE_URL to run the suite against PostgreSQL (the database is reset!).
 _tmp = Path(tempfile.mkdtemp(prefix="orvella-test-"))
 os.environ["ORVELLA_DATABASE_URL"] = os.environ.get("ORVELLA_TEST_DATABASE_URL") or f"sqlite:///{(_tmp / 'test.db').as_posix()}"
+# Code runs with the local Node fallback unless a test opts into the runner, whatever backend/.env says for development.
+os.environ["ORVELLA_RUNNER_URL"] = os.environ.get("ORVELLA_TEST_RUNNER_URL", "")
+# Same for the public URL: backend/.env may point Google sign-in at the dev server; tests expect the test client's host.
+os.environ["ORVELLA_PUBLIC_URL"] = ""
+for _k in ("GROQ", "CEREBRAS", "GEMINI"):  # tes tidak pernah memanggil layanan AI sungguhan
+    os.environ[f"ORVELLA_{_k}_API_KEY"] = ""
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from fastapi.testclient import TestClient  # noqa: E402

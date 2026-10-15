@@ -35,6 +35,8 @@ def register(client):
     r = client.post("/api/auth/register", json={"name": "Tes", "email": email, "password": ""})
     assert r.status_code == 422 and r.json()["detail"]["fields"]["password"] == "Kata sandi tidak boleh kosong."
     r = client.post("/api/auth/register", json={"name": "Tes", "email": email, "password": "x"})
+    assert r.status_code == 422 and r.json()["detail"]["fields"]["password"] == "Minimal 8 karakter."
+    r = client.post("/api/auth/register", json={"name": "Tes", "email": email, "password": "rahasia-123"})
     assert r.status_code == 200 and not r.json()["onboarded"]
     return email
 

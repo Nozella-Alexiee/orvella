@@ -1,6 +1,6 @@
 # Orvella: mockup desain
 
-Orvella adalah nama baru GNOSIA setelah jadi project pribadi. Folder ini berisi **mockup desain saja**, tanpa kode produksi. Rebuild kode di `../gnosia/` baru dimulai setelah semua fase mockup di-ACC.
+Orvella adalah nama baru GNOSIA setelah jadi project pribadi. Folder ini berisi **mockup desain saja**, tanpa kode produksi. Kode produksinya ada di root repo ini (`../`).
 
 ## Status fase
 

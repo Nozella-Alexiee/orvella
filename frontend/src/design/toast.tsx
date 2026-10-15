@@ -4,17 +4,19 @@ import { Icon } from './Icon';
 import { Html } from '../lib/html';
 
 export type ToastKind = 'accent' | 'success' | 'warning' | 'danger';
-type Toast = { id: number; kind: ToastKind; icon: string; title: string; body?: string; ms: number };
+export type ToastAction = { label: string; run: () => void; primary?: boolean };
+type Toast = { id: number; kind: ToastKind; icon: string; title: string; body?: string; ms: number; actions?: ToastAction[] };
 
 const useToasts = create<{ items: Toast[]; push: (t: Omit<Toast, 'id' | 'ms'> & { ms?: number }) => void; remove: (id: number) => void }>(set => ({
   items: [],
-  push: t => set(s => ({ items: [...s.items, { ms: 4200, ...t, id: Date.now() + Math.random() }] })),
+  // toast yang sama persis tidak ditumpuk (mis. efek yang jalan dua kali di StrictMode)
+  push: t => set(s => s.items.some(x => x.title === t.title && x.body === t.body) ? s : { items: [...s.items, { ...t, ms: t.ms ?? 4200, id: Date.now() + Math.random() }] }),
   remove: id => set(s => ({ items: s.items.filter(x => x.id !== id) })),
 }));
 
 /** toast({ kind, icon, title, body }) — bottom-right stack, auto-dismiss after 4.2 s. */
-export const toast = (t: { kind?: ToastKind; icon?: string; title: string; body?: string; ms?: number }) =>
-  useToasts.getState().push({ kind: t.kind || 'accent', icon: t.icon || 'info', title: t.title, body: t.body, ms: t.ms });
+export const toast = (t: { kind?: ToastKind; icon?: string; title: string; body?: string; ms?: number; actions?: ToastAction[] }) =>
+  useToasts.getState().push({ kind: t.kind || 'accent', icon: t.icon || 'info', title: t.title, body: t.body, ms: t.ms ?? (t.actions?.length ? 9000 : undefined), actions: t.actions });
 
 function ToastItem({ t }: { t: Toast }) {
   const remove = useToasts(s => s.remove);
@@ -25,7 +27,8 @@ function ToastItem({ t }: { t: Toast }) {
   return (
     <div className={`toast is-${t.kind}${leaving ? ' is-leaving' : ''}`} role="status">
       <Icon name={t.icon} className="toast-icon" />
-      <div className="grow"><div className="t-medium">{t.title}</div>{t.body && <Html as="div" className="t-muted t-sm mt-1" html={t.body} />}</div>
+      <div className="grow"><div className="t-medium">{t.title}</div>{t.body && <Html as="div" className="t-muted t-sm mt-1" html={t.body} />}
+        {t.actions?.length ? <div className="toast-acts">{t.actions.map(a => <button key={a.label} className={`btn btn-sm${a.primary ? ' btn-primary' : ''}`} onClick={() => { kill(); a.run(); }}>{a.label}</button>)}</div> : null}</div>
       <button className="btn btn-ghost btn-icon btn-sm" aria-label="Tutup" onClick={kill}><Icon name="x" /></button>
     </div>
   );

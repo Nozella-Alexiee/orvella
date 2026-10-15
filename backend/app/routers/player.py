@@ -10,6 +10,7 @@ import random
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
+from starlette.concurrency import run_in_threadpool
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 from sqlalchemy import func, select
@@ -19,7 +20,7 @@ from ..config import settings
 from ..db import SessionLocal, get_db
 from ..models import (Attempt, Chapter, ChapterProgress, ExamSession, HintOpen, Klass, QuizRound, Submission, User, now)
 from ..security import current_user, user_from_token
-from ..services import activity, content as content_svc, learning, runner, scoring, unlock
+from ..services import activity, badges, content as content_svc, learning, runner, scoring, unlock
 from .learner import get_chapter, phase_meta
 
 router = APIRouter(prefix="/api", tags=["player"])
@@ -585,6 +586,8 @@ def kuis_finish(round_id: int, user: User = Depends(current_user), db: Session =
                 result["uji"] = _uji_options(content)
             else:
                 rnd.passed = pct >= 70
+        db.flush()
+        result["lencana_baru"] = badges.evaluate(db, user, night=badges.is_night())
         db.commit()
     pass_pct = result.get("pass_pct", 70)
     review = []
@@ -896,7 +899,7 @@ async def challenge_ws(ws: WebSocket, chapter_id: int) -> None:
                 await ws.send_json({"type": "error", "message": "Bab tidak ditemukan."})
                 continue
             try:
-                res, outcome = run_challenge(db, user, ch, code)
+                res, outcome = await run_in_threadpool(run_challenge, db, user, ch, code)
             except HTTPException as e:
                 await ws.send_json({"type": "error", "message": e.detail if isinstance(e.detail, str) else e.detail.get("message")})
                 continue
@@ -908,7 +911,7 @@ async def challenge_ws(ws: WebSocket, chapter_id: int) -> None:
             for r in res["results"]:
                 await ws.send_json({"type": "running", "id": r["id"]})
                 await ws.send_json({"type": "result", **r})
-            await ws.send_json({"type": "done", **outcome, "xp_week": activity.week_xp(db, user.id)})
+            await ws.send_json({"type": "done", **outcome, "xp_week": await run_in_threadpool(activity.week_xp, db, user.id)})
     except WebSocketDisconnect:
         pass
     finally:

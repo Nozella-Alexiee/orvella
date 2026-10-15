@@ -115,6 +115,9 @@ addEventListener('orv:motion', () => all.forEach(o => o._applyLevel()));
 
 function frame(now) {
   raf = requestAnimationFrame(frame);
+  // jendela lagi bergerak (os/motion.ts): Orvi diam sebentar; kursor diam > 2 detik: kedip & napas cukup 24 fps
+  if (window.__osBusy && window.__osBusy()) { last = now; return; }
+  if (now - pointer.t > 2000 && now - last < 41) return;
   const dt = Math.min(0.05, (now - last) / 1000 || 0.016); last = now;
   for (const o of all) if (o._visible) o._tick(dt, now / 1000);
 }

@@ -9,6 +9,7 @@ import { useApi, useMe } from '../api/hooks';
 import { api } from '../api/client';
 import { usePrefs } from '../state/prefs';
 import type { Me } from '../api/types';
+import { isAdmin } from './common';
 
 type NavItem = { id: string; icon: string; label: string; to: string; match?: (p: string) => boolean };
 
@@ -20,6 +21,7 @@ const LEARNER: NavItem[] = [
   { id: 'progres', icon: 'sparkles', label: 'Progres', to: '/progres' },
 ];
 const MENTOR: NavItem[] = [
+  { id: 'desktop', icon: 'monitor', label: 'Desktop', to: '/beranda' },
   { id: 'mentor', icon: 'layout-dashboard', label: 'Ringkasan', to: '/mentor', match: p => p === '/mentor' },
   { id: 'siswa', icon: 'users', label: 'Siswa', to: '/mentor/siswa', match: p => p.startsWith('/mentor/siswa') },
   { id: 'review', icon: 'message-square-code', label: 'Antrian review', to: '/mentor/review' },
@@ -73,8 +75,8 @@ export function AppNav({ role }: { role: 'learner' | 'mentor' }) {
         <div className="nav-right">
           {role === 'mentor' ? (
             <>
-              <span className="badge badge-mono hide-sm">{me?.role === 'admin' ? 'ADMIN' : 'MENTOR'}</span>
-              {me?.role === 'admin' && <Link className="btn btn-ghost btn-sm hide-sm" to="/admin"><Icon name="layout-dashboard" />Admin</Link>}
+              <span className="badge badge-mono hide-sm">{me?.role === 'superadmin' ? 'SUPERADMIN' : isAdmin(me?.role) ? 'ADMIN' : 'MENTOR'}</span>
+              {isAdmin(me?.role) && <Link className="btn btn-ghost btn-sm hide-sm" to="/admin"><Icon name="layout-dashboard" />Admin</Link>}
               <button className="btn btn-ghost btn-icon" data-palette-open aria-label="Cari"><Icon name="search" /></button>
               <AccountMenu me={me} />
             </>
@@ -122,7 +124,7 @@ function AccountMenu({ me }: { me: Me | null | undefined }) {
           <div className="t-xs t-faint" style={{ padding: '0 8px 6px' }}>{me?.email}</div>
           <Link className="menu-item" to="/pengaturan" onClick={() => setOpen(false)}><Icon name="settings" />Pengaturan</Link>
           {me?.role === 'learner' && <Link className="menu-item" to="/progres#feedback" onClick={() => setOpen(false)}><Icon name="bell" />Notifikasi{me.unread ? <span className="badge badge-accent" style={{ marginLeft: 'auto' }}>{me.unread}</span> : null}</Link>}
-          {me?.role !== 'learner' && <Link className="menu-item" to={me?.role === 'admin' ? '/admin' : '/mentor'} onClick={() => setOpen(false)}><Icon name="layout-dashboard" />{me?.role === 'admin' ? 'Admin' : 'Mentor'}</Link>}
+          {me?.role !== 'learner' && <Link className="menu-item" to={isAdmin(me?.role) ? '/admin' : '/mentor'} onClick={() => setOpen(false)}><Icon name="layout-dashboard" />{isAdmin(me?.role) ? 'Admin' : 'Mentor'}</Link>}
           <button className="menu-item w-full" onClick={() => { toggleTheme(); setOpen(false); }}><Icon name="sun-moon" />Ganti tema</button>
           <button className="menu-item w-full" onClick={logout}><Icon name="log-out" />Keluar</button>
         </div>
@@ -141,18 +143,18 @@ export function AdminSidebar() {
   const loc = useLocation();
   const toggleTheme = usePrefs(s => s.toggleTheme);
   const groups: [string, [string, string, string, string, string?][]][] = [
-    ['Ringkasan', [['admin', 'layout-dashboard', 'Dashboard', '/admin'], ['mentor', 'chart-no-axes-column', 'Tampilan mentor', '/mentor']]],
+    ['Ringkasan', [['desktop', 'monitor', 'Desktop', '/beranda'], ['admin', 'layout-dashboard', 'Dashboard', '/admin'], ['mentor', 'chart-no-axes-column', 'Tampilan mentor', '/mentor']]],
     ['Konten', [['studio', 'wand-sparkles', 'Studio Materi', '/studio'], ['bab', 'blocks', 'Bab & Scene', '/admin/bab', fmt(c?.chapters)], ['perkuat', 'list-checks', 'Bank soal Perkuat', '/admin/bab?fokus=perkuat', fmt(c?.perkuat)],
       ['kuis', 'zap', 'Bank soal Kuis', '/admin/bab?fokus=kuis', fmt(c?.kuis)], ['challenge', 'swords', 'Challenge', '/admin/bab?fokus=challenge', fmt(c?.challenge)],
       ['ulangan', 'timer', 'Ulangan', '/admin/bab?fokus=ulangan', fmt(c?.ulangan)], ['proyek', 'folder-kanban', 'Proyek', '/admin/bab?fokus=proyek', fmt(c?.proyek)]]],
     ['Orang', [['users', 'users', 'Pengguna', '/admin/pengguna'], ['mentors', 'graduation-cap', 'Mentor', '/admin/pengguna?peran=mentor'], ['org', 'building-2', 'Kelas', '/admin/pengguna?tab=kelas']]],
-    ['Sistem', [['runtime', 'cpu', 'Runtime kode', '/admin/runtime'], ['settings', 'settings', 'Pengaturan', '/pengaturan']]],
+    ['Sistem', [['runtime', 'cpu', 'Runtime kode', '/admin/runtime'], ...(me?.role === 'superadmin' ? [['log', 'history', 'Log aktivitas', '/admin/log'] as [string, string, string, string]] : []), ['settings', 'settings', 'Pengaturan', '/pengaturan']]],
   ];
   const full = loc.pathname + loc.search;
   const isActive = (to: string) => (to.includes('?') ? full === to : loc.pathname === to && (!loc.search || to !== '/admin/bab' || !loc.search.includes('fokus')));
   return (
     <aside className="sidebar">
-      <div className="row between" style={{ padding: '4px 6px 12px' }}><Logo to="/admin" /><span className="badge badge-mono">ADMIN</span></div>
+      <div className="row between" style={{ padding: '4px 6px 12px' }}><Logo to="/admin" /><span className="badge badge-mono">{me?.role === 'superadmin' ? 'SUPERADMIN' : 'ADMIN'}</span></div>
       {groups.map(([g, items]) => (
         <div className="sidebar-group" key={g}>
           <span className="t-label">{g}</span>
@@ -188,6 +190,7 @@ export function CommandPalette() {
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        if (document.querySelector('.os-root')) return; // Orvella OS punya Spotlight sendiri
         e.preventDefault();
         if (!blocked && me) setOpen(o => !o);
       }
@@ -217,7 +220,7 @@ function Palette({ me, close }: { me: Me; close: () => void }) {
          { icon: 'folder-kanban', title: 'Proyek', href: '/proyek' }]
       : [{ icon: 'layout-dashboard', title: 'Ringkasan kelas', href: '/mentor' }, { icon: 'message-square-code', title: 'Antrian review', href: '/mentor/review' },
          { icon: 'wand-sparkles', title: 'Studio Materi', hint: 'Buat jalur & bab', href: '/studio' },
-         ...(me.role === 'admin' ? [{ icon: 'blocks', title: 'Builder bab', href: '/admin/bab' }, { icon: 'users', title: 'Pengguna', href: '/admin/pengguna' }] : [])];
+         ...(isAdmin(me.role) ? [{ icon: 'blocks', title: 'Builder bab', href: '/admin/bab' }, { icon: 'users', title: 'Pengguna', href: '/admin/pengguna' }] : [])];
     const actions: PalItem[] = [
       ...(learner ? [{ icon: 'plus', title: 'Program atau notebook baru', hint: '12 bahasa + proyek web', href: '/playground?baru=1' }] : []),
       { icon: 'sun-moon', title: 'Ganti tema', hint: 'Paper / Ink', action: toggleTheme },

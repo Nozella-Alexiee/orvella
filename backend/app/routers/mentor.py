@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from ..db import get_db
 from ..models import (Assignment, Attempt, Chapter, ChapterProgress, ConceptMastery, Concept, Klass, Message, Path, Project,
                       ProjectProgress, QuizRound, ReviewComment, Submission, User, now)
-from ..security import require_role
+from ..security import is_admin, require_role
 from ..services import activity, content as content_svc, learning, signals, unlock
 from ..views import ago, person
 from .learner import phase_meta
@@ -393,7 +393,7 @@ def add_comment(sid: int, body: CommentIn, me: User = Depends(staff), db: Sessio
 def delete_comment(sid: int, cid: int, me: User = Depends(staff), db: Session = Depends(get_db)) -> dict[str, bool]:
     _sub(db, me, sid)
     c = db.get(ReviewComment, cid)
-    if c and c.submission_id == sid and (c.author_id == me.id or me.role == "admin"):
+    if c and c.submission_id == sid and (c.author_id == me.id or is_admin(me)):
         db.delete(c)
         db.commit()
     return {"ok": True}

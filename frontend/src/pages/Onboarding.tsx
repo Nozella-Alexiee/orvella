@@ -48,7 +48,7 @@ export default function Onboarding() {
   };
 
   return (
-    <AuthFrame>
+    <AuthFrame title="Kenalan dulu" wide say={step === 'tujuan' ? 'Tiga pertanyaan singkat, lalu desktopmu siap.' : undefined}>
       {step === 'tujuan' && (
         <div className="auth-form">
           {dots}

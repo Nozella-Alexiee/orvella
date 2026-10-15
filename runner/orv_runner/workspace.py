@@ -336,6 +336,29 @@ def _ts(s: str) -> float:
 
 
 # ---------------------------------------------------------------- database
+MAX_SQL_BYTES = 2_000_000       # impor .sql
+MAX_DUMP_BYTES = 5_000_000      # unduh .sql
+_VACUUM_INTO = re.compile(r"\bvacuum\b[^;]*\binto\b", re.I)
+_CREATE_TABLE = re.compile(r'^CREATE TABLE (?:IF NOT EXISTS )?("[^"]+"|`[^`]+`|\[[^\]]+\]|[^\s(]+)', re.I)
+
+
+def _deny_attach(action: int, *_: Any) -> int:
+    # ATTACH/DETACH would let a query open any file in the runner (e.g. another project's database)
+    return sqlite3.SQLITE_DENY if action in (sqlite3.SQLITE_ATTACH, sqlite3.SQLITE_DETACH) else sqlite3.SQLITE_OK
+
+
+def _harden(con: sqlite3.Connection) -> None:
+    con.setconfig(sqlite3.SQLITE_DBCONFIG_DEFENSIVE, True)
+    con.setlimit(sqlite3.SQLITE_LIMIT_ATTACHED, 0)
+    con.set_authorizer(_deny_attach)
+    con.execute("PRAGMA trusted_schema = OFF")
+
+
+def _guard_sql(sql: str) -> None:
+    if _VACUUM_INTO.search(sql):
+        raise ValueError("VACUUM INTO tidak diizinkan di Sandbox.")
+
+
 def _sqlite_path(sid: str, file: str) -> Path:
     if not PATH.match(file) or not file.endswith((".db", ".sqlite", ".sqlite3")):
         raise ValueError("Berkas database tidak valid.")
@@ -368,10 +391,13 @@ def query(sid: str, engine: str, sql: str, file: str = "", limit: int = 200) -> 
                 return {"columns": cols, "rows": _jsonable(rows), "affected": cur.rowcount if not cols else None}
         finally:
             con.close()
+    _guard_sql(sql)
+    if not file:  # tanpa nama berkas: pakai database pertama di proyek
+        found = db_files(sid)
+        file = found[0] if found else ""
     con = sqlite3.connect(f"file:{_sqlite_path(sid, file)}?mode=rw", uri=True, timeout=2)
     try:
-        con.setconfig(sqlite3.SQLITE_DBCONFIG_DEFENSIVE, True)
-        con.execute("PRAGMA trusted_schema = OFF")
+        _harden(con)
         deadline = time.monotonic() + 4
         con.set_progress_handler(lambda: 1 if time.monotonic() > deadline else 0, 10_000)
         cur = con.execute(sql)
@@ -400,3 +426,122 @@ def _jsonable(rows: list[list[Any]]) -> list[list[Any]]:
     for r in rows:
         out.append([v if isinstance(v, (int, float, str)) or v is None else (v.hex() if isinstance(v, (bytes, bytearray)) else str(v)) for v in r])
     return out
+
+
+def _sqlite_target(sid: str, file: str, create: bool) -> Path:
+    """Berkas SQLite proyek: yang diminta, yang pertama ada, atau data.db baru (hanya saat impor)."""
+    if not file:
+        found = db_files(sid)
+        file = found[0] if found else ("data.db" if create else "")
+    if not file:
+        raise FileNotFoundError("Belum ada berkas database.")
+    if not PATH.match(file) or not file.endswith((".db", ".sqlite", ".sqlite3")):
+        raise ValueError("Berkas database tidak valid.")
+    p = workdir(sid) / file
+    if not p.is_file():
+        if not create:
+            raise FileNotFoundError(file)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.touch()
+        os.chown(p, _UID, _UID)
+    return p
+
+
+def _count_statements(sql: str) -> int:
+    n, buf = 0, ""
+    for line in sql.splitlines(keepends=True):
+        buf += line
+        if sqlite3.complete_statement(buf):
+            if buf.strip():
+                n += 1
+            buf = ""
+    return n + (1 if buf.strip() else 0)
+
+
+def dump(sid: str, engine: str, file: str = "") -> dict[str, Any]:
+    """Isi database proyek sebagai skrip SQL (struktur + data) yang bisa diimpor lagi."""
+    check_sid(sid)
+    if engine == "mysql":
+        con = _mysql(_db_name(sid), _db_pass(sid), _db_name(sid))
+        out = ["-- Dump database MySQL proyek Orvella", "SET FOREIGN_KEY_CHECKS = 0;"]
+        size, count = 0, 0
+        try:
+            with con.cursor() as cur:
+                cur.execute("SHOW FULL TABLES WHERE Table_type = 'BASE TABLE'")
+                names = [r[0] for r in cur.fetchall()]
+                for t in names:
+                    q = str(t).replace("`", "``")
+                    cur.execute(f"SHOW CREATE TABLE `{q}`")
+                    out += [f"DROP TABLE IF EXISTS `{q}`;", cur.fetchone()[1] + ";"]
+                    cur.execute(f"SELECT * FROM `{q}`")
+                    rows = cur.fetchall()
+                    for i in range(0, len(rows), 100):
+                        vals = ",\n".join("(" + ", ".join(con.escape(v) for v in r) + ")" for r in rows[i:i + 100])
+                        stmt = f"INSERT INTO `{q}` VALUES\n{vals};"
+                        size += len(stmt)
+                        if size > MAX_DUMP_BYTES:
+                            raise ValueError("Database terlalu besar untuk diunduh (maksimal 5 MB).")
+                        out.append(stmt)
+                    count += 1
+        finally:
+            con.close()
+        out.append("SET FOREIGN_KEY_CHECKS = 1;")
+        return {"sql": "\n".join(out) + "\n", "tables": count}
+    path = _sqlite_target(sid, file, create=False)
+    con = sqlite3.connect(f"file:{path}?mode=ro", uri=True, timeout=2)
+    try:
+        _harden(con)
+        lines, size = [f"-- Dump database SQLite proyek Orvella ({path.name})"], 0
+        for line in con.iterdump():
+            m = _CREATE_TABLE.match(line)
+            if m:  # supaya bisa diimpor ulang ke database yang sudah punya tabel yang sama
+                lines.append(f"DROP TABLE IF EXISTS {m.group(1)};")
+            size += len(line)
+            if size > MAX_DUMP_BYTES:
+                raise ValueError("Database terlalu besar untuk diunduh (maksimal 5 MB).")
+            lines.append(line)
+        count = con.execute("SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'").fetchone()[0]
+    finally:
+        con.close()
+    return {"sql": "\n".join(lines) + "\n", "tables": count, "file": path.name}
+
+
+def load(sid: str, engine: str, sql: str, file: str = "") -> dict[str, Any]:
+    """Jalankan skrip .sql (hasil unduh atau buatan sendiri) ke database proyek."""
+    check_sid(sid)
+    if len(sql.encode()) > MAX_SQL_BYTES:
+        raise ValueError("Berkas .sql terlalu besar (maksimal 2 MB).")
+    if not sql.strip():
+        raise ValueError("Berkas .sql kosong.")
+    if engine == "mysql":
+        if not cfg.MYSQL_HOST:
+            raise ValueError("MySQL belum tersedia di server ini.")
+        provision_mysql(sid)
+        import pymysql
+        con = pymysql.connect(host=cfg.MYSQL_HOST, user=_db_name(sid), password=_db_pass(sid), database=_db_name(sid),
+                              client_flag=pymysql.constants.CLIENT.MULTI_STATEMENTS, connect_timeout=5, charset="utf8mb4")
+        n = 0
+        try:
+            with con.cursor() as cur:
+                cur.execute("SET SESSION max_statement_time = 20")
+                cur.execute(sql)
+                n = 1
+                while cur.nextset():
+                    n += 1
+            con.commit()
+        finally:
+            con.close()
+        return {"statements": n}
+    _guard_sql(sql)
+    path = _sqlite_target(sid, file, create=True)
+    con = sqlite3.connect(str(path), timeout=2)
+    try:
+        _harden(con)
+        deadline = time.monotonic() + 15
+        con.set_progress_handler(lambda: 1 if time.monotonic() > deadline else 0, 10_000)
+        con.executescript(sql)
+        con.commit()
+    finally:
+        con.close()
+    os.chown(path, _UID, _UID)
+    return {"statements": _count_statements(sql), "file": path.name}

@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from ..db import get_db
 from ..models import Chapter, Klass, Message, Notebook, Project, ProjectProgress, ReviewComment, Submission, User, now
 from ..security import current_user
-from ..services import activity, diagnostics, learning, runner, runtime, stacks
+from ..services import activity, badges, diagnostics, learning, runner, runtime, stacks
 from ..views import ago, person
 
 router = APIRouter(prefix="/api", tags=["workspace"])
@@ -230,9 +230,11 @@ def run_program(body: RunIn, user: User = Depends(current_user), db: Session = D
         raise HTTPException(429, str(e)) from e
     except runner.RunnerUnavailable as e:
         raise HTTPException(503, str(e)) from e
+    badges.after_run(user, body.lang, bool(res.get("ok")))
     activity.record_activity(db, user, 0)
+    new = badges.evaluate(db, user, night=badges.is_night())
     db.commit()
-    return run_view(res)
+    return {**run_view(res), "lencana_baru": new}
 
 
 # ------------------------------------------------------------------ projects

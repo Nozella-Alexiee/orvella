@@ -11,3 +11,6 @@ frontend/node_modules/
 frontend/dist/
 backend/.venv-orv/
 *.tsbuildinfo
+
+# backup database (scripts/db.sh)
+backups/

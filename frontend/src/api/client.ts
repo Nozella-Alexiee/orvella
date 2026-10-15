@@ -41,6 +41,9 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
     if (res.status === 401) window.dispatchEvent(new CustomEvent('orvella:unauthorized'));
     throw err;
   }
+  // lencana baru bisa ikut di respons mana pun (run, kuis, heartbeat, ...); Orvella OS merayakannya
+  const fresh = (data as { lencana_baru?: unknown[] } | null)?.lencana_baru;
+  if (Array.isArray(fresh) && fresh.length) window.dispatchEvent(new CustomEvent('orvella:lencana', { detail: fresh }));
   return data as T;
 }
 

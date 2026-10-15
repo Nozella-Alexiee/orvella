@@ -16,8 +16,8 @@ from sqlalchemy.orm import Session
 from ..db import get_db
 from ..models import (Attempt, Chapter, ChapterProgress, ChapterVersion, Concept, ContentReport, DailyActivity, Klass, Organization,
                       Path, PlayerState, QuizRound, User, now)
-from ..security import hash_password, require_role
-from ..services import activity, content as content_svc, paths as paths_svc, unlock
+from ..security import hash_password, is_admin, is_superadmin, password_problem, require_role
+from ..services import activity, ai_quota, audit, content as content_svc, paths as paths_svc, unlock
 from ..views import ago, person
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
@@ -199,9 +199,26 @@ def users(role: str | None = None, q: str = "", me: User = Depends(admin_only), 
         stmt = stmt.where(User.role == role)
     rows = [u for u in db.scalars(stmt) if not q or q.lower() in (u.name + u.email).lower()]
     return {"items": [{**person(u), "email": u.email, "class": (db.get(Klass, u.class_id).name if u.class_id else ""),
-                       "active": ago(u.last_active_at), "xp": activity.total_xp(db, u.id)} for u in rows],
+                       "active": ago(u.last_active_at), "xp": activity.total_xp(db, u.id),
+                       "ai_limit": u.ai_limit, "ai_effective": ai_quota.limit_for(db, u), "editable": _can_manage(me, u), "self": u.id == me.id} for u in rows],
+            "me": {"role": me.role, "assignable": _assignable(me)}, "ai": ai_quota.settings(db),
             "classes": [{"id": k.id, "name": k.name, "mentor": person(db.get(User, k.mentor_id)) if k.mentor_id else None}
                         for k in db.scalars(select(Klass).order_by(Klass.name))]}
+
+
+# Admin biasa ngatur siswa & mentor; superadmin juga ngatur admin. Role superadmin sendiri tidak pernah bisa
+# dikasih atau diubah lewat API (cuma lewat scripts/set_role.py di server).
+SUPER_ONLY = "Cuma superadmin yang bisa ngatur admin."
+
+
+def _assignable(me: User) -> list[str]:
+    return ["learner", "mentor", "admin"] if is_superadmin(me) else ["learner", "mentor"]
+
+
+def _can_manage(me: User, u: User) -> bool:
+    if u.role == "superadmin":
+        return False
+    return is_superadmin(me) or not is_admin(u)
 
 
 class UserIn(BaseModel):
@@ -216,11 +233,17 @@ class UserIn(BaseModel):
 def create_user(body: UserIn, me: User = Depends(admin_only), db: Session = Depends(get_db)) -> dict[str, Any]:
     if body.role not in ("learner", "mentor", "admin"):
         raise HTTPException(422, "Peran tidak dikenal.")
+    if body.role not in _assignable(me):
+        raise HTTPException(403, SUPER_ONLY)
+    if (p := password_problem(body.password, body.email)):
+        raise HTTPException(422, {"fields": {"password": p}})
     if db.scalar(select(User).where(func.lower(User.email) == body.email.lower())):
         raise HTTPException(422, {"fields": {"email": "Email sudah terdaftar."}})
     u = User(name=body.name.strip(), email=body.email.strip().lower(), password_hash=hash_password(body.password), role=body.role,
              org_id=me.org_id, class_id=body.class_id, onboarded=body.role != "learner", prefs={})
     db.add(u)
+    db.flush()
+    audit.record(db, me, "user.create", u, role=u.role)
     db.commit()
     return person(u)
 
@@ -228,6 +251,8 @@ def create_user(body: UserIn, me: User = Depends(admin_only), db: Session = Depe
 class UserPatch(BaseModel):
     role: str | None = None
     class_id: int | None = None
+    ai_limit: int | None = None
+    ai_default: bool = False  # true = kembalikan batas Tanya Orvi orang ini ke bawaan
 
 
 @router.patch("/users/{uid}")
@@ -235,14 +260,63 @@ def patch_user(uid: int, body: UserPatch, me: User = Depends(admin_only), db: Se
     u = db.get(User, uid)
     if u is None:
         raise HTTPException(404, "Pengguna tidak ditemukan.")
-    if body.role in ("learner", "mentor", "admin"):
-        if u.id == me.id and body.role != "admin":
-            raise HTTPException(409, "Kamu tidak bisa menurunkan peranmu sendiri.")
+    own = u.id == me.id
+    # akun sendiri: cuma kelas yang boleh diubah (role tetap terkunci, termasuk superadmin)
+    if own and (body.role not in (None, me.role) or body.ai_limit is not None or body.ai_default):
+        raise HTTPException(409, "Kamu tidak bisa mengubah peran atau batasmu sendiri.")
+    if not own and u.role == "superadmin":
+        raise HTTPException(403, "Akun superadmin cuma bisa diubah lewat server.")
+    if not own and not _can_manage(me, u):
+        raise HTTPException(403, SUPER_ONLY)
+    if body.role is not None and not own and body.role != u.role:
+        if body.role not in ("learner", "mentor", "admin"):
+            raise HTTPException(422, "Peran tidak dikenal.")
+        if body.role not in _assignable(me):
+            raise HTTPException(403, SUPER_ONLY)
+        audit.record(db, me, "user.role", u, **{"from": u.role, "to": body.role})
         u.role = body.role
-    if body.class_id is not None:
-        u.class_id = body.class_id or None
+    if body.class_id is not None and (body.class_id or None) != u.class_id:
+        new = body.class_id or None
+        k = db.get(Klass, new) if new else None
+        if new and k is None:
+            raise HTTPException(422, "Kelas tidak ditemukan.")
+        audit.record(db, me, "user.class", u, to=k.name if k else "")
+        u.class_id = new
+    if body.ai_limit is not None or body.ai_default:
+        if not is_superadmin(me):
+            raise HTTPException(403, "Cuma superadmin yang bisa ngatur batas Orvi AI.")
+        if not body.ai_default and not ai_quota.valid_user_limit(body.ai_limit):
+            raise HTTPException(422, f"Batas harus -1 (tanpa batas) atau 0–{ai_quota.MAX_LIMIT}.")
+        new_ai = None if body.ai_default else body.ai_limit
+        if new_ai != u.ai_limit:
+            audit.record(db, me, "user.ai_limit", u, **{"from": u.ai_limit, "to": new_ai})
+        u.ai_limit = new_ai
     db.commit()
-    return person(u)
+    return {**person(u), "ai_limit": u.ai_limit, "ai_effective": ai_quota.limit_for(db, u)}
+
+
+# ------------------------------------------------------------- Tanya Orvi
+class AiIn(BaseModel):
+    limit: int
+    window_hours: int
+
+
+@router.get("/ai")
+def ai_settings(me: User = Depends(admin_only), db: Session = Depends(get_db)) -> dict[str, Any]:
+    return {**ai_quota.settings(db), "editable": is_superadmin(me), "max_limit": ai_quota.MAX_LIMIT, "max_window": ai_quota.MAX_WINDOW}
+
+
+@router.put("/ai")
+def put_ai_settings(body: AiIn, me: User = Depends(admin_only), db: Session = Depends(get_db)) -> dict[str, Any]:
+    if not is_superadmin(me):
+        raise HTTPException(403, "Cuma superadmin yang bisa ngatur batas Orvi AI.")
+    try:
+        out = ai_quota.put(db, body.limit, body.window_hours)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from e
+    audit.record(db, me, "ai.settings", None, limit=out["limit"], window_hours=out["window_hours"])
+    db.commit()
+    return {**out, "editable": True, "max_limit": ai_quota.MAX_LIMIT, "max_window": ai_quota.MAX_WINDOW}
 
 
 class ClassIn(BaseModel):
@@ -255,6 +329,7 @@ def create_class(body: ClassIn, me: User = Depends(admin_only), db: Session = De
     path = db.scalar(select(Path).order_by(Path.id))
     k = Klass(org_id=me.org_id, name=body.name.strip(), path_id=path.id if path else None, mentor_id=body.mentor_id, started_on=activity.local_today())
     db.add(k)
+    audit.record(db, me, "class.create", None, name=k.name)
     db.commit()
     return {"id": k.id, "name": k.name}
 
@@ -506,5 +581,14 @@ class RuntimeIn(BaseModel):
 def runtime_update(body: RuntimeIn, me: User = Depends(admin_only), db: Session = Depends(get_db)) -> dict[str, Any]:
     from ..services import runtime
     value = runtime.put(db, body.disabled, body.timeout, body.memory)
+    audit.record(db, me, "runtime.update", None, disabled=body.disabled)
     db.commit()
     return value
+
+
+# ------------------------------------------------------------- log aktivitas
+@router.get("/log")
+def activity_log(sebelum: int | None = None, me: User = Depends(admin_only), db: Session = Depends(get_db)) -> dict[str, Any]:
+    if not is_superadmin(me):
+        raise HTTPException(403, "Log aktivitas cuma bisa dilihat superadmin.")
+    return audit.page(db, before=sebelum)

@@ -15,6 +15,7 @@ export type OrviHandle = {
   point: (el: Element | null, o?: { at?: 'tr' | 'left' | 'top' | 'center'; hold?: number }) => Promise<void>;
   carry: (from: Element | null, to: Element | null, o?: { label?: string; onDrop?: () => void }) => Promise<void>;
   celebrate: () => void; oops: () => void; react: (m: Mood, ms?: number) => void; wake: () => void;
+  sleep: () => void; hush: () => void; mood: (m: Mood) => void; sleeping: () => boolean; host: () => HTMLElement | null;
 };
 const SIZES = { xs: 32, sm: 60, md: 96, lg: 150, xl: 220 };
 const PHASE_TINT: Record<string, string> = { pahami: '--pahami-fill', perkuat: '--perkuat-fill', kuis: '--kuis-fill', uji: '--uji-fill' };
@@ -59,6 +60,11 @@ export const Orvi = forwardRef<OrviHandle, Props>(function Orvi(
     oops: () => inst.current?.oops(),
     react: (m, ms) => inst.current?.react(m || 'idle', ms),
     wake: () => inst.current?.wake(),
+    sleep: () => inst.current?.sleep(),
+    hush: () => inst.current?.hush(),
+    mood: m => inst.current?.mood(m || 'idle'),
+    sleeping: () => !!inst.current?._state?.sleeping,
+    host: () => host.current,
   }), []);
 
   if (!show) return null;

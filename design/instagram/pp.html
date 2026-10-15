@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Orvella · foto profil IG (Stiker pop)</title>
+<!--
+  1080 × 1080. IG memotong foto profil jadi lingkaran, jadi isi dijaga di dalam lingkaran tengah.
+  ?v=marigold  stiker Orvi di latar marigold bersinar (disarankan, paling kelihatan di daftar story)
+  ?v=krem      stiker Orvi di kertas krem, sama dengan feed
+  ?guide=1     menampilkan lingkaran potong untuk dicek
+-->
+<link rel="stylesheet" href="vendor/orvi.css">
+<link rel="stylesheet" href="sticker.css">
+<style>
+  body { width: 1080px; height: 1080px; overflow: hidden; }
+  #pp { position: relative; width: 1080px; height: 1080px; }
+  .marigold { background: radial-gradient(circle at 50% 48%, #FFD466 0 30%, #FFB224 64%, #F59A0C 100%); }
+  .rays { position: absolute; inset: 0; background: repeating-conic-gradient(from 0deg at 50% 48%, rgb(255 255 255 / .16) 0 7.5deg, transparent 7.5deg 15deg);
+    -webkit-mask: radial-gradient(circle at 50% 48%, transparent 0 250px, #000 420px); mask: radial-gradient(circle at 50% 48%, transparent 0 250px, #000 420px); }
+  .krem .rays { background: repeating-conic-gradient(from 0deg at 50% 48%, rgb(255 178 36 / .22) 0 7.5deg, transparent 7.5deg 15deg); }
+  .o { position: absolute; left: 50%; top: 48%; transform: translate(-50%, -50%) rotate(-4deg); }
+  .guide { position: absolute; inset: 0; border-radius: 50%; box-shadow: 0 0 0 2000px rgb(255 0 80 / .25); outline: 3px dashed #ff0050; }
+</style>
+</head>
+<body>
+<div id="pp"><div class="rays"></div></div>
+<script src="vendor/lucide.min.js"></script>
+<script src="vendor/orvi.js"></script>
+<script src="stickers.js"></script>
+<script>
+(async () => {
+  const S = window.STK, q = new URLSearchParams(location.search), v = q.get('v') || 'marigold', pp = document.getElementById('pp');
+  pp.classList.add(v === 'krem' ? 'paper' : 'marigold', v);
+  pp.insertAdjacentHTML('beforeend', `<div class="o">${S.orvi('happy', 800, { pipT: -.5 })}</div>`);
+  pp.insertAdjacentHTML('beforeend', S.spark(250, 230, 84, v === 'krem' ? '#FFB224' : '#fff', -8) + S.spark(770, 770, 64, '#FF7EB6', 10) + S.spark(800, 250, 46, '#7466EC'));
+  if (q.get('guide')) pp.insertAdjacentHTML('beforeend', '<div class="guide"></div>');
+  await S.ready();
+})();
+</script>
+</body>
+</html>

@@ -10,7 +10,7 @@ from __future__ import annotations
 from datetime import date, datetime, timezone
 from typing import Any
 
-from sqlalchemy import JSON, Boolean, Date, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import JSON, Boolean, Date, ForeignKey, Index, Integer, LargeBinary, String, Text, UniqueConstraint
 from sqlalchemy import DateTime as _DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import TypeDecorator
@@ -66,8 +66,9 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String(200), unique=True, index=True)
     name: Mapped[str] = mapped_column(String(120))
-    password_hash: Mapped[str] = mapped_column(String(200))
-    role: Mapped[str] = mapped_column(String(16), default="learner")  # learner | mentor | admin
+    password_hash: Mapped[str | None] = mapped_column(String(200), nullable=True)  # None = akun khusus Google
+    google_sub: Mapped[str | None] = mapped_column(String(64), unique=True, nullable=True)  # id akun Google ("sub" di id_token)
+    role: Mapped[str] = mapped_column(String(16), default="learner")  # learner | mentor | admin | superadmin
     org_id: Mapped[int | None] = mapped_column(ForeignKey("organizations.id"))
     class_id: Mapped[int | None] = mapped_column(ForeignKey("classes.id"))
     avatar: Mapped[str] = mapped_column(String(4), default="")  # "", a2..a5 (colour class)
@@ -77,6 +78,11 @@ class User(Base):
     goal: Mapped[str] = mapped_column(String(40), default="")
     daily_goal_min: Mapped[int] = mapped_column(Integer, default=20)
     assist_cap: Mapped[int] = mapped_column(Integer, default=6)  # mentor-set hint cap for Perkuat / Playground
+    # batas Tanya Orvi per orang, diatur superadmin (services/ai_quota.py): None = ikut bawaan, -1 = tanpa batas, n = n pertanyaan per jendela waktu.
+    # Sengaja bukan di prefs, karena prefs bisa diubah pengguna sendiri.
+    ai_limit: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    # sesi (JWT) yang terbit sebelum waktu ini ditolak: ganti/reset kata sandi mengeluarkan semua sesi lama
+    pw_changed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     prefs: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)  # orvi, reminders, mentor_sees_wrong, language
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
@@ -261,6 +267,17 @@ class XpEvent(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, index=True)
 
 
+class UserBadge(Base):
+    """Lencana stiker yang sudah didapat (aturan di services/badges.py). Satu kode sekali per user."""
+    __tablename__ = "user_badges"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    code: Mapped[str] = mapped_column(String(40))
+    earned_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+    __table_args__ = (UniqueConstraint("user_id", "code"),)
+
+
 class DailyActivity(Base):
     __tablename__ = "daily_activity"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -379,9 +396,58 @@ class Notebook(Base):
     # notebook = JS cells (runs in the browser) · program = one file in any language · web = fullstack workspace
     kind: Mapped[str] = mapped_column(String(16), default="notebook", server_default="notebook")
     lang: Mapped[str] = mapped_column(String(20), default="javascript", server_default="javascript")
-    files: Mapped[dict[str, Any] | None] = mapped_column(JSON, default=dict)  # program: {code, stdin} · web: {stack, files: {path: text}}
+    # program: {entry, files: {name: text}, stdin} (older rows: {code, stdin}) · web: {stack, files: {path: text}}
+    files: Mapped[dict[str, Any] | None] = mapped_column(JSON, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    # Sandbox (Orvella OS): gallery publishing, remix lineage and optimistic concurrency for file saves
+    description: Mapped[str] = mapped_column(Text, default="", server_default="")
+    visibility: Mapped[str] = mapped_column(String(8), default="private", server_default="private")  # private | class | public
+    remix_of_id: Mapped[int | None] = mapped_column(ForeignKey("notebooks.id", ondelete="SET NULL", name="fk_notebooks_remix_of_id_notebooks"))
+    published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    star_count: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    share_replay: Mapped[bool] = mapped_column(Boolean, default=False, server_default="0")
+    rev: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    # Ngoding bareng: riwayat Yjs terakhir (dipakai lagi saat room dibuka ulang supaya klien bisa menggabung), dan
+    # generasinya. Dikosongkan tiap kali berkas diubah di luar room (services/sandbox.set_files).
+    ystate: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True)
+    ygen: Mapped[str | None] = mapped_column(String(16), nullable=True)
+
+    __table_args__ = (Index("ix_notebooks_gallery", "visibility", "published_at"),)
+
+
+class NotebookSnapshot(Base):
+    """A saved version of a Sandbox project ("mesin waktu")."""
+    __tablename__ = "notebook_snapshots"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    notebook_id: Mapped[int] = mapped_column(ForeignKey("notebooks.id", ondelete="CASCADE"), index=True)
+    label: Mapped[str] = mapped_column(String(120), default="")
+    files: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    stats: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)  # {add, del} against the previous snapshot
+    auto: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+class NotebookReplay(Base):
+    """One chunk of recorded edits (CodeMirror ChangeSet JSON, zlib-compressed) for Replay."""
+    __tablename__ = "notebook_replays"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    notebook_id: Mapped[int] = mapped_column(ForeignKey("notebooks.id", ondelete="CASCADE"), index=True)
+    session: Mapped[str] = mapped_column(String(16))
+    seq: Mapped[int] = mapped_column(Integer)
+    base_snapshot_id: Mapped[int | None] = mapped_column(ForeignKey("notebook_snapshots.id", ondelete="SET NULL"))
+    data: Mapped[bytes] = mapped_column(LargeBinary)
+    n_events: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+    __table_args__ = (UniqueConstraint("notebook_id", "session", "seq"),)
+
+
+class NotebookStar(Base):
+    __tablename__ = "notebook_stars"
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    notebook_id: Mapped[int] = mapped_column(ForeignKey("notebooks.id", ondelete="CASCADE"), primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
 
 
 class Assignment(Base):
@@ -426,3 +492,147 @@ class ContentReport(Base):
     item_id: Mapped[str] = mapped_column(String(40))
     body: Mapped[str] = mapped_column(Text, default="")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+# ---------------------------------------------------------------- realtime ---
+class NotebookMember(Base):
+    """Teman yang diajak ngoding bareng di proyek Sandbox. role: edit | view."""
+    __tablename__ = "notebook_members"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    notebook_id: Mapped[int] = mapped_column(ForeignKey("notebooks.id", ondelete="CASCADE"), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    role: Mapped[str] = mapped_column(String(8), default="edit")
+    added_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+    __table_args__ = (UniqueConstraint("notebook_id", "user_id"),)
+
+
+class KolabLink(Base):
+    """Tautan undangan /s/{code}: berlaku 24 jam, bisa dicabut."""
+    __tablename__ = "kolab_links"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    notebook_id: Mapped[int] = mapped_column(ForeignKey("notebooks.id", ondelete="CASCADE"), index=True)
+    code: Mapped[str] = mapped_column(String(12), unique=True)
+    role: Mapped[str] = mapped_column(String(8), default="edit")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    revoked: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class Duel(Base):
+    """Duel 1 lawan 1: 5 soal Kuis yang sama, jam dan skor di server. state: pending | live | done | declined | expired."""
+    __tablename__ = "duels"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    a_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    b_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    lang: Mapped[str] = mapped_column(String(20), default="")
+    path_id: Mapped[int | None] = mapped_column(ForeignKey("paths.id", ondelete="SET NULL"))
+    questions: Mapped[list[Any]] = mapped_column(JSON, default=list)  # salinan soal (dengan kunci) saat duel dibuat
+    state: Mapped[str] = mapped_column(String(10), default="pending")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    ends_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    a_answers: Mapped[list[Any]] = mapped_column(JSON, default=list)
+    b_answers: Mapped[list[Any]] = mapped_column(JSON, default=list)
+    a_score: Mapped[int] = mapped_column(Integer, default=0)
+    b_score: Mapped[int] = mapped_column(Integer, default=0)
+    winner_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
+
+
+class LiveQuiz(Base):
+    """Kuis langsung kelas (ala Kahoot) yang dipandu mentor. state: lobby | live | done."""
+    __tablename__ = "live_quizzes"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    host_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    class_id: Mapped[int | None] = mapped_column(ForeignKey("classes.id", ondelete="SET NULL"))
+    pin: Mapped[str] = mapped_column(String(6), index=True)
+    title: Mapped[str] = mapped_column(String(120), default="Kuis langsung")
+    questions: Mapped[list[Any]] = mapped_column(JSON, default=list)
+    seconds: Mapped[int] = mapped_column(Integer, default=20)
+    state: Mapped[str] = mapped_column(String(8), default="lobby")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class LiveQuizAnswer(Base):
+    __tablename__ = "live_quiz_answers"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    quiz_id: Mapped[int] = mapped_column(ForeignKey("live_quizzes.id", ondelete="CASCADE"), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    q_index: Mapped[int] = mapped_column(Integer)
+    choice: Mapped[int] = mapped_column(Integer)
+    correct: Mapped[bool] = mapped_column(Boolean, default=False)
+    points: Mapped[int] = mapped_column(Integer, default=0)
+    ms: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+    __table_args__ = (UniqueConstraint("quiz_id", "user_id", "q_index"),)
+
+
+class HelpRequest(Base):
+    """Angkat tangan: siswa minta bantuan mentor. state: open | taken | done. Maksimal satu yang terbuka per siswa."""
+    __tablename__ = "help_requests"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    learner_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    mentor_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), index=True)
+    context: Mapped[str] = mapped_column(String(12))  # sandbox | perkuat | uji
+    ref: Mapped[str] = mapped_column(String(160), default="")  # /sandbox/12, /belajar/3/perkuat, ...
+    message: Mapped[str] = mapped_column(String(300), default="")
+    state: Mapped[str] = mapped_column(String(8), default="open")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    taken_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    done_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+# ---------------------------------------------------------------- keamanan ---
+class AdminEvent(Base):
+    """Log aktivitas admin & keamanan: siapa mengubah apa (role, kelas, batas AI, setelan), dibaca superadmin."""
+    __tablename__ = "admin_events"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    actor_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), index=True)  # None = server/skrip/sistem
+    action: Mapped[str] = mapped_column(String(40))
+    target_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    detail: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, index=True)
+
+
+class LoginAttempt(Base):
+    """Percobaan yang dibatasi: kind "login" (salah kata sandi) atau "lupa" (minta link reset)."""
+    __tablename__ = "login_attempts"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    kind: Mapped[str] = mapped_column(String(8), default="login")
+    email: Mapped[str] = mapped_column(String(200), index=True)
+    ip: Mapped[str] = mapped_column(String(64), default="", index=True)
+    at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, index=True)
+
+
+class PasswordReset(Base):
+    """Link lupa kata sandi: yang disimpan cuma hash token, berlaku 30 menit, sekali pakai."""
+    __tablename__ = "password_resets"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+# ---------------------------------------------------------------- Tanya Orvi ---
+class AiUsage(Base):
+    """Satu pertanyaan ke AI (yang dihitung batas). Jendela bergulir: dihitung dari waktu `at`."""
+    __tablename__ = "ai_usage"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    model: Mapped[str] = mapped_column(String(80), default="")
+    at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, index=True)
+
+
+class AiFeedback(Base):
+    """👍/👎 untuk jawaban Orvi, bahan memperbaiki prompt. Tanpa isi pertanyaan."""
+    __tablename__ = "ai_feedback"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), index=True)
+    nilai: Mapped[str] = mapped_column(String(8))  # naik | turun
+    alasan: Mapped[str] = mapped_column(String(40), default="")
+    sumber: Mapped[str] = mapped_column(String(80), default="")  # model AI atau "bawaan"
+    at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)

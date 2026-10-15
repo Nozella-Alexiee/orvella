@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Orvella · Reels "Tebak output-nya?" (Stiker pop)</title>
+<!--
+  1080 × 1920, 20 detik, tanpa suara (musik dipilih di IG).
+  Timeline GSAP dijeda; render.mjs memanggil REEL.seek(t) per frame (30 fps) lalu ffmpeg menyatukannya.
+  Buka langsung di browser untuk pratinjau (?play=1 memutar otomatis, ?t=12 lompat ke detik 12).
+  Area aman Reels: teks penting di y 250–1480 dan x < 940 (tombol suka/komentar di kanan, caption di bawah).
+-->
+<link rel="stylesheet" href="vendor/orvi.css">
+<link rel="stylesheet" href="sticker.css">
+<style>
+  body { width: 1080px; height: 1920px; overflow: hidden; }
+  #r { position: relative; width: 1080px; height: 1920px; }
+  .a { position: absolute; left: 0; top: 0; will-change: transform; }
+  .brand { display: flex; align-items: center; gap: 12px; font: 800 44px var(--font-display); font-stretch: 85%; letter-spacing: -.02em; }
+  .t0 { text-transform: none; }
+  .code .c { opacity: 0; }
+  .opt { font: 700 70px/1 var(--font-mono); padding: 18px 44px 18px 18px; gap: 28px; }
+  .no { display: inline-grid; place-items: center; width: 90px; height: 90px; border-radius: 50%; background: var(--grape-soft); color: var(--ink); font: 800 50px var(--font-display); flex: none; }
+  .opt.ok .no { background: #fff; }
+  .count { width: 250px; height: 250px; border-radius: 50%; justify-content: center; font: 800 190px/1 var(--font-display); font-stretch: 80%; }
+  .count b { position: absolute; inset: 0; display: grid; place-items: center; padding-bottom: 12px; }
+  .memo { flex-direction: column; align-items: flex-start; gap: 10px; padding: 18px 26px 22px; }
+  .memo small { font: 800 26px var(--font-ui); color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; }
+  .memo .row { display: flex; align-items: center; gap: 16px; font: 800 56px/1 var(--font-mono); }
+  .memo .cell { position: relative; display: grid; place-items: center; width: 92px; height: 92px; border-radius: 22px; background: var(--blue-soft); border: 4px solid var(--ink); }
+  .memo .cell i { position: absolute; font-style: normal; }
+  .memo .strike { position: absolute; left: 14px; right: 14px; top: 50%; height: 9px; margin-top: -4px; background: var(--coral); border-radius: 9px; transform-origin: 0 50%; }
+  .conf { position: absolute; width: 30px; height: 16px; border-radius: 5px; border: 3px solid var(--ink); }
+  .lbl { font: 800 46px/1 var(--font-ui); padding: 22px 40px; }
+  .marq { display: flex; gap: 34px; }
+  .ring { position: absolute; left: -300px; top: 520px; width: 1680px; height: 880px; overflow: visible; }
+</style>
+</head>
+<body>
+<div id="r" class="paper"></div>
+<script src="vendor/lucide.min.js"></script>
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/orvi.js"></script>
+<script src="stickers.js"></script>
+<script>
+(async () => {
+  const S = window.STK, R = S.seeded(20), root = document.getElementById('r');
+  const el = (x, y, html, rot = 0) => {
+    root.insertAdjacentHTML('beforeend', `<div class="a">${html}</div>`);
+    const n = root.lastElementChild;
+    gsap.set(n, { x, y, rotation: rot, opacity: 0 });
+    n.dataset.rot = rot;
+    return n;
+  };
+  const tl = gsap.timeline({ paused: true, defaults: { ease: 'power2.out' } });
+  // stiker "ditempel": jatuh dari besar, miring, lalu memantul di tempatnya
+  const slap = (n, at, d = .5) => tl.fromTo(n, { opacity: 0, scale: 1.7, rotation: +n.dataset.rot - 14 },
+    { opacity: 1, scale: 1, rotation: +n.dataset.rot, duration: d, ease: 'back.out(2.1)' }, at);
+  const pop = (n, at) => tl.fromTo(n, { opacity: 0, scale: .2 }, { opacity: 1, scale: 1, duration: .4, ease: 'back.out(3)' }, at);
+  const away = (ns, at) => tl.to(ns, { opacity: 0, y: '-=90', rotation: '+=10', scale: .85, duration: .35, stagger: .05, ease: 'power2.in' }, at);
+  const swap = (a, b, at) => { tl.set(a, { opacity: 0 }, at); tl.set(b, { opacity: 1 }, at); };
+
+  // cincin orbit besar di latar, berputar pelan sepanjang video
+  root.insertAdjacentHTML('beforeend', `<svg class="ring" viewBox="-840 -440 1680 880"><g>
+    <ellipse rx="800" ry="210" fill="none" stroke="#1E1C45" stroke-width="30" transform="translate(8 10)" opacity=".9"/>
+    <ellipse rx="800" ry="210" fill="none" stroke="#1E1C45" stroke-width="30"/>
+    <ellipse rx="800" ry="210" fill="none" stroke="#fff" stroke-width="22"/>
+    <ellipse rx="800" ry="210" fill="none" stroke="#C9BFFF" stroke-width="10"/></g></svg>`);
+  const ring = root.lastElementChild;
+  gsap.set(ring, { rotation: -24, opacity: .55 });
+  tl.to(ring, { rotation: -6, duration: 20, ease: 'none' }, 0);
+
+  // kilau yang berkedip terus
+  const sparks = [[860, 300, 90, '#FFB224'], [120, 820, 60, '#FF7EB6'], [900, 1480, 70, '#1FB488'], [560, 250, 44, '#8D5CF6']].map(([x, y, s, c], i) => {
+    root.insertAdjacentHTML('beforeend', S.spark(x, y, s, c, i * 9));
+    return root.lastElementChild;
+  });
+  tl.fromTo(sparks, { scale: 0 }, { scale: 1, duration: .4, stagger: .15, ease: 'back.out(3)' }, .2);
+  sparks.forEach((s, i) => tl.to(s, { scale: .7, rotation: '+=25', duration: .6, yoyo: true, repeat: 25, ease: 'sine.inOut' }, .8 + i * .2));
+
+  // pita 12 bahasa yang terus bergeser di bawah (area caption, jadi cuma hiasan)
+  const marq = el(0, 1640, `<div class="marq">${[...Array(24)].map((_, i) => S.mono(i % 12, 118, [-6, 4, -3, 7, -2, 5][i % 6])).join('')}</div>`);
+  tl.fromTo(marq, { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: .5 }, .3);
+  tl.to(marq, { x: -1824, duration: 19.7, ease: 'none' }, .3);
+
+  const brand = el(80, 250, `<div class="brand">${S.logo(64)}orvella</div>`);
+  tl.to(brand, { opacity: 1, duration: .3 }, .1);
+
+  // ---------------- 1 · hook (0 – 3.1)
+  const o1 = el(300, 330, S.orvi('happy', 500, { pipT: -.5 }), 4);
+  const o1t = el(300, 330, S.orvi('think', 500, { pipT: 2.3 }), 4);
+  const w1 = el(80, 880, `<div class="big die" style="font-size:210px">Tebak</div>`, -3);
+  const w2 = el(80, 1070, `<div class="big die" style="font-size:210px"><span class="hl" style="background:var(--grape);color:#fff">output</span></div>`, 1);
+  const w3 = el(80, 1270, `<div class="big die" style="font-size:210px">-nya?</div>`, -2);
+  slap(o1, .25, .6);
+  tl.to(o1, { y: '-=20', duration: .5, yoyo: true, repeat: 3, ease: 'sine.inOut' }, .9);
+  swap(o1, o1t, 1.7);
+  slap(w1, .7); slap(w2, 1.05); slap(w3, 1.4);
+  away([o1t, w1, w2, w3], 2.8);
+
+  // ---------------- 2 · kode diketik + pilihan (3.2 – 8)
+  const Q = { code: ['x = 4', 'x = x * 2', 'print(x)'], options: ['4', '8', 'x * 2'], answer: 1 };
+  const KW = /\b(print)\b/g;
+  const hl = l => l.replace(/\b(\d+)\b/g, '<span class="num">$1</span>').replace(KW, '<span class="f">$1</span>');
+  const title = el(80, 400, `<div class="big die t0" style="font-size:112px">Apa yang dicetak?</div>`, -2);
+  const card = el(90, 580, `<div class="stk code" style="--t:14px;font-size:74px;line-height:1.55;border-radius:40px;padding:44px 60px;min-width:640px">
+      ${Q.code.map((l, n) => `<div class="ln"><span class="n">${n + 1}</span><span class="t">${hl(l)}</span></div>`).join('')}</div>`, -1.5);
+  card.querySelectorAll('.t').forEach(t => {
+    const walk = node => [...node.childNodes].forEach(ch => {
+      if (ch.nodeType === 3) ch.replaceWith(...[...ch.textContent].map(c => Object.assign(document.createElement('span'), { className: 'c', textContent: c })));
+      else walk(ch);
+    });
+    walk(t);
+  });
+  const py = el(720, 540, S.mono(0, 130), 8);
+  const opts = Q.options.map((o, i) => el([130, 180, 130][i], 1070 + i * 150,
+    `<span class="stk pill opt" style="--c:#fff"><span class="no">${'ABC'[i]}</span>${o}</span>`, [-2, 2, -1][i]));
+  const o2 = el(690, 1060, S.orvi('focus', 250, { pipT: .6 }), -6);
+  slap(title, 3.2); slap(card, 3.5); pop(py, 3.9);
+  const chars = card.querySelectorAll('.c');
+  tl.to(chars, { opacity: 1, duration: .01, stagger: .075, ease: 'none' }, 4.0);   // ±1,6 detik mengetik
+  opts.forEach((n, i) => slap(n, 5.9 + i * .25, .45));
+  slap(o2, 6.6);
+
+  // ---------------- 3 · hitung mundur (8 – 11)
+  const title3 = el(80, 400, `<div class="big die t0" style="font-size:112px">Jawab dalam hati…</div>`, -2);
+  swap(title, title3, 8);
+  pop(title3, 8);
+  tl.to(o2, { opacity: 0, scale: .6, duration: .25, ease: 'power2.in' }, 7.9);
+  const counts = [3, 2, 1].map((k, i) => el(690, 1080, `<span class="stk count" style="--c:${['var(--coral)', 'var(--grape)', 'var(--mint)'][i]};--fg:#fff"><b>${k}</b></span>`, [-6, 5, -3][i]));
+  counts.forEach((n, i) => {
+    slap(n, 8.2 + i, .4);
+    if (i < 2) tl.to(n, { opacity: 0, scale: .5, duration: .2, ease: 'power2.in' }, 8.95 + i);
+  });
+  tl.to(counts[2], { opacity: 0, scale: .5, duration: .2, ease: 'power2.in' }, 10.95);
+
+  // ---------------- 4 · jawaban (11 – 14.5)
+  const title4 = el(80, 400, `<div class="big die t0" style="font-size:112px">Jawabannya…</div>`, -2);
+  swap(title3, title4, 11);
+  pop(title4, 11);
+  const right = opts[Q.answer].querySelector('.opt');
+  tl.to(right, { backgroundColor: '#1FB488', color: '#fff', duration: .15 }, 11.4);
+  tl.to(right.querySelector('.no'), { backgroundColor: '#fff', duration: .15 }, 11.4);
+  tl.fromTo(opts[Q.answer], { scale: 1 }, { scale: 1.18, duration: .45, ease: 'back.out(3)' }, 11.4);
+  tl.to([opts[0], opts[2]], { opacity: .35, duration: .3 }, 11.4);
+  tl.to(py, { opacity: 0, scale: .5, duration: .2, ease: 'power2.in' }, 11.2);
+  const o4 = el(690, 330, S.orvi('cheer', 250, { pipT: .9 }), 6);
+  slap(o4, 11.6);
+  tl.to(o4, { y: '-=36', duration: .28, yoyo: true, repeat: 5, ease: 'power1.out' }, 12.1);
+  // confetti dari pil jawaban
+  const colors = ['#FFB224', '#1FB488', '#8D5CF6', '#FF6A55', '#FF7EB6', '#3E9BF0'];
+  const conf = Array.from({ length: 34 }, (_, i) => {
+    root.insertAdjacentHTML('beforeend', `<span class="conf" style="background:${colors[i % colors.length]}"></span>`);
+    const c = root.lastElementChild, a = R() * Math.PI * 2, d = 180 + R() * 330;
+    gsap.set(c, { x: 330, y: 1250, opacity: 0, rotation: R() * 180 });
+    tl.set(c, { opacity: 1 }, 11.45);
+    tl.to(c, { x: 330 + Math.cos(a) * d, y: 1250 + Math.sin(a) * d * .8 - 180, rotation: '+=' + (R() * 540 - 270), duration: .7, ease: 'power3.out' }, 11.45);
+    tl.to(c, { y: '+=' + (380 + R() * 260), opacity: 0, rotation: '+=160', duration: 1.3, ease: 'power1.in' }, 12.15);
+    return c;
+  });
+  const memo = el(585, 1040, `<div class="stk memo" style="--c:#fff"><small>isi memori</small>
+      <div class="row"><span>x</span><span class="cell"><i class="v4">4</i><span class="strike"></span></span><span>→</span><span class="cell" style="background:var(--mint-soft)"><i class="v8">8</i></span></div></div>`, 4);
+  slap(memo, 12.3);
+  tl.fromTo(memo.querySelector('.strike'), { scaleX: 0 }, { scaleX: 1, duration: .3, ease: 'power2.inOut' }, 12.9);
+  tl.fromTo(memo.querySelector('.v8'), { opacity: 0, scale: 2.2 }, { opacity: 1, scale: 1, duration: .4, ease: 'back.out(3)' }, 13.1);
+
+  // ---------------- 5 · penutup (14.5 – 20)
+  away([title4, card, py, ...opts, memo, o4], 14.4);
+  const t1 = el(80, 380, `<div class="big die" style="font-size:150px;letter-spacing:0">Learn.</div>`, -2);
+  const t2 = el(80, 545, `<div class="big die" style="font-size:150px;letter-spacing:0">Build.</div>`, 1);
+  const t3 = el(80, 725, `<div class="big die" style="font-size:124px;letter-spacing:0"><span class="hl">Collaborate.</span></div>`, -2);
+  slap(t1, 15.0); slap(t2, 15.3); slap(t3, 15.6);
+  const soon = el(80, 960, `<span class="stk" style="--c:var(--marigold);--t:14px;padding:26px 44px 30px;border-radius:40px"><span class="big" style="font-size:130px">Segera<br>hadir.</span></span>`, -4);
+  const o5 = el(640, 900, S.orvi('happy', 320, { pipT: -.4 }), 8);
+  const handle = el(80, 1270, `<span class="stk" style="--c:#fff;padding:22px 38px;font:800 92px/1 var(--font-display);font-stretch:82%;letter-spacing:-.03em">@orvella.labs</span>`, -2);
+  const follow = el(100, 1420, `<span class="stk pill lbl" style="--c:var(--lilac);--fg:#fff"><svg data-i="bell-ring" width="46" height="46" stroke-width="2.6"></svg>Follow &amp; nyalakan notifikasi</span>`, 2);
+  slap(soon, 16.4); slap(o5, 16.7); slap(handle, 17.2); slap(follow, 17.6);
+  tl.to(o5, { y: '-=24', rotation: 4, duration: .6, yoyo: true, repeat: 3, ease: 'sine.inOut' }, 17.4);
+  tl.to(follow, { scale: 1.06, duration: .3, yoyo: true, repeat: 3, ease: 'sine.inOut' }, 18.4);
+  tl.set({}, {}, 20);   // durasi tepat 20 detik
+
+  S.icons();
+  window.REEL = { duration: tl.duration(), seek: t => { tl.seek(t, false); } };
+  const q = new URLSearchParams(location.search);
+  if (q.get('t')) tl.seek(+q.get('t'));
+  if (q.get('play')) tl.play(q.get('t') ? +q.get('t') : 0);
+  await S.ready();
+})();
+</script>
+</body>
+</html>

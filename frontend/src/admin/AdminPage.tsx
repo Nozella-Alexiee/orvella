@@ -6,6 +6,8 @@ import { Icon } from '../design/Icon';
 import { toast } from '../design/toast';
 import { cx, EmptyState, LoadError, Modal, Skel } from '../design/ui';
 import { iconNames } from '../design/Icon';
+import { AiLimitCard } from './AiLimitCard';
+import { OsSettingsCard } from './OsSettingsCard';
 
 type Overview = {
   org: string;
@@ -107,6 +109,8 @@ export default function AdminPage() {
           ))}
         </tbody></table></div>
       </section>
+      <OsSettingsCard />
+      <AiLimitCard />
       <NewChapterModal open={creating} onClose={() => setCreating(false)} />
     </div>
   );

@@ -1,0 +1,12 @@
+# Development di Linux (dipakai ./dev.sh): API dan Vite jalan di host, sisanya di Docker.
+# Membuka PostgreSQL dan runner hanya ke localhost supaya uvicorn di host bisa memakainya.
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d db runner preview mysql
+
+services:
+  db:
+    ports:
+      - "127.0.0.1:${DEV_DB_PORT:-5432}:5432"
+
+  runner:
+    ports:
+      - "127.0.0.1:${DEV_RUNNER_PORT:-8081}:8080"

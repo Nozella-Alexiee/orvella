@@ -30,6 +30,12 @@ const loaders: Record<string, () => Promise<Extension>> = {
   text: () => Promise.resolve([]),
 };
 const cache = new Map<string, Extension>();
+/** Paket bahasa CodeMirror (dimuat sekali lalu disimpan). */
+export function loadLanguage(lang: string): Promise<Extension> {
+  const hit = cache.get(lang);
+  if (hit) return Promise.resolve(hit);
+  return (loaders[lang] || loaders.text)().then(e => { cache.set(lang, e); return e; });
+}
 function useLanguage(lang: string) {
   const [ext, setExt] = useState<Extension | null>(() => cache.get(lang) || null);
   useEffect(() => {
@@ -41,9 +47,9 @@ function useLanguage(lang: string) {
   }, [lang]);
   return ext;
 }
-const WIDE_INDENT = new Set(['python', 'c', 'cpp', 'rust', 'java', 'go', 'php', 'kotlin']);
+export const WIDE_INDENT = new Set(['python', 'c', 'cpp', 'rust', 'java', 'go', 'php', 'kotlin']);
 
-const orvellaHighlight = HighlightStyle.define([
+export const orvellaHighlight = HighlightStyle.define([
   { tag: [t.keyword, t.definitionKeyword, t.modifier, t.controlKeyword, t.operatorKeyword, t.bool, t.null], class: 'k' },
   { tag: [t.string, t.special(t.string), t.regexp], class: 's' },
   { tag: [t.number], class: 'n' },

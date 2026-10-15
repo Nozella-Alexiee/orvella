@@ -15,10 +15,11 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..models import Chapter, Klass, Path, User
+from ..security import is_admin
 
 
 def mentor_class_ids(db: Session, user: User) -> set[int]:
-    if user.role == "admin":
+    if is_admin(user):
         return set(db.scalars(select(Klass.id)))
     if user.role == "mentor":
         return set(db.scalars(select(Klass.id).where(Klass.mentor_id == user.id)))
@@ -26,7 +27,7 @@ def mentor_class_ids(db: Session, user: User) -> set[int]:
 
 
 def can_view(db: Session, user: User, path: Path) -> bool:
-    if user.role == "admin" or path.owner_id == user.id or path.visibility == "public":
+    if is_admin(user) or path.owner_id == user.id or path.visibility == "public":
         return True
     classes = set(path.class_ids or [])
     if user.class_id:
@@ -41,7 +42,7 @@ def can_view(db: Session, user: User, path: Path) -> bool:
 
 
 def can_edit(user: User, path: Path) -> bool:
-    return user.role == "admin" or (user.role == "mentor" and path.owner_id == user.id)
+    return is_admin(user) or (user.role == "mentor" and path.owner_id == user.id)
 
 
 def visible(db: Session, user: User) -> list[Path]:

@@ -179,6 +179,34 @@ def session_query(sid: str, body: QueryIn) -> dict[str, Any]:
         return {"ok": False, "error": str(e)[:500]}
 
 
+@app.get("/sessions/{sid}/db/dump", dependencies=[Depends(auth)])
+def session_dump(sid: str, engine: str = "sqlite", file: str = "") -> dict[str, Any]:
+    _ws_call(workspace.check_sid, sid)
+    try:
+        return workspace.dump(sid, engine, file)
+    except (ValueError, FileNotFoundError) as e:
+        raise HTTPException(400, str(e) if not isinstance(e, FileNotFoundError) else "Belum ada berkas database untuk diunduh.") from e
+    except Exception as e:  # noqa: BLE001 - the learner's own database
+        raise HTTPException(400, f"Database belum bisa dibaca: {str(e)[:200]}") from e
+
+
+class LoadIn(BaseModel):
+    engine: str = Field(pattern="^(mysql|sqlite)$")
+    sql: str = Field(max_length=2_100_000)
+    file: str = ""
+
+
+@app.post("/sessions/{sid}/db/load", dependencies=[Depends(auth)])
+def session_load(sid: str, body: LoadIn) -> dict[str, Any]:
+    _ws_call(workspace.check_sid, sid)
+    try:
+        return {"ok": True, **workspace.load(sid, body.engine, body.sql, body.file)}
+    except (ValueError, FileNotFoundError) as e:
+        raise HTTPException(400, str(e)) from e
+    except Exception as e:  # noqa: BLE001 - SQL errors belong to the learner
+        raise HTTPException(400, f"Impor gagal: {str(e)[:300]}") from e
+
+
 @app.delete("/projects/{sid}", dependencies=[Depends(auth)])
 def project_wipe(sid: str) -> dict[str, bool]:
     _ws_call(workspace.wipe, sid)

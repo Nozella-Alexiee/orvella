@@ -8,10 +8,18 @@ export type Person = { id: number; name: string; initials: string; avatar: strin
 
 export type Me = Person & {
   email: string; title: string; onboarded: boolean; goal: string; daily_goal_min: number; assist_cap: number;
-  prefs: { orvi?: boolean; reminders?: boolean; mentor_sees_wrong?: boolean; language?: string };
+  prefs: { orvi?: boolean; reminders?: boolean; mentor_sees_wrong?: boolean; language?: string; presence?: string; tour_done?: boolean;
+    note?: string; pomodoro?: { work: number; rest: number } };
   class: { id: number; name: string } | null; org: string | null;
   streak: number; xp_week: number; xp_total: number; today_minutes: number; unread: number; joined: string | null;
+  level: number; level_xp: number; next_xp: number;
+  has_password?: boolean;
+  /** batas Orvi AI yang berlaku: limit null = tanpa batas */
+  ai?: { limit: number | null; window_hours: number; unlimited: boolean };
 };
+
+/** Lencana stiker (backend services/badges.py). */
+export type Badge = { code: string; title: string; how: string; icon: string; color: string; earned: boolean; earned_at: string | null };
 
 export type ChapterRef = { id: number; slug: string; title: string; number: number; published: boolean };
 

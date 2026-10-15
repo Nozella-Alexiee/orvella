@@ -20,7 +20,7 @@ from sqlalchemy.orm import Session
 
 from ..db import get_db
 from ..models import Chapter, ChapterProgress, Klass, Path, User, now
-from ..security import current_user, require_role
+from ..security import current_user, is_admin, require_role
 from ..services import content as content_svc, learning, paths as paths_svc, quickquiz, runner
 from ..views import ago
 
@@ -60,7 +60,7 @@ def _path_card(db: Session, p: Path) -> dict[str, Any]:
 @router.get("/overview")
 def overview(me: User = Depends(staff), db: Session = Depends(get_db)) -> dict[str, Any]:
     mine = [p for p in db.scalars(select(Path).order_by(Path.id)) if paths_svc.can_edit(me, p)]
-    return {"paths": [_path_card(db, p) for p in mine], "classes": _classes(db, me), "admin": me.role == "admin",
+    return {"paths": [_path_card(db, p) for p in mine], "classes": _classes(db, me), "admin": is_admin(me),
             "langs": list(LANGS), "levels": list(LEVELS)}
 
 
@@ -95,7 +95,7 @@ def path_detail(pid: int, me: User = Depends(staff), db: Session = Depends(get_d
                          "updated": ago(c.updated_at)})
     others = [{"id": o.id, "title": o.title, "language": o.language} for o in db.scalars(select(Path).order_by(Path.id))
               if o.id != p.id and paths_svc.can_edit(me, o)]
-    return {"path": _path_card(db, p), "chapters": chapters, "classes": _classes(db, me), "admin": me.role == "admin", "others": others}
+    return {"path": _path_card(db, p), "chapters": chapters, "classes": _classes(db, me), "admin": is_admin(me), "others": others}
 
 
 def _problems(draft: dict[str, Any]) -> list[str]:
@@ -128,7 +128,7 @@ def update_path(pid: int, body: PathPatch, me: User = Depends(staff), db: Sessio
             raise HTTPException(403, "Kamu hanya bisa menerbitkan ke kelas yang kamu ajar.")
         p.class_ids = sorted(set(body.class_ids))
     if body.visibility is not None:
-        if body.visibility == "public" and me.role != "admin":
+        if body.visibility == "public" and not is_admin(me):
             raise HTTPException(403, "Hanya admin yang bisa memasukkan jalur ke katalog umum.")
         if body.visibility == "class" and not p.class_ids:
             raise HTTPException(422, "Pilih minimal satu kelas.")
@@ -216,7 +216,7 @@ def copy_chapter(cid: int, body: CopyIn, me: User = Depends(staff), db: Session 
 @router.delete("/chapters/{cid}")
 def delete_chapter(cid: int, me: User = Depends(staff), db: Session = Depends(get_db)) -> dict[str, bool]:
     ch = paths_svc.require_chapter_edit(db, me, cid)
-    if ch.version and me.role != "admin":
+    if ch.version and not is_admin(me):
         raise HTTPException(409, "Bab yang sudah terbit tidak bisa dihapus. Ubah isinya lalu terbitkan versi baru.")
     if db.scalar(select(func.count()).select_from(ChapterProgress).where(ChapterProgress.chapter_id == ch.id)):
         raise HTTPException(409, "Sudah ada siswa yang membuka bab ini.")

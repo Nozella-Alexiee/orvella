@@ -12,7 +12,8 @@ from sqlalchemy.orm import Session
 from ..db import get_db
 from ..models import Notebook, User, now
 from ..security import current_user
-from ..services import activity, preview, runner, stacks
+from ..services import activity, badges, preview, runner, stacks
+from ..services import sandbox as sb
 
 router = APIRouter(prefix="/api/web", tags=["web"])
 
@@ -25,9 +26,11 @@ def sid_of(nb: Notebook) -> str:
     return f"p{nb.id}"
 
 
-def _project(db: Session, user: User, nid: int) -> Notebook:
+def _project(db: Session, user: User, nid: int, view: bool = False) -> Notebook:
+    """Pemilik dan teman ngoding bareng yang boleh mengedit. view=True: juga yang hanya menonton (status & pratinjau)."""
     nb = db.get(Notebook, nid)
-    if nb is None or nb.user_id != user.id or nb.kind != "web":
+    a = sb.access(db, user, nb) if nb is not None and nb.kind == "web" else None
+    if a is None or (not view and a not in ("owner", "edit")):
         raise HTTPException(404, "Proyek tidak ditemukan.")
     return nb
 
@@ -73,10 +76,13 @@ def start(nid: int, request: Request, user: User = Depends(current_user), db: Se
     nb = _project(db, user, nid)
     runner.check_rate(user.id)
     stack = (nb.files or {}).get("stack", "static")
+    apply_db_seed(db, nb)
     st = _run(runner.call, "POST", "/sessions", {"sid": sid_of(nb), "owner": user.id, "stack": stack, "files": _files(nb)})
     activity.record_activity(db, user, 0)
+    badges.mark(user, "web")
+    new = badges.evaluate(db, user, night=badges.is_night())
     db.commit()
-    return _view(request, nb, user, st)
+    return {**_view(request, nb, user, st), "lencana_baru": new}
 
 
 @router.post("/{nid}/stop")
@@ -88,7 +94,7 @@ def stop(nid: int, user: User = Depends(current_user), db: Session = Depends(get
 
 @router.get("/{nid}/status")
 def status(nid: int, request: Request, since: float | None = None, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict[str, Any]:
-    nb = _project(db, user, nid)
+    nb = _project(db, user, nid, view=True)
     st = _run(runner.call, "GET", f"/sessions/{sid_of(nb)}")
     logs = _run(runner.call, "GET", f"/sessions/{sid_of(nb)}/logs", params={"since": since} if since else None) if st.get("state") != "stopped" else {"lines": [], "cursor": since or 0}
     return {**_view(request, nb, user, st), "logs": logs}
@@ -125,7 +131,7 @@ def files(nid: int, body: FilesIn, user: User = Depends(current_user), db: Sessi
 
 @router.get("/{nid}/preview")
 def preview_link(nid: int, request: Request, path: str = "/", user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict[str, str]:
-    nb = _project(db, user, nid)
+    nb = _project(db, user, nid, view=True)
     return {"url": preview.enter_url(request, sid_of(nb), user.id, path), "origin": preview.origin(request)}
 
 
@@ -149,3 +155,35 @@ def query(nid: int, body: QueryIn, user: User = Depends(current_user), db: Sessi
     nb = _project(db, user, nid)
     runner.check_rate(user.id)
     return _run(runner.call, "POST", f"/sessions/{sid_of(nb)}/db", {"engine": _engine(nb), "sql": body.sql, "file": body.file})
+
+
+@router.get("/{nid}/db/dump")
+def db_dump(nid: int, file: str = "", user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict[str, Any]:
+    """Isi database proyek sebagai skrip .sql (untuk diunduh, dipindah, atau dicadangkan)."""
+    nb = _project(db, user, nid)
+    return _run(runner.call, "GET", f"/sessions/{sid_of(nb)}/db/dump", params={"engine": _engine(nb), "file": file})
+
+
+class LoadIn(BaseModel):
+    sql: str = Field(min_length=1, max_length=2_000_000)
+    file: str = ""
+
+
+@router.post("/{nid}/db/load")
+def db_load(nid: int, body: LoadIn, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict[str, Any]:
+    """Jalankan berkas .sql ke database proyek (mis. hasil unduh dari proyek lain)."""
+    nb = _project(db, user, nid)
+    runner.check_rate(user.id)
+    return _run(runner.call, "POST", f"/sessions/{sid_of(nb)}/db/load", {"engine": _engine(nb), "sql": body.sql, "file": body.file})
+
+
+def apply_db_seed(db: Session, nb: Notebook) -> None:
+    """database.sql dari proyek yang diimpor dimuat sekali, sebelum server proyek pertama kali menyala."""
+    seed = (nb.files or {}).get("db_seed")
+    if not isinstance(seed, dict) or not seed.get("sql"):
+        return
+    _run(runner.call, "POST", f"/sessions/{sid_of(nb)}/db/load", {"engine": _engine(nb), "sql": seed["sql"], "file": seed.get("file") or ""})
+    files = dict(nb.files or {})
+    files.pop("db_seed", None)
+    nb.files = files
+    db.commit()

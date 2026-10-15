@@ -13,6 +13,7 @@ import { useLockRedirect } from '../lib/hooks';
 import { shake } from '../fx';
 import { ApiError } from '../api/client';
 import { useHighlightLang } from '../lib/useLang';
+import { askOrviAbout } from '../orvi/ask';
 
 /* from mockups/bab.html */
 const css = `
@@ -85,6 +86,8 @@ export default function Bab() {
           <div className="row gap-3 mt-6 wrap">
             <Link className="btn btn-phase btn-xl btn-press" data-phase={d.primary.phase} to={d.primary.href}>{d.completed ? 'Ulas Pahami' : d.primary.label}<Icon name="arrow-right" /></Link>
             <span className="t-sm t-faint">{d.completed ? `Bab selesai · ±${d.eta.total} menit total` : `±${d.eta.total} menit total · sisa ±${left} menit`}</span>
+            <button className="btn btn-ghost btn-press" onClick={() => askOrviAbout({ konteks: { bab: `Bab ${d.position.number} · ${d.chapter.title}`, bahasa: (q.data as { language?: string } | undefined)?.language || '' } })}>
+              <Icon name="orvi-ai" />Tanya Orvi AI soal bab ini</button>
           </div>
         </div>
         <div className="t-center"><PhaseRing values={d.ring} size={220} stroke={14}><Orvi size={150} mood={d.completed ? 'cheer' : 'happy'} /></PhaseRing></div>

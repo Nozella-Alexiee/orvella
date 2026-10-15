@@ -33,6 +33,18 @@ def total_xp(db: Session, user_id: int) -> int:
     return db.scalar(select(func.coalesce(func.sum(XpEvent.amount), 0)).where(XpEvent.user_id == user_id)) or 0
 
 
+def level_start(n: int) -> int:
+    """Total XP untuk mencapai level n. Tiap level butuh 50 XP lebih banyak dari sebelumnya (100, 150, 200, ...)."""
+    return 100 * (n - 1) + 25 * (n - 1) * (n - 2)
+
+
+def level_of(xp: int) -> dict[str, int]:
+    n = 1
+    while xp >= level_start(n + 1):
+        n += 1
+    return {"level": n, "level_xp": xp - level_start(n), "next_xp": level_start(n + 1) - level_start(n)}
+
+
 def week_xp(db: Session, user_id: int) -> int:
     today = local_today()
     start = datetime.combine(today - timedelta(days=today.weekday()), datetime.min.time(), LOCAL_TZ)

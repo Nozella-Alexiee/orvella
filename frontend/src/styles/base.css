@@ -361,6 +361,10 @@ a.list-row:hover, .list-row.is-clickable:hover { background: var(--surface-hover
   font-size: var(--fs-14); font-weight: 650; line-height: 1.4; animation: rise-in var(--dur-slow) var(--spring-bouncy);
 }
 .toast .toast-icon { margin-top: 1px; }
+.toast .t-muted, .toast .btn-ghost { color: inherit; }
+.toast .t-muted { opacity: .78; }
+.toast-acts { display: flex; gap: 6px; margin-top: 8px; }
+.toast-acts .btn:not(.btn-primary) { background: rgb(255 255 255 / .14); color: inherit; border-color: transparent; }
 .toast.is-success .toast-icon { color: var(--perkuat-fill); }
 .toast.is-danger .toast-icon { color: var(--uji-fill); }
 .toast.is-accent .toast-icon { color: var(--marigold); }

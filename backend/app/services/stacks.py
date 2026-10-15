@@ -301,13 +301,19 @@ def api_catatan():
         "name": "FastAPI + frontend",
         "entry": "/",
         "files": {
-            "main.py": """# API kuis kecil: FastAPI melayani JSON di /api dan halaman di /static
+            "main.py": """# API kuis kecil: FastAPI melayani JSON di /api, halaman di /static, dan menyimpan jawaban di SQLite
+import sqlite3
+
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 app = FastAPI(title="Kuis Orvella")
+
+db = sqlite3.connect("kuis.db", check_same_thread=False)
+db.execute("CREATE TABLE IF NOT EXISTS jawaban (id INTEGER PRIMARY KEY, soal INTEGER, benar INTEGER, waktu TEXT DEFAULT CURRENT_TIMESTAMP)")
+db.commit()
 
 SOAL = [
     {"id": 1, "tanya": "Keluaran print(2 ** 3)?", "pilihan": ["6", "8", "9"], "jawab": 1},
@@ -329,7 +335,16 @@ def daftar_soal():
 @app.post("/api/jawab")
 def jawab(j: Jawaban):
     soal = next(s for s in SOAL if s["id"] == j.id)
-    return {"benar": soal["jawab"] == j.pilih}
+    benar = soal["jawab"] == j.pilih
+    db.execute("INSERT INTO jawaban (soal, benar) VALUES (?, ?)", (j.id, int(benar)))
+    db.commit()
+    return {"benar": benar}
+
+
+@app.get("/api/rekap")
+def rekap():
+    total, benar = db.execute("SELECT COUNT(*), COALESCE(SUM(benar), 0) FROM jawaban").fetchone()
+    return {"dijawab": total, "benar": benar}
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")

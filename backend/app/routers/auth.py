@@ -1,19 +1,29 @@
+import hashlib
+import json
+import secrets
+from datetime import timedelta
 from typing import Any, Literal
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ..db import get_db
-from ..models import Chapter, Klass, Path, User
-from ..security import clear_session, current_user, hash_password, issue_session, verify_password
-from ..services import activity, learning
+from ..config import settings
+from ..models import Chapter, Klass, PasswordReset, Path, User, now
+from ..security import clear_session, current_user, hash_password, issue_session, password_problem, verify_password
+from ..services import activity, audit, guard, learning, mailer
 from ..views import me_view
 
 router = APIRouter(prefix="/api", tags=["auth"])
 
-DEFAULT_PREFS = {"orvi": True, "reminders": True, "mentor_sees_wrong": True, "language": "id"}
+DEFAULT_PREFS = {"orvi": True, "reminders": True, "mentor_sees_wrong": True, "language": "id",
+                 # Orvella OS: status terlihat teman ("on"/"off"), tur Orvi sudah dilihat, musik terakhir
+                 "presence": "on", "tour_done": False, "music": None,
+                 # desktop: catatan tempel dan setelan timer fokus (menit kerja/istirahat)
+                 "note": "", "pomodoro": {"work": 25, "rest": 5}}
+PREF_LIMITS = {"note": 3000}  # batas panjang JSON per kunci; kunci lain 500
 
 
 class RegisterIn(BaseModel):
@@ -35,6 +45,8 @@ def register(body: RegisterIn, response: Response, db: Session = Depends(get_db)
         errors["email"] = "Email belum valid."
     if not body.password:
         errors["password"] = "Kata sandi tidak boleh kosong."
+    elif (p := password_problem(body.password, email)):
+        errors["password"] = p
     if not body.name.strip():
         errors["name"] = "Nama panggilan tidak boleh kosong."
     if not errors and db.scalar(select(User).where(func.lower(User.email) == email)):
@@ -51,12 +63,22 @@ def register(body: RegisterIn, response: Response, db: Session = Depends(get_db)
 
 
 @router.post("/auth/login")
-def login(body: LoginIn, response: Response, db: Session = Depends(get_db)) -> dict[str, Any]:
+def login(body: LoginIn, request: Request, response: Response, db: Session = Depends(get_db)) -> dict[str, Any]:
     if not body.password:
         raise HTTPException(422, {"fields": {"password": "Kata sandi tidak boleh kosong."}})
-    user = db.scalar(select(User).where(func.lower(User.email) == body.email.strip().lower()))
+    email, ip = body.email.strip().lower(), guard.client_ip(request)
+    guard.check_login(db, email, ip)  # 429 kalau sudah terlalu sering salah (per email & per IP)
+    user = db.scalar(select(User).where(func.lower(User.email) == email))
+    if user is not None and not user.password_hash and user.google_sub:
+        raise HTTPException(401, {"fields": {"password": "Akun ini dibuat lewat Google. Pakai tombol Masuk dengan Google."}})
     if user is None or not verify_password(body.password, user.password_hash):
+        fails = guard.fail_login(db, email, ip)
+        if fails == guard.PER_EMAIL:
+            audit.record(db, None, "login.locked", user, email=email, fails=fails)
+        db.commit()
         raise HTTPException(401, {"fields": {"password": "Email atau kata sandi belum cocok."}})
+    guard.clear_login(db, email)
+    db.commit()
     issue_session(response, user)
     return me_view(db, user)
 
@@ -70,6 +92,86 @@ def logout(response: Response) -> dict[str, bool]:
 @router.get("/me")
 def me(user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict[str, Any]:
     return me_view(db, user)
+
+
+# ------------------------------------------------------- kata sandi ---
+class PasswordIn(BaseModel):
+    lama: str = ""
+    baru: str
+
+
+@router.post("/me/password")
+def change_password(body: PasswordIn, response: Response, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict[str, Any]:
+    """Ganti kata sandi. Akun khusus Google boleh membuat kata sandi pertama tanpa kata sandi lama.
+    Semua sesi lain keluar (pw_changed_at); sesi ini diterbitkan ulang."""
+    if user.password_hash and not verify_password(body.lama, user.password_hash):
+        raise HTTPException(422, {"fields": {"lama": "Kata sandi lama belum cocok."}})
+    if (p := password_problem(body.baru, user.email)):
+        raise HTTPException(422, {"fields": {"baru": p}})
+    user.password_hash = hash_password(body.baru)
+    user.pw_changed_at = now()
+    audit.record(db, user, "password.change", user)
+    db.commit()
+    issue_session(response, user)
+    return {"ok": True}
+
+
+class LupaIn(BaseModel):
+    email: str = Field(max_length=200)
+
+
+LUPA_OK = {"ok": True, "pesan": "Kalau emailnya terdaftar, link buat atur ulang kata sandi udah dikirim. Cek juga folder spam."}
+RESET_MINUTES = 30
+
+
+def _token_hash(t: str) -> str:
+    return hashlib.sha256(t.encode()).hexdigest()
+
+
+@router.post("/auth/lupa")
+def forgot(body: LupaIn, request: Request, db: Session = Depends(get_db)) -> dict[str, Any]:
+    """Selalu jawab sama, terdaftar atau tidak, supaya orang tidak bisa mengecek email mana yang terdaftar."""
+    email = body.email.strip().lower()
+    if "@" not in email or not guard.allow_lupa(db, email, guard.client_ip(request)):
+        db.commit()
+        return LUPA_OK
+    user = db.scalar(select(User).where(func.lower(User.email) == email))
+    base = settings.public_url.rstrip("/") or str(request.base_url).rstrip("/")
+    if user is not None and not user.password_hash:
+        mailer.send(user.email, "Masuk ke Orvella", f"Halo {user.name},\n\nAkunmu di Orvella masuk lewat Google, jadi gak punya kata sandi. "
+                    f"Buka {base}/masuk lalu pilih Masuk dengan Google.\n\nKalau kamu gak minta ini, abaikan aja email ini.")
+    elif user is not None:
+        token = secrets.token_urlsafe(32)
+        db.add(PasswordReset(user_id=user.id, token_hash=_token_hash(token), expires_at=now() + timedelta(minutes=RESET_MINUTES)))
+        mailer.send(user.email, "Atur ulang kata sandi Orvella", f"Halo {user.name},\n\nBuka link ini buat bikin kata sandi baru "
+                    f"(berlaku {RESET_MINUTES} menit, sekali pakai):\n{base}/reset-sandi/{token}\n\nKalau kamu gak minta ini, abaikan aja. Kata sandimu gak berubah.")
+    db.commit()
+    return LUPA_OK
+
+
+class ResetIn(BaseModel):
+    token: str = Field(max_length=200)
+    baru: str
+
+
+@router.post("/auth/reset")
+def reset_password(body: ResetIn, db: Session = Depends(get_db)) -> dict[str, Any]:
+    r = db.scalar(select(PasswordReset).where(PasswordReset.token_hash == _token_hash(body.token)))
+    exp = r.expires_at if r is not None and r.expires_at.tzinfo else (r.expires_at.replace(tzinfo=now().tzinfo) if r is not None else None)
+    if r is None or r.used_at is not None or exp < now():
+        raise HTTPException(410, "Link ini udah kedaluwarsa atau udah dipakai. Minta link baru ya.")
+    user = db.get(User, r.user_id)
+    if user is None:
+        raise HTTPException(410, "Link ini udah gak berlaku.")
+    if (p := password_problem(body.baru, user.email)):
+        raise HTTPException(422, {"fields": {"baru": p}})
+    user.password_hash = hash_password(body.baru)
+    user.pw_changed_at = now()  # semua sesi lama keluar
+    r.used_at = now()
+    guard.clear_login(db, user.email.lower())
+    audit.record(db, None, "password.reset", user)
+    db.commit()
+    return {"ok": True}
 
 
 class MeUpdate(BaseModel):
@@ -86,6 +188,9 @@ def update_me(body: MeUpdate, user: User = Depends(current_user), db: Session = 
         user.daily_goal_min = body.daily_goal_min
     if body.prefs is not None:
         allowed = {k: v for k, v in body.prefs.items() if k in DEFAULT_PREFS}
+        too_long = [k for k, v in allowed.items() if len(json.dumps(v, default=str)) > PREF_LIMITS.get(k, 500)]
+        if too_long:
+            raise HTTPException(422, {"fields": {"prefs": f"Isi \"{too_long[0]}\" terlalu panjang."}, "keys": too_long})
         user.prefs = {**DEFAULT_PREFS, **(user.prefs or {}), **allowed}
     db.commit()
     return me_view(db, user)

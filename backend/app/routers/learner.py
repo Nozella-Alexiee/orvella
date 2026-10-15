@@ -13,7 +13,7 @@ from ..db import get_db
 from ..models import (Attempt, Chapter, ChapterProgress, Concept, ConceptMastery, ExamSession, Klass, MasterySnapshot,
                       Message, Notebook, Notification, Path, Project, ProjectProgress, QuizRound, Submission, User)
 from ..security import current_user
-from ..services import activity, content as content_svc, learning, paths as paths_svc, unlock
+from ..services import sandbox, activity, badges, content as content_svc, learning, paths as paths_svc, unlock
 from ..views import ago, person
 
 router = APIRouter(prefix="/api", tags=["learner"])
@@ -218,6 +218,7 @@ def home(user: User = Depends(current_user), db: Session = Depends(get_db)) -> d
         "mentor": mentor_note(db, user),
         "projects": project_cards(db, user),
         "notebook": {"id": nb.id, "title": nb.title, "ago": ago(nb.updated_at)} if nb else None,
+        "quests": sandbox.quest_state(db, user),
         "next_project": next_project_hint(db, user),
         "first_chapter": learning.chapter_ref(next(c for c in chapters if c.kind == "chapter")) if chapters else None,
     }
@@ -517,8 +518,9 @@ def heartbeat(body: Heartbeat, user: User = Depends(current_user), db: Session =
         p = db.scalar(select(ChapterProgress).where(ChapterProgress.user_id == user.id, ChapterProgress.chapter_id == body.chapter_id))
         if p and not p.completed_at:
             p.active_seconds += max(0, min(activity.HEARTBEAT_MAX_SECONDS, body.seconds))
+    new = badges.evaluate(db, user, night=body.seconds > 0 and badges.is_night())
     db.commit()
-    return {"today_minutes": activity.minutes_on(db, user.id, activity.local_today()), "streak": activity.streak(db, user)}
+    return {"today_minutes": activity.minutes_on(db, user.id, activity.local_today()), "streak": activity.streak(db, user), "lencana_baru": new}
 
 
 @router.get("/notifications")

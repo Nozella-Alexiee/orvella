@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Orvella · carousel IG "segera hadir"</title>
+<!--
+  Satu panorama 8 × 1080 px. render.mjs memotongnya jadi 8 slide 1080 × 1350.
+  Langit berputar dari malam → fajar → siang → senja → malam, jadi garis orbit dan Pip menyambung saat digeser.
+  Buka langsung di browser untuk melihat semuanya berjajar.
+-->
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="vendor/orvi.css">
+<style>
+  :root {
+    --ink: #17153A; --ink-2: #4B4777; --ink-3: #625D8F;
+    --sun: #FFB224; --sun-deep: #E88A00; --sun-soft: #FFF0CC; --sun-ink: #7A4200;
+    --violet: #6A4DF4; --violet-soft: #ECE7FF; --violet-ink: #4127C4;
+    --mint: #10B98A; --mint-soft: #D8F6EA; --mint-ink: #06684B;
+    --coral: #FF5E57; --coral-soft: #FFE3E1; --coral-ink: #B3261E;
+    --pink: #EE4D98; --sky: #3D8BFF; --slate: #64748B;
+    --ph-pahami: #3D8BFF; --ph-perkuat: #10B98A; --ph-kuis: #A155F5; --ph-uji: #FF5E57;
+    --lang-python: #3470C9; --lang-javascript: #E0B400; --lang-html: #EE5F2C; --lang-css: #7A4FD6;
+    --lang-c: #4B7392; --lang-cpp: #3353C3; --lang-rust: #B4461C; --lang-java: #D63B3B;
+    --lang-go: #10A0C4; --lang-sql: #1F988A; --lang-kotlin: #B13FCC; --lang-php: #6C7CC2;
+    --orvi-hi: #FFF3C9; --orvi-mid: #FFC53D; --orvi-lo: #F28C00; --orvi-face: #2A1F4E; --orvi-cheek: #FF7E62;
+    --orvi-tint: #6A4DF4; --orvi-glow-op: .5; --pip: #EEE9FF; --pip-shade: #C8BDF4; --lilac: #6A4DF4;
+    --sh-rgb: 40 30 90; --win-solid: #fff; --line-2: rgb(23 21 58 / .18);
+    --ed-bg: #13112F; --ed-bg-2: #19173C; --ed-gutter: #6E69A3; --ed-line: #2B285A; --ed-text: #ECE9FF;
+    --syn-k: #C3A6FF; --syn-s: #97E7B4; --syn-n: #FFB86B; --syn-f: #8CC8FF; --syn-c: #8C87BC; --syn-o: #CFC8EA;
+    --font-display: "Unbounded Variable", "Trebuchet MS", sans-serif;
+    --font-ui: "Figtree Variable", "Segoe UI", sans-serif;
+    --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+    --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { background: #0B0A22; }
+  body { font-family: var(--font-ui); color: var(--ink); -webkit-font-smoothing: antialiased; }
+
+  /* ---------------- panorama & langit ---------------- */
+  .pano { position: relative; width: 8640px; height: 1350px; overflow: hidden;
+    background:
+      linear-gradient(180deg, rgb(255 255 255 / 0) 55%, rgb(255 255 255 / .10)),
+      linear-gradient(90deg,
+        #0B0A22 0%, #1A1350 9%, #3B2A86 13.5%, #FFB9A4 19%, #FFD6BE 22%, #CFDBFF 26%,
+        #BFD7FF 34%, #D6E4FF 44%, #FFE6C9 56%, #FFE2BF 66%, #FFC7A1 73%, #FFB38F 77%,
+        #B98AF0 81.5%, #8C6BFF 84%, #3A2C8F 88%, #1A1350 93%, #0B0A22 100%); }
+  .blob { position: absolute; border-radius: 50%; filter: blur(40px); pointer-events: none; }
+  .blob.night { mix-blend-mode: screen; opacity: .55; }
+  .blob.day { mix-blend-mode: soft-light; opacity: .9; }
+  .stars { position: absolute; inset: 0; pointer-events: none; }
+  .stars i { position: absolute; border-radius: 50%; background: #fff; }
+  .light { position: absolute; border-radius: 50%; pointer-events: none; translate: -50% -50%; }
+  .light.sun { width: 64px; height: 64px; background: #FFE9A8;
+    box-shadow: 0 0 0 30px rgb(255 214 120 / .30), 0 0 120px 90px rgb(255 200 90 / .42), 0 0 360px 240px rgb(255 190 80 / .22); }
+  .light.moon { width: 40px; height: 40px; background: #F1EDFF;
+    box-shadow: 0 0 0 16px rgb(200 190 255 / .18), 0 0 160px 90px rgb(160 140 255 / .30); }
+  .light.moon::before, .light.moon::after { content: ""; position: absolute; border-radius: 50%; background: rgb(169 155 234 / .6); }
+  .light.moon::before { width: 10px; height: 10px; left: 8px; top: 9px; }
+  .light.moon::after { width: 6px; height: 6px; left: 24px; top: 8px; }
+
+  /* garis orbit yang menyambung di semua slide */
+  .orbit { position: absolute; left: 0; top: 0; width: 8640px; height: 1350px; pointer-events: none; }
+  .orbit path { fill: none; stroke-width: 3; stroke-dasharray: 2 14; stroke-linecap: round; }
+
+  /* ---------------- slide ---------------- */
+  .slide { position: absolute; top: 0; width: 1080px; height: 1350px; padding: 96px 96px 0; display: flex; flex-direction: column; }
+  .slide.dark { color: #F3F1FF; }
+  .foot { position: absolute; left: 96px; right: 96px; bottom: 64px; display: flex; align-items: center; justify-content: space-between;
+    font: 700 26px var(--font-ui); letter-spacing: .02em; }
+  .foot .brand { display: flex; align-items: center; gap: 14px; }
+  .foot .brand svg { width: 44px; height: 44px; }
+  .foot .count { font: 600 24px var(--font-mono); opacity: .75; }
+  .slide.dark .foot { color: #E6E1FF; }
+  .slide:not(.dark) .foot { color: var(--ink-2); }
+
+  .eyebrow { font: 800 24px var(--font-ui); letter-spacing: .16em; text-transform: uppercase; display: flex; align-items: center; gap: 14px; }
+  .eyebrow::before { content: ""; width: 34px; height: 5px; border-radius: 3px; background: currentColor; }
+  h1, h2 { font-family: var(--font-display); font-weight: 800; letter-spacing: -.035em; line-height: 1.02; }
+  h1 { font-size: 104px; }
+  h2 { font-size: 78px; margin-top: 22px; }
+  h1 em, h2 em { font-style: normal; color: var(--sun); }
+  .lead { font-size: 37px; line-height: 1.42; font-weight: 500; margin-top: 30px; }
+  .slide:not(.dark) .lead { color: var(--ink-2); }
+  .lead b { color: var(--ink); font-weight: 800; }
+  .slide.dark .lead b { color: #fff; }
+
+  /* jendela kaca (Orvella OS) */
+  .win { border-radius: 30px; overflow: hidden; background: rgb(255 255 255 / .86); backdrop-filter: blur(22px);
+    box-shadow: 0 34px 80px -26px rgb(var(--sh-rgb) / .45), 0 1px 0 rgb(255 255 255 / .7) inset, 0 0 0 1.5px rgb(23 21 58 / .08); }
+  .win.night { background: rgb(26 23 58 / .82); color: #F3F1FF; box-shadow: 0 34px 90px -26px rgb(0 0 0 / .7), 0 0 0 1.5px rgb(255 255 255 / .10); }
+  .bar { display: flex; align-items: center; gap: 16px; height: 76px; padding: 0 24px; background: rgb(246 244 253 / .9); border-bottom: 1.5px solid rgb(23 21 58 / .08); }
+  .win.night .bar { background: rgb(33 30 72 / .92); border-color: rgb(255 255 255 / .08); }
+  .glyph { width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center; color: #fff; flex: none; box-shadow: inset 0 -3px 0 rgb(0 0 0 / .14); }
+  .glyph svg { width: 25px; height: 25px; }
+  .bar .t { font: 800 27px var(--font-ui); }
+  .bar .s { font: 500 23px var(--font-ui); opacity: .6; }
+  .bar .ctl { margin-left: auto; display: flex; gap: 20px; opacity: .45; }
+  .bar .ctl i { width: 16px; height: 16px; border-radius: 50%; border: 2.5px solid currentColor; }
+
+  .chip { display: inline-flex; align-items: center; gap: 12px; padding: 12px 24px; border-radius: 999px; font: 800 24px var(--font-ui); letter-spacing: .12em; }
+  .orvi-box { position: relative; }
+  .orvi-box > .orvi { width: 100%; height: 100%; display: block; }
+
+  /* ---------- 1 ---------- */
+  .s1 .menubar { position: absolute; top: 0; left: 0; right: 0; height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px;
+    background: rgb(14 12 36 / .5); backdrop-filter: blur(16px); font: 800 26px var(--font-display); letter-spacing: -.02em; color: #F3F1FF; border-bottom: 1px solid rgb(255 255 255 / .08); }
+  .s1 .menubar span { display: flex; align-items: center; gap: 12px; }
+  .s1 .menubar small { font: 600 22px var(--font-ui); letter-spacing: 0; opacity: .75; }
+  .s1 .hero-orvi { position: absolute; left: 50%; top: 96px; width: 470px; height: 470px; translate: -50% 0; }
+  .s1 .copy { position: absolute; left: 96px; right: 96px; top: 560px; }
+  .s1 .chip { background: rgb(255 194 71 / .16); color: #FFD98A; box-shadow: inset 0 0 0 2px rgb(255 194 71 / .45); }
+  .s1 h1 { margin-top: 30px; }
+  .s1 .swipe { position: absolute; right: 96px; top: 470px; display: flex; align-items: center; gap: 14px; font: 800 30px var(--font-ui);
+    padding: 18px 30px; border-radius: 999px; background: rgb(255 255 255 / .12); box-shadow: inset 0 0 0 2px rgb(255 255 255 / .22); }
+  .s1 .swipe svg { width: 32px; height: 32px; }
+
+  /* ---------- 2 ---------- */
+  .s2 .win { margin-top: 70px; }
+  .s2 .body { padding: 44px 48px 50px; }
+  .s2 .meet { display: flex; align-items: center; gap: 30px; }
+  .s2 .meet .orvi-box { width: 280px; height: 280px; flex: none; margin: -30px -10px -20px -30px; }
+  .s2 .bubble { position: relative; padding: 24px 30px; border-radius: 30px 30px 30px 8px; background: var(--violet); color: #fff; font: 800 38px var(--font-ui); line-height: 1.2; }
+  .s2 h2 { font-size: 62px; margin-top: 18px; }
+  .s2 .lead { font-size: 34px; margin-top: 22px; }
+  .s2 .note { margin-top: 30px; padding: 26px 30px; border-radius: 22px; background: var(--sun-soft); color: var(--sun-ink); font: 600 30px/1.42 var(--font-ui); display: flex; gap: 20px; }
+  .s2 .note svg { width: 38px; height: 38px; flex: none; margin-top: 3px; }
+
+  /* ---------- 3 ---------- */
+  .ed { background: var(--ed-bg); color: var(--ed-text); }
+  .ed .bar { background: #1B1843; border-color: #2B285A; color: #ECE9FF; }
+  .ed .tab { font: 600 23px var(--font-mono); padding: 10px 18px; border-radius: 12px; background: rgb(255 255 255 / .08); display: flex; align-items: center; gap: 10px; }
+  .ed .run { margin-left: auto; display: flex; align-items: center; gap: 10px; font: 800 23px var(--font-ui); background: var(--mint); color: #042A1F; padding: 10px 20px; border-radius: 12px; box-shadow: inset 0 -3px 0 rgb(0 0 0 / .18); }
+  .ed .run svg { width: 22px; height: 22px; }
+  .code { padding: 30px 0 34px; font: 500 40px/1.75 var(--font-mono); }
+  .ln { display: flex; padding: 0 34px 0 0; position: relative; }
+  .ln .n { width: 86px; text-align: right; padding-right: 30px; color: var(--ed-gutter); }
+  .ln.on { background: rgb(106 77 244 / .30); }
+  .ln.on::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--sun); }
+  .k { color: var(--syn-k); } .num { color: var(--syn-n); } .fn { color: var(--syn-f); } .op { color: var(--syn-o); } .cm { color: var(--syn-c); font-style: italic; }
+  .s3 .stage { display: grid; grid-template-columns: 1fr 330px; gap: 26px; margin-top: 60px; align-items: stretch; }
+  .mem { border-radius: 30px; padding: 28px 30px; background: rgb(255 255 255 / .86); backdrop-filter: blur(22px); box-shadow: 0 34px 80px -26px rgb(var(--sh-rgb) / .45), 0 0 0 1.5px rgb(23 21 58 / .08); display: flex; flex-direction: column; }
+  .mem .lbl { font: 800 22px var(--font-ui); letter-spacing: .14em; color: var(--ink-3); }
+  .mem .slot { margin-top: 26px; border-radius: 22px; border: 3px solid var(--ph-pahami); background: #EEF5FF; padding: 18px 22px 22px; position: relative; }
+  .mem .slot .nm { font: 700 28px var(--font-mono); color: var(--ph-pahami); }
+  .mem .vals { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
+  .mem .old { font: 700 44px var(--font-mono); color: var(--ink-3); text-decoration: line-through; text-decoration-thickness: 4px; opacity: .6; }
+  .mem .arrow { width: 34px; height: 34px; color: var(--ink-3); }
+  .mem .new { font: 800 76px var(--font-mono); color: var(--ink); }
+  .mem .pip-carry { position: absolute; right: -14px; top: -26px; width: 64px; height: 64px; }
+  .mem .out { margin-top: auto; font: 600 24px var(--font-mono); color: var(--ink-2); padding-top: 20px; border-top: 2px dashed rgb(23 21 58 / .14); }
+  .mem .out b { color: var(--mint-ink); }
+
+  /* ---------- 4 ---------- */
+  .s4 .ringwrap { display: grid; grid-template-columns: 330px 1fr; gap: 40px; align-items: center; margin-top: 48px; }
+  .s4 .ring { position: relative; width: 330px; height: 330px; }
+  #phaseRing { width: 100%; height: 100%; rotate: -90deg; }
+  .s4 .ring .orvi-box { position: absolute; inset: 70px; }
+  .phases { display: grid; gap: 18px; }
+  .ph { display: grid; grid-template-columns: 64px 1fr; gap: 20px; align-items: start; padding: 20px 24px; border-radius: 24px; background: rgb(255 255 255 / .8); box-shadow: 0 16px 40px -22px rgb(var(--sh-rgb) / .5), 0 0 0 1.5px rgb(23 21 58 / .06); }
+  .ph .no { width: 64px; height: 64px; border-radius: 18px; display: grid; place-items: center; color: #fff; font: 800 32px var(--font-display); }
+  .ph b { font: 800 34px var(--font-display); letter-spacing: -.02em; display: block; }
+  .ph span { font: 500 27px/1.35 var(--font-ui); color: var(--ink-2); display: block; margin-top: 4px; }
+  .s4 .punch { margin-top: 30px; font: 800 34px/1.3 var(--font-ui); color: var(--ink); display: flex; align-items: center; gap: 16px; }
+  .s4 .punch svg { width: 40px; height: 40px; color: var(--mint); flex: none; }
+
+  /* ---------- 5 ---------- */
+  .screen { margin-top: 44px; height: 540px; border-radius: 30px; overflow: hidden; position: relative;
+    background: radial-gradient(420px 300px at 82% 10%, rgb(255 214 120 / .7), transparent 70%), linear-gradient(160deg, #BFD7FF, #FFE6C9);
+    box-shadow: 0 40px 90px -30px rgb(var(--sh-rgb) / .55), 0 0 0 10px rgb(255 255 255 / .6), 0 0 0 11.5px rgb(23 21 58 / .10); }
+  .screen .mb { height: 38px; display: flex; align-items: center; gap: 22px; padding: 0 18px; background: rgb(255 255 255 / .62); font: 800 17px var(--font-ui); color: var(--ink); }
+  .screen .mb .lg { font: 800 18px var(--font-display); letter-spacing: -.02em; display: flex; align-items: center; gap: 8px; }
+  .screen .mb .r { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+  .screen .mb .pill { padding: 3px 10px; border-radius: 99px; background: rgb(255 178 36 / .25); color: var(--sun-ink); font-size: 15px; }
+  .screen .mw { position: absolute; left: 34px; right: 34px; top: 62px; height: 360px; border-radius: 18px; overflow: hidden; background: #fff;
+    box-shadow: 0 24px 50px -18px rgb(var(--sh-rgb) / .5), 0 0 0 1px rgb(23 21 58 / .08); display: grid; grid-template-rows: 46px 1fr; }
+  .screen .mw .tb { display: flex; align-items: center; gap: 10px; padding: 0 14px; background: linear-gradient(90deg, var(--mint-soft), #F6F4FD 60%); font: 800 17px var(--font-ui); }
+  .screen .mw .tb .g { width: 26px; height: 26px; border-radius: 8px; background: var(--mint); display: grid; place-items: center; color: #fff; }
+  .screen .mw .tb .g svg { width: 15px; height: 15px; }
+  .screen .mw .tb small { font-weight: 500; opacity: .6; }
+  .screen .mw .tb .go { margin-left: auto; background: var(--mint); color: #fff; padding: 5px 12px; border-radius: 8px; font-size: 14px; }
+  .screen .split { display: grid; grid-template-columns: 1.2fr 1fr; min-height: 0; }
+  .screen .mini-ed { background: var(--ed-bg); padding: 14px 0; font: 500 15.5px/1.7 var(--font-mono); color: var(--ed-text); }
+  .screen .mini-ed .ln .n { width: 42px; padding-right: 14px; }
+  .screen .prev { background: linear-gradient(160deg, #FFF7EA, #ECE7FF); display: grid; place-items: center; }
+  .screen .card { width: 210px; padding: 22px 16px 18px; background: #fff; border-radius: 18px; text-align: center; box-shadow: 0 14px 30px -14px rgb(var(--sh-rgb) / .4); }
+  .screen .card .av { width: 58px; height: 58px; border-radius: 50%; background: var(--sun); margin: 0 auto; display: grid; place-items: center; font: 800 26px var(--font-display); color: var(--ink); }
+  .screen .card b { display: block; font: 800 19px var(--font-ui); margin-top: 10px; }
+  .screen .card span { display: block; font: 500 13px var(--font-ui); color: var(--ink-2); margin-top: 4px; }
+  .screen .card i { display: inline-block; margin-top: 12px; font: 800 13px var(--font-ui); font-style: normal; background: var(--violet); color: #fff; padding: 6px 14px; border-radius: 8px; }
+  .dock { position: absolute; left: 50%; bottom: 22px; translate: -50% 0; display: flex; align-items: flex-end; gap: 12px; padding: 10px 14px; border-radius: 24px; background: rgb(255 255 255 / .58);
+    backdrop-filter: blur(16px); box-shadow: 0 16px 36px -16px rgb(var(--sh-rgb) / .45), 0 0 0 1px rgb(255 255 255 / .6) inset; }
+  .dock .ic { width: 62px; height: 62px; border-radius: 17px; display: grid; place-items: center; color: #fff; box-shadow: inset 0 -4px 0 rgb(0 0 0 / .15), 0 6px 14px -8px rgb(var(--sh-rgb) / .6); }
+  .dock .ic svg { width: 30px; height: 30px; }
+  .dock .orvi-box { width: 84px; height: 84px; margin: -18px 0 -6px; }
+  .dock .sep { width: 2px; height: 46px; background: rgb(23 21 58 / .12); align-self: center; }
+
+  /* ---------- 6 ---------- */
+  .langs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 44px; }
+  .lang { border-radius: 24px; padding: 20px 12px 16px; background: rgb(255 255 255 / .82); box-shadow: 0 16px 40px -22px rgb(var(--sh-rgb) / .5), 0 0 0 1.5px rgb(23 21 58 / .06); text-align: center; }
+  .lang .mono { width: 80px; height: 80px; margin: 0 auto; border-radius: 26px; display: grid; place-items: center; color: #fff; font: 800 32px var(--font-mono); letter-spacing: -.04em; box-shadow: inset 0 -5px 0 rgb(0 0 0 / .16); }
+  .lang .nm { margin-top: 12px; font: 800 25px var(--font-ui); }
+  .s6 .run-line { margin-top: 28px; display: flex; align-items: center; gap: 16px; padding: 20px 26px; border-radius: 22px; background: var(--ed-bg); color: var(--ed-text); font: 500 26px var(--font-mono); }
+  .s6 .run-line .ok { margin-left: auto; color: #34D8A6; font-weight: 700; }
+  .s6 .run-line .pr { color: var(--sun); }
+
+  /* ---------- 7 ---------- */
+  .together { display: grid; gap: 22px; margin-top: 46px; }
+  .tg { display: grid; grid-template-columns: 1fr 372px; gap: 26px; align-items: center; padding: 26px 26px 26px 34px; border-radius: 30px; background: rgb(255 255 255 / .86);
+    backdrop-filter: blur(22px); box-shadow: 0 26px 60px -26px rgb(var(--sh-rgb) / .5), 0 0 0 1.5px rgb(23 21 58 / .06); }
+  .tg .tt { display: flex; align-items: center; gap: 16px; white-space: nowrap; font: 800 33px var(--font-display); letter-spacing: -.025em; }
+  .tg p { font: 500 27px/1.38 var(--font-ui); color: var(--ink-2); margin-top: 10px; }
+  .tg .art { height: 170px; border-radius: 20px; position: relative; overflow: hidden; }
+  .kolab { background: var(--ed-bg); padding: 30px 0 30px; font: 500 19px/1.75 var(--font-mono); color: var(--ed-text); }
+  .kolab .ln .n { width: 44px; padding-right: 14px; }
+  .cur { display: inline-block; width: 3px; height: 1.2em; vertical-align: -.2em; position: relative; margin: 0 1px; }
+  .cur b { position: absolute; left: -2px; bottom: 100%; font: 800 14px var(--font-ui); color: #fff; padding: 2px 8px; border-radius: 6px 6px 6px 0; white-space: nowrap; }
+  .cur.a { background: #8C74FF; } .cur.a b { background: #6A4DF4; }
+  .cur.b { background: #FF7A73; } .cur.b b { background: #E5483F; bottom: auto; top: 100%; border-radius: 0 6px 6px 6px; }
+  .duel { background: linear-gradient(135deg, #FFE3E1, #ECE7FF); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 22px; }
+  .duel .p { text-align: center; }
+  .duel .av { width: 64px; height: 64px; border-radius: 50%; margin: 0 auto; display: grid; place-items: center; color: #fff; font: 800 24px var(--font-display); }
+  .duel .bars { margin-top: 12px; display: flex; gap: 5px; justify-content: center; }
+  .duel .bars i { width: 16px; height: 16px; border-radius: 5px; background: rgb(23 21 58 / .12); }
+  .duel .vs { font: 800 34px var(--font-display); color: var(--coral); }
+  .live { background: linear-gradient(135deg, #DCEBFF, #ECE7FF); display: grid; place-items: center; text-align: center; }
+  .live small { font: 800 17px var(--font-ui); letter-spacing: .16em; color: var(--ink-3); }
+  .live .pin { font: 800 52px var(--font-display); letter-spacing: .06em; color: var(--ink); }
+  .live .ans { display: flex; gap: 8px; margin-top: 8px; }
+  .live .ans i { width: 64px; height: 30px; border-radius: 9px; }
+
+  /* ---------- 8 ---------- */
+  .s8 .hero-orvi { position: absolute; left: 50%; top: 70px; width: 480px; height: 480px; translate: -50% 0; }
+  .s8 .copy { position: absolute; left: 96px; right: 96px; top: 590px; text-align: center; }
+  .s8 h1 { font-size: 112px; }
+  .s8 .lead { color: #D9D3FF; margin-top: 26px; }
+  .s8 .handle { display: inline-flex; align-items: center; gap: 18px; margin-top: 34px; padding: 22px 40px; border-radius: 999px; background: var(--sun); color: #1E1C45;
+    font: 800 44px var(--font-display); letter-spacing: -.02em; box-shadow: 0 7px 0 #B96A00, 0 30px 60px -20px rgb(255 178 36 / .6); }
+  .s8 .handle svg { width: 46px; height: 46px; }
+  .s8 .tag { margin-bottom: 22px; font: 700 28px var(--font-ui); letter-spacing: .04em; color: #B9B3E3; }
+</style>
+</head>
+<body>
+<div class="pano" id="pano">
+  <div class="stars" id="stars"></div>
+  <div id="sky"></div>
+  <svg class="orbit" viewBox="0 0 8640 1350" aria-hidden="true">
+    <defs>
+      <linearGradient id="orbitInk" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".2" stop-color="#fff" stop-opacity=".5"/>
+        <stop offset=".26" stop-color="#17153A" stop-opacity=".32"/><stop offset=".78" stop-color="#17153A" stop-opacity=".30"/>
+        <stop offset=".84" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity=".55"/>
+      </linearGradient>
+    </defs>
+    <path id="orbitPath" stroke="url(#orbitInk)" d=""/>
+    <g id="pips"></g>
+  </svg>
+
+  <!-- 1 · boot malam -->
+  <section class="slide s1 dark" style="left:0">
+    <div class="menubar"><span><svg viewBox="-62 -62 124 124" width="30" height="30" class="mark"></svg>Orvella OS</span><small>segera hadir</small></div>
+    <div class="hero-orvi orvi-box" data-orvi="idle" data-pip=".62"></div>
+    <div class="copy">
+      <span class="chip"><svg data-i="sparkles" width="26" height="26"></svg>SEGERA HADIR</span>
+      <h1>Sesuatu sedang <em>mengorbit.</em></h1>
+      <p class="lead">Orvella, tempat belajar ngoding <b>dari paham</b>. Kodenya jalan beneran, belajarnya ditemani Orvi.</p>
+    </div>
+    <div class="swipe">Geser <svg data-i="arrow-right"></svg></div>
+    <div class="foot"><span class="brand"><svg viewBox="-62 -62 124 124" class="mark"></svg>orvella.labs</span><span class="count">01 / 08</span></div>
+  </section>
+
+  <!-- 2 · kenalan -->
+  <section class="slide s2" style="left:1080px">
+    <div class="win">
+      <div class="bar"><span class="glyph" style="background:var(--sun)"><svg data-i="hand"></svg></span><span class="t">Kenalan</span><span class="s">orvi.txt</span><span class="ctl"><i></i><i></i><i></i></span></div>
+      <div class="body">
+        <div class="meet"><div class="orvi-box" data-orvi="happy" data-pip=".2"></div><div class="bubble">Hai, aku Orvi!<br><small style="font-size:28px;font-weight:600;opacity:.85">Salam kenal ya.</small></div></div>
+        <h2>Teman belajar yang <em>sabar.</em></h2>
+        <p class="lead">Orvi itu bola cahaya kecil yang menemanimu belajar ngoding. Bulan mungil yang terus mengelilinginya namanya <b>Pip</b>. Pip yang menunjuk bagian penting.</p>
+        <div class="note"><svg data-i="heart-handshake"></svg><span>Kalau jawabanmu belum tepat, Orvi menunjukkan barisnya dan memberi petunjuk secukupnya. Bukan omelan.</span></div>
+      </div>
+    </div>
+    <div class="foot"><span class="brand"><svg viewBox="-62 -62 124 124" class="mark"></svg>orvella.labs</span><span class="count">02 / 08</span></div>
+  </section>
+
+  <!-- 3 · pahami dulu -->
+  <section class="slide s3" style="left:2160px">
+    <span class="eyebrow" style="color:var(--ph-pahami)">Cara belajarnya</span>
+    <h2>Pahami dulu, <br>baru <em>ngoding.</em></h2>
+    <div class="stage">
+      <div class="win ed">
+        <div class="bar"><span class="tab"><svg data-i="file-code" width="22" height="22"></svg>main.py</span><span class="run"><svg data-i="play"></svg>Jalankan</span></div>
+        <div class="code">
+          <div class="ln"><span class="n">1</span><span>x <span class="op">=</span> <span class="num">4</span></span></div>
+          <div class="ln on"><span class="n">2</span><span>x <span class="op">=</span> x <span class="op">*</span> <span class="num">2</span></span></div>
+          <div class="ln"><span class="n">3</span><span><span class="fn">print</span>(x)</span></div>
+          <div class="ln"><span class="n">4</span><span class="cm"># baris per baris</span></div>
+        </div>
+      </div>
+      <div class="mem">
+        <span class="lbl">MEMORI</span>
+        <div class="slot"><span class="nm">x</span>
+          <div class="vals"><span class="old">4</span><svg class="arrow" data-i="arrow-right"></svg><span class="new">8</span></div>
+          <span class="pip-carry" data-pipsolo></span>
+        </div>
+        <div class="out">keluaran<br><b>8</b></div>
+      </div>
+    </div>
+    <p class="lead">Konsep dijelaskan lewat animasi yang bisa kamu sentuh. Jalankan kodenya <b>baris per baris</b>, lalu lihat nilainya bergerak di memori.</p>
+    <div class="foot"><span class="brand"><svg viewBox="-62 -62 124 124" class="mark"></svg>orvella.labs</span><span class="count">03 / 08</span></div>
+  </section>
+
+  <!-- 4 · empat fase -->
+  <section class="slide s4" style="left:3240px">
+    <span class="eyebrow" style="color:var(--violet)">Tidak ada yang dilompati</span>
+    <h2>Empat fase <br>di <em>tiap bab.</em></h2>
+    <div class="ringwrap">
+      <div class="ring"><svg viewBox="-170 -170 340 340" id="phaseRing"></svg><div class="orvi-box" data-orvi="idle" data-size="190" data-nopip></div></div>
+      <div class="phases">
+        <div class="ph"><span class="no" style="background:var(--ph-pahami)">1</span><div><b>Pahami</b><span>Animasi dan kode hidup menjelaskan konsep.</span></div></div>
+        <div class="ph"><span class="no" style="background:var(--ph-perkuat)">2</span><div><b>Perkuat</b><span>Latihan yang menyesuaikan, dengan petunjuk bertahap.</span></div></div>
+        <div class="ph"><span class="no" style="background:var(--ph-kuis)">3</span><div><b>Kuis</b><span>Trivia cepat berwaktu. Lulus 70% untuk membuka Uji.</span></div></div>
+        <div class="ph"><span class="no" style="background:var(--ph-uji)">4</span><div><b>Uji</b><span>Tantangan kode sungguhan, diperiksa robot penguji.</span></div></div>
+      </div>
+    </div>
+    <p class="punch"><svg data-i="circle-check-big"></svg>Kamu baru diuji setelah benar-benar paham.</p>
+    <div class="foot"><span class="brand"><svg viewBox="-62 -62 124 124" class="mark"></svg>orvella.labs</span><span class="count">04 / 08</span></div>
+  </section>
+
+  <!-- 5 · desktop sendiri -->
+  <section class="slide s5" style="left:4320px">
+    <span class="eyebrow" style="color:var(--mint-ink)">Orvella OS</span>
+    <h2>Belajar di <br>desktop<em>mu</em> sendiri.</h2>
+    <div class="screen">
+      <div class="mb"><span class="lg"><svg viewBox="-62 -62 124 124" width="20" height="20" class="mark"></svg>Orvella</span><span>Sandbox</span><span style="opacity:.6">Berkas</span><span style="opacity:.6">Tampilan</span>
+        <span class="r"><span class="pill">240 XP</span><svg data-i="search" width="18" height="18"></svg></span></div>
+      <div class="mw">
+        <div class="tb"><span class="g"><svg data-i="code-xml"></svg></span>Sandbox <small>kartu-profil / index.html</small><span class="go">Jalankan</span></div>
+        <div class="split">
+          <div class="mini-ed">
+            <div class="ln"><span class="n">1</span><span><span class="k">&lt;main</span> <span class="fn">class</span>=<span style="color:var(--syn-s)">"kartu"</span><span class="k">&gt;</span></span></div>
+            <div class="ln"><span class="n">2</span><span>&nbsp;&nbsp;<span class="k">&lt;h1&gt;</span>Nadia Putri<span class="k">&lt;/h1&gt;</span></span></div>
+            <div class="ln on"><span class="n">3</span><span>&nbsp;&nbsp;<span class="k">&lt;p&gt;</span>Suka Python<span class="k">&lt;/p&gt;</span></span></div>
+            <div class="ln"><span class="n">4</span><span>&nbsp;&nbsp;<span class="k">&lt;button&gt;</span>Suka<span class="k">&lt;/button&gt;</span></span></div>
+            <div class="ln"><span class="n">5</span><span><span class="k">&lt;/main&gt;</span></span></div>
+          </div>
+          <div class="prev"><div class="card"><div class="av">N</div><b>Nadia Putri</b><span>Suka Python</span><i>Suka ♥</i></div></div>
+        </div>
+      </div>
+      <div class="dock">
+        <span class="ic" style="background:var(--sun)"><svg data-i="house"></svg></span>
+        <span class="ic" style="background:var(--violet)"><svg data-i="graduation-cap"></svg></span>
+        <span class="ic" style="background:var(--mint)"><svg data-i="code-xml"></svg></span>
+        <div class="orvi-box" data-orvi="happy" data-size="84" data-pip=".35"></div>
+        <span class="ic" style="background:var(--pink)"><svg data-i="image"></svg></span>
+        <span class="ic" style="background:var(--coral)"><svg data-i="swords"></svg></span>
+        <span class="sep"></span>
+        <span class="ic" style="background:var(--slate)"><svg data-i="settings-2"></svg></span>
+      </div>
+    </div>
+    <p class="lead">Jendela, dock, Spotlight, dan <b>Sandbox</b> untuk proyek bebas, dari web sampai PHP + MySQL.</p>
+    <div class="foot"><span class="brand"><svg viewBox="-62 -62 124 124" class="mark"></svg>orvella.labs</span><span class="count">05 / 08</span></div>
+  </section>
+
+  <!-- 6 · 12 bahasa -->
+  <section class="slide s6" style="left:5400px">
+    <span class="eyebrow" style="color:var(--sun-ink)">12 bahasa</span>
+    <h2>Kodenya jalan <em>beneran.</em></h2>
+    <div class="langs" id="langs"></div>
+    <div class="run-line"><span class="pr">$</span> g++ -std=c++20 main.cpp && ./main <span class="ok">✓ 5/5 tes lulus</span></div>
+    <p class="lead">Dijalankan di <b>sandbox server</b> yang terisolasi, bukan simulasi. Kalau error, Orvi bantu menjelaskan.</p>
+    <div class="foot"><span class="brand"><svg viewBox="-62 -62 124 124" class="mark"></svg>orvella.labs</span><span class="count">06 / 08</span></div>
+  </section>
+
+  <!-- 7 · bareng teman -->
+  <section class="slide s7" style="left:6480px">
+    <span class="eyebrow" style="color:var(--coral-ink)">Bareng teman</span>
+    <h2>Belajar bareng, <br>bukan <em>sendirian.</em></h2>
+    <div class="together">
+      <div class="tg">
+        <div><div class="tt"><span class="glyph" style="background:var(--mint)"><svg data-i="users"></svg></span>Ngoding bareng</div>
+          <p>Kursor dan ketikan teman muncul langsung di editormu.</p></div>
+        <div class="art kolab">
+          <div class="ln"><span class="n">1</span><span><span class="k">def</span> <span class="fn">sapa</span>(nama):<span class="cur a"><b>Nadia</b></span></span></div>
+          <div class="ln"><span class="n">2</span><span>&nbsp;&nbsp;<span class="k">return</span> <span style="color:var(--syn-s)">"Hai "</span> + nama</span></div>
+          <div class="ln"><span class="n">3</span><span><span class="fn">print</span>(sapa(<span style="color:var(--syn-s)">"Raka"</span>))<span class="cur b"><b>Raka</b></span></span></div>
+        </div>
+      </div>
+      <div class="tg">
+        <div><div class="tt"><span class="glyph" style="background:var(--coral)"><svg data-i="swords"></svg></span>Duel 1 lawan 1</div>
+          <p>Lima soal, lima menit. Adu cepat dengan teman sekelas.</p></div>
+        <div class="art duel">
+          <div class="p"><span class="av" style="background:var(--violet)">N</span><div class="bars"><i style="background:var(--mint)"></i><i style="background:var(--mint)"></i><i style="background:var(--mint)"></i><i></i><i></i></div></div>
+          <span class="vs">VS</span>
+          <div class="p"><span class="av" style="background:var(--coral)">R</span><div class="bars"><i style="background:var(--mint)"></i><i style="background:var(--coral)"></i><i></i><i></i><i></i></div></div>
+        </div>
+      </div>
+      <div class="tg">
+        <div><div class="tt"><span class="glyph" style="background:var(--sky)"><svg data-i="presentation"></svg></span>Kuis langsung</div>
+          <p>Mentor menayangkan kuis di kelas, kamu menjawab dari HP.</p></div>
+        <div class="art live"><div><small>KODE GABUNG</small><div class="pin">482 915</div>
+          <div class="ans"><i style="background:var(--ph-pahami)"></i><i style="background:var(--ph-perkuat)"></i><i style="background:var(--ph-kuis)"></i><i style="background:var(--ph-uji)"></i></div></div></div>
+      </div>
+    </div>
+    <div class="foot"><span class="brand"><svg viewBox="-62 -62 124 124" class="mark"></svg>orvella.labs</span><span class="count">07 / 08</span></div>
+  </section>
+
+  <!-- 8 · segera hadir -->
+  <section class="slide s8 dark" style="left:7560px">
+    <div class="hero-orvi orvi-box" data-orvi="cheer" data-pip=".9"></div>
+    <div class="copy">
+      <p class="tag">Belajar ngoding dari paham.</p>
+      <h1>Segera <em>hadir.</em></h1>
+      <p class="lead">Follow dan nyalakan notifikasi, biar tidak ketinggalan orbit pertamanya.</p>
+      <span class="handle"><svg data-i="at-sign"></svg>orvella.labs</span>
+    </div>
+    <div class="foot"><span class="brand"><svg viewBox="-62 -62 124 124" class="mark"></svg>orvella.labs</span><span class="count">08 / 08</span></div>
+  </section>
+</div>
+
+<script src="vendor/lucide.min.js"></script>
+<script src="vendor/orvi.js"></script>
+<script src="common.js"></script>
+<script>
+(async () => {
+  const W = 8640, H = 1350, SW = 1080;
+  const rnd = seeded(20260930);
+
+  // bintang hanya di bagian malam (slide 1, awal slide 2, akhir slide 7, slide 8)
+  const nightAt = x => { const f = x / W; return f < .16 ? 1 : f < .2 ? (.2 - f) / .04 : f > .86 ? 1 : f > .8 ? (f - .8) / .06 : 0; };
+  const stars = document.getElementById('stars');
+  for (let i = 0; i < 520; i++) {
+    const x = rnd() * W, y = rnd() * H * .8, k = nightAt(x);
+    if (k <= 0 || rnd() > k) continue;
+    const s = document.createElement('i'), r = rnd() * 3 + 1.2;
+    Object.assign(s.style, { left: x + 'px', top: y + 'px', width: r + 'px', height: r + 'px', opacity: (.35 + rnd() * .55) * k });
+    stars.appendChild(s);
+  }
+
+  // aurora + cahaya: bulan di malam, matahari naik-turun di siang
+  const sky = document.getElementById('sky');
+  const blob = (x, y, r, c, kind) => { const b = document.createElement('div'); b.className = 'blob ' + kind;
+    Object.assign(b.style, { left: x - r + 'px', top: y - r + 'px', width: r * 2 + 'px', height: r * 2 + 'px', background: `radial-gradient(closest-side, ${c}, transparent)` }); sky.appendChild(b); };
+  [[300, 380, 520, '#7A5CFF'], [900, 1050, 460, '#FF5FA8'], [620, 900, 380, '#2ED3A1'], [7800, 360, 560, '#7A5CFF'], [8300, 1000, 460, '#FF5FA8'], [7300, 1150, 420, '#3B6BFF'], [8100, 700, 300, '#2ED3A1']]
+    .forEach(([x, y, r, c]) => blob(x, y, r, c, 'night'));
+  [[1700, 1100, 520, '#FF8FA3'], [2500, 300, 560, '#FFC24B'], [3300, 1100, 600, '#7C63FF'], [4200, 250, 520, '#4FE0B5'], [5000, 1150, 560, '#7FB7FF'],
+   [5800, 300, 560, '#FFC24B'], [6500, 1000, 600, '#FF7A59'], [7100, 350, 500, '#D65CFF']].forEach(([x, y, r, c]) => blob(x, y, r, c, 'day'));
+  const light = (x, y, kind) => { const l = document.createElement('div'); l.className = 'light ' + kind; Object.assign(l.style, { left: x + 'px', top: y + 'px' }); sky.appendChild(l); };
+  light(880, 150, 'moon'); light(8020, 240, 'moon');
+  // matahari: terbit di slide 2, tinggi di siang, terbenam di slide 7
+  [[1990, 520], [2980, 210], [4050, 150], [5140, 190], [6250, 330]].forEach(([x, y]) => light(x, y, 'sun'));
+
+  // garis orbit: gelombang pelan di pita bawah, Pip di tiap slide
+  const path = document.getElementById('orbitPath'), pips = document.getElementById('pips');
+  const yAt = x => 1205 + Math.sin(x / SW * Math.PI * 1.0 + .6) * 26;
+  let d = `M -20 ${yAt(-20)}`; for (let x = 0; x <= W + 20; x += 20) d += ` L ${x} ${yAt(x).toFixed(1)}`;
+  path.setAttribute('d', d);
+  for (let i = 0; i < 8; i++) {
+    const x = i * SW + 560 + (i % 2 ? 60 : -40), y = yAt(x);
+    pips.insertAdjacentHTML('beforeend', `<g transform="translate(${x} ${y}) scale(1.9)"><circle r="10" fill="#EEE9FF" stroke="#C8BDF4" stroke-width="1.6"/>
+      <circle cx="-3.6" cy="-3.6" r="2.3" fill="#C8BDF4"/><circle cx="4" cy="-4.6" r="1.2" fill="#C8BDF4"/><circle cx="-3" cy="2.2" r="1.35" fill="#2A1F4E"/><circle cx="3.2" cy="2.2" r="1.35" fill="#2A1F4E"/></g>`);
+  }
+
+  // cincin 4 fase
+  const ring = document.getElementById('phaseRing'), C = 2 * Math.PI * 140, gap = 16;
+  ['--ph-pahami', '--ph-perkuat', '--ph-kuis', '--ph-uji'].forEach((v, i) => {
+    ring.insertAdjacentHTML('beforeend', `<circle r="140" fill="none" stroke="var(${v})" stroke-width="30" stroke-linecap="round"
+      stroke-dasharray="${C / 4 - gap} ${C}" stroke-dashoffset="${-(C / 4) * i - gap / 2}"/>`);
+  });
+
+  // 12 bahasa, monogram (bukan logo resmi)
+  const L = [['Py', 'Python', 'python'], ['JS', 'JavaScript', 'javascript', '#2A2100'], ['&lt;/&gt;', 'HTML', 'html'], ['{ }', 'CSS', 'css'],
+    ['C', 'C', 'c'], ['C++', 'C++', 'cpp'], ['Rs', 'Rust', 'rust'], ['Jv', 'Java', 'java'], ['Go', 'Go', 'go'], ['SQL', 'SQL', 'sql'], ['Kt', 'Kotlin', 'kotlin'], ['php', 'PHP', 'php']];
+  document.getElementById('langs').innerHTML = L.map(([m, n, k, ink]) =>
+    `<div class="lang"><div class="mono" style="background:var(--lang-${k});${ink ? `color:${ink}` : ''}">${m}</div><div class="nm">${n}</div></div>`).join('');
+
+  paintCommon();
+  await ready();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+.orvi { display: inline-block; line-height: 0; --orvi-tint: var(--lilac); vertical-align: middle; position: relative; }
+.orvi-svg { overflow: visible; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; width: 100%; height: 100%; }
+.orvi-svg.is-static { cursor: inherit; }
+.o-shadow { fill: rgb(var(--sh-rgb) / .17); transform-box: fill-box; transform-origin: center; }
+.o-glow { opacity: var(--orvi-glow-op); transform-box: fill-box; transform-origin: center; }
+.o-ring { fill: none; stroke: var(--orvi-tint); stroke-width: 3.4; }
+.o-ring-back { opacity: .4; } .o-ring-front { opacity: .95; }
+.o-rim { fill: none; stroke: rgb(255 255 255 / .4); stroke-width: 3; stroke-linecap: round; }
+.o-shine { fill: #fff; opacity: .62; } .o-shine2 { fill: #fff; opacity: .78; }
+.o-cheek { fill: var(--orvi-cheek); opacity: .42; transition: opacity .3s; }
+.o-iris { fill: var(--orvi-face); } .o-glint { fill: #fff; }
+.o-happy, .o-shut { fill: none; stroke: var(--orvi-face); stroke-width: 3.8; stroke-linecap: round; opacity: 0; transition: opacity .12s; }
+.o-open { transform-box: fill-box; transform-origin: center; transition: transform .28s var(--ease-spring), opacity .12s; }
+[data-eyes="happy"] .o-open, [data-eyes="shut"] .o-open { opacity: 0; }
+[data-eyes="happy"] .o-happy, [data-eyes="shut"] .o-shut { opacity: 1; }
+[data-eyes="wide"] .o-open { transform: scale(1.22); } [data-eyes="narrow"] .o-open { transform: scaleY(.7); }
+.o-brow { fill: none; stroke: var(--orvi-face); stroke-width: 3.1; stroke-linecap: round; opacity: 0; transform-box: fill-box; transform-origin: center; transition: opacity .2s, transform .35s var(--ease-spring); }
+[data-mood="think"] .o-brow-l { opacity: 1; transform: translateY(-5px) rotate(-10deg); }
+[data-mood="think"] .o-brow-r { opacity: 1; transform: translateY(-1px); }
+[data-mood="oops"] .o-brow { opacity: 1; transform: translateY(-8px); }
+[data-mood="focus"] .o-brow-l { opacity: 1; transform: translateY(3px) rotate(16deg); }
+[data-mood="focus"] .o-brow-r { opacity: 1; transform: translateY(3px) rotate(-16deg); }
+[data-mood="happy"] .o-cheek, [data-mood="cheer"] .o-cheek { opacity: .72; }
+[data-mood="sleep"] .o-cheek { opacity: .3; }
+.o-mouth { fill: none; stroke: var(--orvi-face); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+.o-mouth.is-filled { fill: var(--orvi-face); }
+.o-pip-body { fill: var(--pip); stroke: color-mix(in oklab, var(--pip-shade) 55%, var(--orvi-tint)); stroke-width: 1.6; }
+.o-crater { fill: var(--pip-shade); } .o-pip-face circle { fill: var(--orvi-face); } .o-trail { fill: var(--orvi-tint); }
+.o-think circle { fill: var(--win-solid); stroke: var(--line-2); stroke-width: 1.6; }
+.o-zzz text { font: 800 17px var(--font-display); fill: var(--ink-3); }
+.o-spark { fill: var(--sun); }
+.orvi--xs .o-ring { stroke-width: 7.5; }
+.orvi--xs .o-cheek, .orvi--xs .o-trail, .orvi--xs .o-crater, .orvi--xs .o-pip-face, .orvi--xs .o-rim, .orvi--xs .o-shine2, .orvi--xs .o-shadow { display: none; }
+.orvi--sm .o-ring { stroke-width: 5; } .orvi--sm .o-trail, .orvi--sm .o-shadow { display: none; }
