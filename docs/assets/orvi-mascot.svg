@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="320" height="320">
+  <defs>
+    <!-- Orvi Body Radial Gradient -->
+    <radialGradient id="mascotOrviGrad" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#FFF5D6" />
+      <stop offset="35%" stop-color="#FFC53D" />
+      <stop offset="85%" stop-color="#F28C00" />
+      <stop offset="100%" stop-color="#C96500" />
+    </radialGradient>
+
+    <!-- Pip Moon Gradient -->
+    <radialGradient id="mascotPipGrad" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="70%" stop-color="#E2DCD2" />
+      <stop offset="100%" stop-color="#B8AFA0" />
+    </radialGradient>
+
+    <!-- Filters -->
+    <filter id="mascotGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="mascotShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#05040A" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <g transform="translate(160, 160)" filter="url(#mascotShadow)">
+    <!-- Ground Shadow -->
+    <ellipse cx="0" cy="115" rx="74" ry="14" fill="#0A0918" opacity="0.4" />
+
+    <!-- Orvi Ambient Glow Behind -->
+    <circle cx="0" cy="0" r="95" fill="#FFB224" opacity="0.28" filter="url(#mascotGlow)" />
+
+    <!-- Back Half of Orbit Ring (Behind Body) -->
+    <g transform="rotate(-16)">
+      <ellipse cx="0" cy="0" rx="115" ry="29" fill="none" stroke="#FFBC3B" stroke-width="5" opacity="0.35" stroke-dasharray="160 190" />
+    </g>
+
+    <!-- Orvi Body (Luminous Sphere) -->
+    <circle cx="0" cy="0" r="70" fill="url(#mascotOrviGrad)" stroke="#FFDA73" stroke-width="1.8" />
+
+    <!-- Specular Highlight (Top Left) -->
+    <ellipse cx="-24" cy="-26" rx="17" ry="8.5" fill="#FFFFFF" opacity="0.68" transform="rotate(-30 -24 -26)" />
+
+    <!-- Eyes (Big, Curious, Reflective) -->
+    <g>
+      <!-- Left Eye -->
+      <ellipse cx="-22" cy="-2" rx="9" ry="12" fill="#1E1C45" />
+      <circle cx="-25" cy="-6" r="3.8" fill="#FFFFFF" />
+      <circle cx="-20" cy="3" r="1.8" fill="#FFFFFF" />
+      
+      <!-- Right Eye -->
+      <ellipse cx="22" cy="-2" rx="9" ry="12" fill="#1E1C45" />
+      <circle cx="19" cy="-6" r="3.8" fill="#FFFFFF" />
+      <circle cx="24" cy="3" r="1.8" fill="#FFFFFF" />
+    </g>
+
+    <!-- Rosy Cheeks -->
+    <ellipse cx="-38" cy="17" rx="10" ry="5.5" fill="#FF5E36" opacity="0.65" />
+    <ellipse cx="38" cy="17" rx="10" ry="5.5" fill="#FF5E36" opacity="0.65" />
+
+    <!-- Warm Cheerful Smile -->
+    <path d="M-11 17 Q0 29 11 17" fill="none" stroke="#1E1C45" stroke-width="3.5" stroke-linecap="round" />
+
+    <!-- Front Half of Orbit Ring (In Front of Body) -->
+    <g transform="rotate(-16)">
+      <!-- 4-Phase Colored Orbit Arcs -->
+      <!-- Pahami (Sky Blue) -->
+      <path d="M-115 0 A115 29 0 0 1 -57 25" fill="none" stroke="#3E9BF0" stroke-width="6.5" stroke-linecap="round" />
+      <!-- Perkuat (Mint) -->
+      <path d="M-57 25 A115 29 0 0 1 0 29" fill="none" stroke="#1FB488" stroke-width="6.5" stroke-linecap="round" />
+      <!-- Kuis (Grape) -->
+      <path d="M0 29 A115 29 0 0 1 67 23" fill="none" stroke="#8D5CF6" stroke-width="6.5" stroke-linecap="round" />
+      <!-- Uji (Coral) -->
+      <path d="M67 23 A115 29 0 0 1 115 0" fill="none" stroke="#FF6A55" stroke-width="6.5" stroke-linecap="round" />
+
+      <!-- Pip: Orbiting Little Moon -->
+      <g transform="translate(74, 22)">
+        <!-- Motion Trail Dots -->
+        <circle cx="-22" cy="-5" r="3" fill="#FFBC3B" opacity="0.3" />
+        <circle cx="-12" cy="-2.5" r="4.2" fill="#FFBC3B" opacity="0.55" />
+
+        <!-- Moon Sphere -->
+        <circle cx="0" cy="0" r="16" fill="url(#mascotPipGrad)" stroke="#4A4560" stroke-width="1.4" />
+        <!-- Moon Craters -->
+        <circle cx="-5" cy="-4" r="3" fill="#9C9485" opacity="0.4" />
+        <circle cx="4" cy="5" r="2.2" fill="#9C9485" opacity="0.4" />
+        <!-- Pip Eyes -->
+        <circle cx="-4" cy="1" r="1.4" fill="#1E1C45" />
+        <circle cx="4" cy="1" r="1.4" fill="#1E1C45" />
+      </g>
+    </g>
+  </g>
+</svg>

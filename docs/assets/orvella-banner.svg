@@ -1,0 +1,247 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 440" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0E0D1F" />
+      <stop offset="50%" stop-color="#171533" />
+      <stop offset="100%" stop-color="#221E47" />
+    </linearGradient>
+
+    <!-- Card Background -->
+    <linearGradient id="cardBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#24214D" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#181635" stop-opacity="0.85" />
+    </linearGradient>
+
+    <!-- Orvi Body Radial Gradient -->
+    <radialGradient id="orviGrad" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#FFF5D6" />
+      <stop offset="35%" stop-color="#FFC53D" />
+      <stop offset="85%" stop-color="#F28C00" />
+      <stop offset="100%" stop-color="#C96500" />
+    </radialGradient>
+
+    <!-- Pip Moon Gradient -->
+    <radialGradient id="pipGrad" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="70%" stop-color="#E2DCD2" />
+      <stop offset="100%" stop-color="#B8AFA0" />
+    </radialGradient>
+
+    <!-- Glow & Shadow Filters -->
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="14" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#05040A" flood-opacity="0.5" />
+    </filter>
+  </defs>
+
+  <!-- Banner Background -->
+  <rect width="1200" height="440" rx="28" fill="url(#bgGrad)" />
+
+  <!-- Constellation / Grid Network -->
+  <g opacity="0.05" stroke="#FFFFFF" stroke-width="1">
+    <path d="M0 70 H1200 M0 140 H1200 M0 210 H1200 M0 280 H1200 M0 350 H1200" />
+    <path d="M70 0 V440 M210 0 V440 M350 0 V440 M490 0 V440 M630 0 V440 M770 0 V440 M910 0 V440 M1050 0 V440 M1190 0 V440" />
+  </g>
+
+  <!-- Ambient Light Orbs -->
+  <circle cx="1030" cy="120" r="160" fill="#7466EC" opacity="0.18" filter="url(#softGlow)" />
+  <circle cx="820" cy="360" r="140" fill="#FFB224" opacity="0.14" filter="url(#softGlow)" />
+  <circle cx="140" cy="340" r="140" fill="#3E9BF0" opacity="0.12" filter="url(#softGlow)" />
+
+  <!-- RIGHT HERO CARD: Orvi and Pip Mascot Spotlight -->
+  <g transform="translate(840, 50)" filter="url(#cardShadow)">
+    <!-- Glassmorphic Card Frame -->
+    <rect width="290" height="340" rx="24" fill="url(#cardBg)" stroke="#3E3970" stroke-width="1.5" />
+
+    <!-- Orvi & Pip Mascot System -->
+    <g transform="translate(145, 145)">
+      <!-- Ground Shadow -->
+      <ellipse cx="0" cy="98" rx="64" ry="12" fill="#0A0918" opacity="0.6" />
+
+      <!-- Orvi Ambient Glow Behind -->
+      <circle cx="0" cy="0" r="82" fill="#FFB224" opacity="0.25" filter="url(#softGlow)" />
+
+      <!-- Back Half of Orbit Ring (Behind Body) -->
+      <g transform="rotate(-16)">
+        <ellipse cx="0" cy="0" rx="96" ry="24" fill="none" stroke="#FFBC3B" stroke-width="4.5" opacity="0.35" stroke-dasharray="140 160" />
+      </g>
+
+      <!-- Orvi Body (Luminous Sphere) -->
+      <circle cx="0" cy="0" r="58" fill="url(#orviGrad)" stroke="#FFDA73" stroke-width="1.5" />
+
+      <!-- Specular Highlight (Top Left) -->
+      <ellipse cx="-20" cy="-22" rx="14" ry="7" fill="#FFFFFF" opacity="0.65" transform="rotate(-30 -20 -22)" />
+
+      <!-- Cute Anime Eyes -->
+      <g>
+        <!-- Left Eye -->
+        <ellipse cx="-18" cy="-2" rx="7.5" ry="10" fill="#1E1C45" />
+        <circle cx="-20" cy="-5" r="3.2" fill="#FFFFFF" />
+        <circle cx="-16" cy="2" r="1.5" fill="#FFFFFF" />
+        
+        <!-- Right Eye -->
+        <ellipse cx="18" cy="-2" rx="7.5" ry="10" fill="#1E1C45" />
+        <circle cx="16" cy="-5" r="3.2" fill="#FFFFFF" />
+        <circle cx="20" cy="2" r="1.5" fill="#FFFFFF" />
+      </g>
+
+      <!-- Rosy Cheeks -->
+      <ellipse cx="-32" cy="14" rx="8" ry="4.5" fill="#FF5E36" opacity="0.6" />
+      <ellipse cx="32" cy="14" rx="8" ry="4.5" fill="#FF5E36" opacity="0.6" />
+
+      <!-- Warm Smile -->
+      <path d="M-9 14 Q0 24 9 14" fill="none" stroke="#1E1C45" stroke-width="3" stroke-linecap="round" />
+
+      <!-- Front Half of Orbit Ring (In Front of Body) -->
+      <g transform="rotate(-16)">
+        <!-- 4-Phase Colored Orbit Arcs -->
+        <!-- Pahami (Sky Blue) -->
+        <path d="M-96 0 A96 24 0 0 1 -48 20" fill="none" stroke="#3E9BF0" stroke-width="5" stroke-linecap="round" />
+        <!-- Perkuat (Mint) -->
+        <path d="M-48 20 A96 24 0 0 1 0 24" fill="none" stroke="#1FB488" stroke-width="5" stroke-linecap="round" />
+        <!-- Kuis (Grape) -->
+        <path d="M0 24 A96 24 0 0 1 56 19" fill="none" stroke="#8D5CF6" stroke-width="5" stroke-linecap="round" />
+        <!-- Uji (Coral) -->
+        <path d="M56 19 A96 24 0 0 1 96 0" fill="none" stroke="#FF6A55" stroke-width="5" stroke-linecap="round" />
+
+        <!-- Pip: Orbiting Little Moon -->
+        <g transform="translate(62, 18)">
+          <!-- Motion Trail Dots -->
+          <circle cx="-18" cy="-4" r="2.5" fill="#FFBC3B" opacity="0.3" />
+          <circle cx="-10" cy="-2" r="3.5" fill="#FFBC3B" opacity="0.5" />
+
+          <!-- Moon Sphere -->
+          <circle cx="0" cy="0" r="13" fill="url(#pipGrad)" stroke="#4A4560" stroke-width="1.2" />
+          <!-- Moon Craters -->
+          <circle cx="-4" cy="-3" r="2.5" fill="#9C9485" opacity="0.4" />
+          <circle cx="3" cy="4" r="1.8" fill="#9C9485" opacity="0.4" />
+          <!-- Pip Eyes -->
+          <circle cx="-3" cy="1" r="1.2" fill="#1E1C45" />
+          <circle cx="3" cy="1" r="1.2" fill="#1E1C45" />
+        </g>
+      </g>
+    </g>
+
+    <!-- Mascot Identity Pill -->
+    <rect x="45" y="278" width="200" height="38" rx="19" fill="#15132B" stroke="#48427A" stroke-width="1.2" />
+    <text x="145" y="302" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="800" fill="#F8F1E4" letter-spacing="1.2">
+      ORVI &amp; PIP · MASKOT ✦
+    </text>
+  </g>
+
+  <!-- LEFT HERO SECTION: Branding, Badges, Tagline, Languages -->
+  <g transform="translate(75, 65)">
+    <!-- Category Eyebrow Pill -->
+    <g>
+      <rect width="295" height="34" rx="17" fill="#24214D" stroke="#4B4582" stroke-width="1.2" />
+      <circle cx="18" cy="17" r="5" fill="#FFB224" />
+      <text x="34" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="800" fill="#FFD078" letter-spacing="1.5">
+        FULLSTACK CODING OS · DESKTOP
+      </text>
+    </g>
+
+    <!-- Title & Wordmark -->
+    <g transform="translate(0, 82)">
+      <text font-family="'Plus Jakarta Sans', 'Bricolage Grotesque', sans-serif" font-size="62" font-weight="900" fill="#FFFFFF" letter-spacing="-1.5">
+        ORVELLA
+      </text>
+      <text x="315" y="-12" font-family="'JetBrains Mono', monospace" font-size="16" font-weight="800" fill="#9A8FFF">
+        v2.0
+      </text>
+    </g>
+
+    <!-- Tagline & Value Prop -->
+    <g transform="translate(0, 126)">
+      <text font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', sans-serif" font-size="23" font-weight="700" fill="#F8F1E4">
+        Learn. Build. <tspan fill="#FFB224">Collaborate.</tspan>
+      </text>
+      <text y="32" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', sans-serif" font-size="15" fill="#B3AECF" font-weight="400">
+        Platform belajar pemrograman interaktif dengan 4 fase kognitif, desktop OS di browser,
+      </text>
+      <text y="54" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', sans-serif" font-size="15" fill="#B3AECF" font-weight="400">
+        sandbox Docker multi-bahasa, editor realtime bareng teman, dan asisten Orvi AI.
+      </text>
+    </g>
+
+    <!-- 4 Phases Chips -->
+    <g transform="translate(0, 222)">
+      <!-- 1 Pahami -->
+      <g transform="translate(0, 0)">
+        <rect width="115" height="36" rx="10" fill="#13233D" stroke="#3E9BF0" stroke-width="1.2" />
+        <circle cx="16" cy="18" r="5" fill="#3E9BF0" />
+        <text x="28" y="23" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="700" fill="#90CDF4">1 · Pahami</text>
+      </g>
+      <path d="M123 18 L131 18" stroke="#686294" stroke-width="2" stroke-linecap="round" />
+
+      <!-- 2 Perkuat -->
+      <g transform="translate(139, 0)">
+        <rect width="115" height="36" rx="10" fill="#0C2920" stroke="#1FB488" stroke-width="1.2" />
+        <circle cx="16" cy="18" r="5" fill="#1FB488" />
+        <text x="28" y="23" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="700" fill="#9AE6B4">2 · Perkuat</text>
+      </g>
+      <path d="M262 18 L270 18" stroke="#686294" stroke-width="2" stroke-linecap="round" />
+
+      <!-- 3 Kuis -->
+      <g transform="translate(278, 0)">
+        <rect width="105" height="36" rx="10" fill="#281B47" stroke="#8D5CF6" stroke-width="1.2" />
+        <circle cx="16" cy="18" r="5" fill="#8D5CF6" />
+        <text x="28" y="23" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="700" fill="#D6BCFA">3 · Kuis</text>
+      </g>
+      <path d="M391 18 L399 18" stroke="#686294" stroke-width="2" stroke-linecap="round" />
+
+      <!-- 4 Uji -->
+      <g transform="translate(407, 0)">
+        <rect width="105" height="36" rx="10" fill="#381919" stroke="#FF6A55" stroke-width="1.2" />
+        <circle cx="16" cy="18" r="5" fill="#FF6A55" />
+        <text x="28" y="23" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="700" fill="#FEB2B2">4 · Uji</text>
+      </g>
+    </g>
+
+    <!-- Supported Languages Monograms Pill Row -->
+    <g transform="translate(0, 276)">
+      <text y="14" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#8B85B6" letter-spacing="1">12+ BAHASA TERISOLASI:</text>
+      <g transform="translate(170, 0)">
+        <!-- Py -->
+        <rect x="0" y="0" width="34" height="22" rx="5" fill="#1C2D44" stroke="#3776AB" stroke-width="1" />
+        <text x="17" y="15" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="800" fill="#64B5F6">Py</text>
+
+        <!-- JS -->
+        <rect x="40" y="0" width="34" height="22" rx="5" fill="#2D2B16" stroke="#F7DF1E" stroke-width="1" />
+        <text x="57" y="15" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="800" fill="#FDD835">JS</text>
+
+        <!-- Rs -->
+        <rect x="80" y="0" width="34" height="22" rx="5" fill="#321D17" stroke="#CE412B" stroke-width="1" />
+        <text x="97" y="15" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="800" fill="#FF8A65">Rs</text>
+
+        <!-- Go -->
+        <rect x="120" y="0" width="34" height="22" rx="5" fill="#142B36" stroke="#00ADD8" stroke-width="1" />
+        <text x="137" y="15" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="800" fill="#4DD0E1">Go</text>
+
+        <!-- C++ -->
+        <rect x="160" y="0" width="38" height="22" rx="5" fill="#192A40" stroke="#00599C" stroke-width="1" />
+        <text x="179" y="15" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="800" fill="#64B5F6">C++</text>
+
+        <!-- PHP -->
+        <rect x="204" y="0" width="38" height="22" rx="5" fill="#231F38" stroke="#777BB4" stroke-width="1" />
+        <text x="223" y="15" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="10.5" font-weight="800" fill="#B39DDB">PHP</text>
+
+        <!-- Java -->
+        <rect x="248" y="0" width="34" height="22" rx="5" fill="#301A18" stroke="#E76F00" stroke-width="1" />
+        <text x="265" y="15" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="800" fill="#FFAB91">Jv</text>
+
+        <!-- SQL -->
+        <rect x="288" y="0" width="40" height="22" rx="5" fill="#1F2833" stroke="#336791" stroke-width="1" />
+        <text x="308" y="15" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="10.5" font-weight="800" fill="#80DEEA">SQL</text>
+
+        <!-- Web -->
+        <rect x="334" y="0" width="48" height="22" rx="5" fill="#241B33" stroke="#E44D26" stroke-width="1" />
+        <text x="358" y="15" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="10.5" font-weight="800" fill="#FFCC80">&lt;/&gt;</text>
+      </g>
+    </g>
+  </g>
+</svg>
