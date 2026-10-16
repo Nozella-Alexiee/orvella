@@ -1,0 +1,263 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 460" width="100%" height="100%">
+  <defs>
+    <!-- Background Dark Mesh -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#080A12" />
+      <stop offset="40%" stop-color="#0E1020" />
+      <stop offset="80%" stop-color="#14122C" />
+      <stop offset="100%" stop-color="#090A14" />
+    </linearGradient>
+
+    <!-- Ambient Nebulae -->
+    <radialGradient id="nebulaViolet" cx="20%" cy="25%" r="60%">
+      <stop offset="0%" stop-color="#7C3AED" stop-opacity="0.28" />
+      <stop offset="60%" stop-color="#4F46E5" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#0E1020" stop-opacity="0" />
+    </radialGradient>
+
+    <radialGradient id="nebulaGold" cx="85%" cy="35%" r="55%">
+      <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.32" />
+      <stop offset="50%" stop-color="#D97706" stop-opacity="0.10" />
+      <stop offset="100%" stop-color="#0E1020" stop-opacity="0" />
+    </radialGradient>
+
+    <radialGradient id="nebulaCyan" cx="50%" cy="90%" r="50%">
+      <stop offset="0%" stop-color="#06B6D4" stop-opacity="0.20" />
+      <stop offset="100%" stop-color="#080A12" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Glassmorphic Window Gradients -->
+    <linearGradient id="glassBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E1E38" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#121324" stop-opacity="0.92" />
+    </linearGradient>
+
+    <linearGradient id="glassBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#818CF8" stop-opacity="0.5" />
+      <stop offset="50%" stop-color="#4F46E5" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#F59E0B" stop-opacity="0.3" />
+    </linearGradient>
+
+    <!-- Pill Gradients -->
+    <linearGradient id="pillViolet" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366F1" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0.15" />
+    </linearGradient>
+
+    <linearGradient id="pillAmber" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#EF4444" stop-opacity="0.15" />
+    </linearGradient>
+
+    <linearGradient id="pillEmerald" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10B981" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#06B6D4" stop-opacity="0.15" />
+    </linearGradient>
+
+    <!-- Orvi Mascot Gradients -->
+    <radialGradient id="orviSun" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#FFFBEB" />
+      <stop offset="25%" stop-color="#FDE68A" />
+      <stop offset="65%" stop-color="#F59E0B" />
+      <stop offset="90%" stop-color="#D97706" />
+      <stop offset="100%" stop-color="#B45309" />
+    </radialGradient>
+
+    <radialGradient id="pipMoon" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="60%" stop-color="#E2E8F0" />
+      <stop offset="100%" stop-color="#94A3B8" />
+    </radialGradient>
+
+    <!-- Glow Filters -->
+    <filter id="intenseGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="subtleGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="windowShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#000000" flood-opacity="0.65" />
+    </filter>
+
+    <!-- Grid Pattern -->
+    <pattern id="techGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#6366F1" stroke-width="0.8" stroke-opacity="0.08" />
+    </pattern>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="1200" height="460" rx="20" fill="url(#bgGradient)" />
+  <rect width="1200" height="460" rx="20" fill="url(#techGrid)" />
+
+  <!-- Ambient Glows -->
+  <circle cx="240" cy="180" r="320" fill="url(#nebulaViolet)" />
+  <circle cx="980" cy="160" r="300" fill="url(#nebulaGold)" />
+  <circle cx="620" cy="400" r="350" fill="url(#nebulaCyan)" />
+
+  <!-- Outer Frame Border -->
+  <rect width="1198" height="458" x="1" y="1" rx="19" fill="none" stroke="#312E81" stroke-width="1.2" stroke-opacity="0.4" />
+
+  <!-- LEFT: macOS Style Window Simulation -->
+  <g transform="translate(60, 52)" filter="url(#windowShadow)">
+    <!-- Window Body -->
+    <rect width="470" height="356" rx="16" fill="url(#glassBg)" stroke="url(#glassBorder)" stroke-width="1.2" />
+    
+    <!-- Titlebar -->
+    <rect width="470" height="42" rx="16" fill="#18182E" fill-opacity="0.9" />
+    <rect width="470" height="12" y="30" fill="#18182E" fill-opacity="0.9" />
+    <line x1="0" y1="42" x2="470" y2="42" stroke="#312E81" stroke-width="0.8" stroke-opacity="0.4" />
+
+    <!-- Traffic Lights -->
+    <circle cx="24" cy="21" r="5.5" fill="#EF4444" />
+    <circle cx="42" cy="21" r="5.5" fill="#F59E0B" />
+    <circle cx="60" cy="21" r="5.5" fill="#10B981" />
+
+    <!-- Window Title -->
+    <text x="235" y="25" fill="#94A3B8" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Orvella OS — sandbox.rs</text>
+
+    <!-- Code Editor Content -->
+    <g transform="translate(24, 62)" font-family="'JetBrains Mono', 'Fira Code', Menlo, monospace" font-size="12">
+      <!-- Line Numbers -->
+      <text x="0" y="20" fill="#475569">01</text>
+      <text x="0" y="42" fill="#475569">02</text>
+      <text x="0" y="64" fill="#475569">03</text>
+      <text x="0" y="86" fill="#475569">04</text>
+      <text x="0" y="108" fill="#475569">05</text>
+      <text x="0" y="130" fill="#475569">06</text>
+      <text x="0" y="152" fill="#475569">07</text>
+      <text x="0" y="174" fill="#475569">08</text>
+
+      <!-- Code Tokens -->
+      <text x="32" y="20">
+        <tspan fill="#F43F5E">use</tspan> <tspan fill="#E2E8F0">orvella::sandbox::{</tspan><tspan fill="#38BDF8">DockerRunner</tspan><tspan fill="#E2E8F0">, </tspan><tspan fill="#38BDF8">CgroupV2</tspan><tspan fill="#E2E8F0">};</tspan>
+      </text>
+      <text x="32" y="42">
+        <tspan fill="#F43F5E">use</tspan> <tspan fill="#E2E8F0">orvella::crdt::</tspan><tspan fill="#38BDF8">YjsCollabSession</tspan><tspan fill="#E2E8F0">;</tspan>
+      </text>
+      <text x="32" y="64">
+        <tspan fill="#64748B">// Multi-language isolated runner (12+ runtimes)</tspan>
+      </text>
+      <text x="32" y="86">
+        <tspan fill="#818CF8">pub async fn</tspan> <tspan fill="#FBBF24">execute_safe</tspan><tspan fill="#E2E8F0">(code: &amp;</tspan><tspan fill="#38BDF8">str</tspan><tspan fill="#E2E8F0">) -&gt; </tspan><tspan fill="#38BDF8">ExecutionResult</tspan> <tspan fill="#E2E8F0">{</tspan>
+      </text>
+      <text x="48" y="108">
+        <tspan fill="#818CF8">let</tspan> <tspan fill="#E2E8F0">runner = </tspan><tspan fill="#38BDF8">DockerRunner</tspan><tspan fill="#E2E8F0">::builder()</tspan>
+      </text>
+      <text x="64" y="130">
+        <tspan fill="#E2E8F0">.memory_limit(</tspan><tspan fill="#A78BFA">128.megabytes()</tspan><tspan fill="#E2E8F0">)</tspan>
+      </text>
+      <text x="64" y="152">
+        <tspan fill="#E2E8F0">.network(</tspan><tspan fill="#34D399">false</tspan><tspan fill="#E2E8F0">)</tspan> <tspan fill="#64748B">// Strict airgap jail</tspan>
+      </text>
+      <text x="64" y="174">
+        <tspan fill="#E2E8F0">.pids_max(</tspan><tspan fill="#F59E0B">64</tspan><tspan fill="#E2E8F0">)</tspan>
+      </text>
+    </g>
+
+    <!-- Mini Embedded Terminal Widget -->
+    <g transform="translate(20, 266)">
+      <rect width="430" height="74" rx="8" fill="#090A14" stroke="#312E81" stroke-width="0.8" />
+      <circle cx="16" cy="14" r="3" fill="#34D399" />
+      <text x="28" y="17" fill="#10B981" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700">SANDBOX STATUS: RUNNING (0.04s · 0 Net)</text>
+      <text x="16" y="38" fill="#E2E8F0" font-family="'JetBrains Mono', monospace" font-size="11">&gt; 12/12 test assertions passed ✨</text>
+      <text x="16" y="56" fill="#38BDF8" font-family="'JetBrains Mono', monospace" font-size="11">&gt; Yjs Room: #duel-room-419 · 2 peers active</text>
+    </g>
+  </g>
+
+  <!-- RIGHT: Typography & Feature Ecosystem -->
+  <g transform="translate(580, 52)">
+    
+    <!-- Top Superbadge -->
+    <g transform="translate(0, 16)">
+      <rect width="320" height="28" rx="14" fill="url(#pillViolet)" stroke="#818CF8" stroke-width="0.8" />
+      <circle cx="14" cy="14" r="4" fill="#A855F7" filter="url(#subtleGlow)" />
+      <text x="28" y="18" fill="#C7D2FE" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" font-size="11" font-weight="700" letter-spacing="1">ORVELLA CLOUD OS · V2.4 PRODUCTION</text>
+    </g>
+
+    <!-- Brand Headline -->
+    <text x="0" y="100" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" font-size="52" font-weight="900" letter-spacing="-1.5">
+      ORVELLA
+    </text>
+
+    <!-- Gradient Subtitle -->
+    <text x="0" y="132" fill="#FBBF24" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif" font-size="16" font-weight="700" letter-spacing="2">
+      THE CLOUD WEB DESKTOP FOR MASTERING CODE
+    </text>
+
+    <!-- Description Paragraph -->
+    <text x="0" y="168" fill="#94A3B8" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif" font-size="14" font-weight="400" line-height="1.6">
+      <tspan x="0" dy="0">Experience programming education redefined. Complete macOS-style</tspan>
+      <tspan x="0" dy="22">desktop in your browser powered by 4-phase cognitive learning,</tspan>
+      <tspan x="0" dy="22">multiplayer Yjs CRDTs, and hardened 12+ language Docker sandboxes.</tspan>
+    </text>
+
+    <!-- Pill Badges Grid -->
+    <g transform="translate(0, 245)">
+      <!-- Pill 1: Web Desktop -->
+      <g transform="translate(0, 0)">
+        <rect width="170" height="34" rx="8" fill="#1E1B4B" stroke="#6366F1" stroke-width="1" />
+        <text x="14" y="21" fill="#C7D2FE" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11.5" font-weight="600">🖥️ Web Window OS</text>
+      </g>
+
+      <!-- Pill 2: 4-Phase Loop -->
+      <g transform="translate(182, 0)">
+        <rect width="190" height="34" rx="8" fill="#1E1B4B" stroke="#38BDF8" stroke-width="1" />
+        <text x="14" y="21" fill="#BAE6FD" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11.5" font-weight="600">🔄 4-Phase Cognitive Loop</text>
+      </g>
+
+      <!-- Pill 3: Docker Sandbox -->
+      <g transform="translate(384, 0)">
+        <rect width="175" height="34" rx="8" fill="#064E3B" stroke="#10B981" stroke-width="1" />
+        <text x="14" y="21" fill="#A7F3D0" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11.5" font-weight="600">🐳 12+ Docker Sandbox</text>
+      </g>
+
+      <!-- Pill 4: Yjs CRDT -->
+      <g transform="translate(0, 46)">
+        <rect width="170" height="34" rx="8" fill="#3B0764" stroke="#A855F7" stroke-width="1" />
+        <text x="14" y="21" fill="#F3E8FF" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11.5" font-weight="600">⚡ Yjs Realtime CRDT</text>
+      </g>
+
+      <!-- Pill 5: Orvi AI -->
+      <g transform="translate(182, 46)">
+        <rect width="190" height="34" rx="8" fill="#451A03" stroke="#F59E0B" stroke-width="1" />
+        <text x="14" y="21" fill="#FDE68A" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11.5" font-weight="600">🤖 Orvi AI &amp; Pip Companion</text>
+      </g>
+
+      <!-- Pill 6: Zero Telemetry -->
+      <g transform="translate(384, 46)">
+        <rect width="175" height="34" rx="8" fill="#18181B" stroke="#71717A" stroke-width="1" />
+        <text x="14" y="21" fill="#E4E4E7" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11.5" font-weight="600">🛡️ 100% Free &amp; Open Source</text>
+      </g>
+    </g>
+
+    <!-- Mini Mascot Spot (Orvi & Pip vector) -->
+    <g transform="translate(480, 50)" filter="url(#intenseGlow)">
+      <!-- Orbital Ring -->
+      <ellipse cx="40" cy="40" rx="46" ry="16" fill="none" stroke="#FDE68A" stroke-width="1.8" stroke-dasharray="6 3" transform="rotate(-18, 40, 40)" opacity="0.8" />
+      
+      <!-- Orvi Body -->
+      <circle cx="40" cy="40" r="28" fill="url(#orviSun)" />
+      
+      <!-- Orvi Eyes -->
+      <circle cx="33" cy="36" r="3.2" fill="#78350F" />
+      <circle cx="47" cy="36" r="3.2" fill="#78350F" />
+      <circle cx="34" cy="35" r="1.2" fill="#FFFFFF" />
+      <circle cx="48" cy="35" r="1.2" fill="#FFFFFF" />
+
+      <!-- Orvi Smile -->
+      <path d="M 34 43 Q 40 48 46 43" fill="none" stroke="#78350F" stroke-width="2" stroke-linecap="round" />
+
+      <!-- Pip Moon Companion -->
+      <g transform="translate(80, 24)">
+        <circle cx="0" cy="0" r="9" fill="url(#pipMoon)" />
+        <circle cx="-2" cy="-1" r="1.2" fill="#475569" />
+        <circle cx="2" cy="-1" r="1.2" fill="#475569" />
+      </g>
+    </g>
+  </g>
+</svg>

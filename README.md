@@ -3,518 +3,397 @@
 </p>
 
 <p align="center">
-  <strong>Learn. Build. Collaborate.</strong><br/>
-  Platform Belajar Pemrograman Fullstack Interaktif Berbasis Siklus 4 Fase Kognitif, Desktop OS di Browser, Multi-Container Runner Docker Aman, dan Kolaborasi Realtime.
+  <strong>The Next-Generation Web Desktop OS for Mastering Fullstack Programming.</strong><br/>
+  An interactive, browser-based cloud operating system featuring a 4-phase cognitive learning loop, hardened multi-language Docker sandboxes, realtime Yjs multiplayer, and the Orvi AI companion.
 </p>
 
 <p align="center">
-  <a href="#-orvella-os-desktop-lingkungan-belajar-di-browser"><img src="https://img.shields.io/badge/Desktop_OS-Web_Window_Manager-1E1C45?style=for-the-badge&logo=apple&logoColor=white" alt="Orvella OS" /></a>
-  <a href="#-siklus-belajar-4-fase-the-4-phase-loop"><img src="https://img.shields.io/badge/Pedagogi-4_Fase_Kognitif-3E9BF0?style=for-the-badge" alt="4 Fase Kognitif" /></a>
-  <a href="#-maskot-resmi-orvi--pip"><img src="https://img.shields.io/badge/Maskot-Orvi_%26_Pip-FFB224?style=for-the-badge" alt="Orvi Mascot" /></a>
-  <a href="#-12-bahasa-pemrograman-terisolasi"><img src="https://img.shields.io/badge/Sandbox-12+_Bahasa_Docker-1FB488?style=for-the-badge&logo=docker&logoColor=white" alt="Docker Sandbox" /></a>
-  <a href="#-kolaborasi-realtime--multiplayer"><img src="https://img.shields.io/badge/Realtime-Yjs_CRDT_·_WebSocket-8D5CF6?style=for-the-badge" alt="Realtime Yjs" /></a>
-  <a href="#-orvi-ai-asisten-ngoding-multi-provider-ctrlj"><img src="https://img.shields.io/badge/AI_Engine-Orvi_AI_·_Multi--Provider-FF6A55?style=for-the-badge&logo=openai&logoColor=white" alt="Orvi AI" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License MIT" /></a>
+  <a href="#-orvella-os-the-browser-desktop-experience"><img src="https://img.shields.io/badge/Desktop_OS-Web_Window_Manager-4F46E5?style=for-the-badge&logo=apple&logoColor=white" alt="Orvella OS" /></a>
+  <a href="#-the-4-phase-cognitive-loop"><img src="https://img.shields.io/badge/Pedagogy-4_Phase_Cognitive_Loop-0284C7?style=for-the-badge" alt="4 Phase Loop" /></a>
+  <a href="#-12-hardened-docker-language-sandboxes"><img src="https://img.shields.io/badge/Sandbox-12+_Languages_Docker-059669?style=for-the-badge&logo=docker&logoColor=white" alt="Docker Sandboxes" /></a>
+  <a href="#-realtime-multiplayer--social-learning"><img src="https://img.shields.io/badge/Realtime-Yjs_CRDT_·_WebSockets-7C3AED?style=for-the-badge" alt="Realtime Yjs" /></a>
+  <a href="#-orvi-ai--pip-companion"><img src="https://img.shields.io/badge/AI_Tutor-Orvi_AI_·_Multi--Provider-D97706?style=for-the-badge&logo=openai&logoColor=white" alt="Orvi AI" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10B981?style=for-the-badge" alt="MIT License" /></a>
+</p>
+
+<p align="center">
+  <a href="README.md"><b>English</b></a> · <a href="README.id.md"><b>Bahasa Indonesia</b></a> · <a href="#-quickstart--deployment"><b>Quickstart (30s)</b></a> · <a href="#-demo-credentials"><b>Demo Accounts</b></a> · <a href="#-system-architecture"><b>Architecture</b></a>
 </p>
 
 ---
 
 <p align="center">
-  <img src="docs/assets/orvella-hero.gif" alt="Orvella Live Hero Preview" width="100%" style="border-radius: 16px; box-shadow: 0 16px 48px rgba(0,0,0,0.25);" />
+  <img src="docs/assets/orvella-hero.gif" alt="Orvella Live Hero Preview" width="100%" style="border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,0.35); border: 1px solid rgba(99, 102, 241, 0.25);" />
 </p>
 
 ---
 
-## 📑 Daftar Isi
+## 📑 Table of Contents
 
-- [🌟 Mengenal Orvella: Belajar Ngoding dari Paham](#-mengenal-orvella-belajar-ngoding-dari-paham)
-- [🪐 Maskot Resmi: Orvi & Pip](#-maskot-resmi-orvi--pip)
-- [🖥️ Orvella OS: Desktop Lingkungan Belajar di Browser](#️-orvella-os-desktop-lingkungan-belajar-di-browser)
-- [🤖 Orvi AI: Asisten Ngoding Multi-Provider (Ctrl+J)](#-orvi-ai-asisten-ngoding-multi-provider-ctrlj)
-- [🔄 Siklus Belajar 4 Fase (The 4-Phase Loop)](#-siklus-belajar-4-fase-the-4-phase-loop)
-- [🌐 12+ Bahasa Pemrograman Terisolasi](#-12-bahasa-pemrograman-terisolasi)
-- [⚡ Kolaborasi Realtime & Multiplayer](#-kolaborasi-realtime--multiplayer)
-- [📸 Galeri Antarmuka Lengkap](#-galeri-antarmuka-lengkap)
-- [🏗️ Studio Materi (Curriculum Builder)](#️-studio-materi-curriculum-builder)
-- [🎨 Desain Sistem: Susu, Nila, & Marigold](#-desain-sistem-susu-nila--marigold)
-- [🛡️ Arsitektur Keamanan & Sistem Peran](#️-arsitektur-keamanan--sistem-peran)
-- [⚙️ Diagram Arsitektur Sistem](#️-diagram-arsitektur-sistem)
-- [🚀 Panduan Menjalankan Aplikasi](#-panduan-menjalankan-aplikasi)
-  - [Opsi A: Docker + Cloudflare Quick Tunnel (Satu Perintah, Otomatis)](#opsi-a-docker--cloudflare-quick-tunnel-satu-perintah-otomatis)
-  - [Opsi B: Development Lokal Linux / macOS](#opsi-b-development-lokal-linux--macos)
-  - [Opsi C: Development di Windows](#opsi-c-development-di-windows)
-  - [Opsi D: Manajemen Database & Cadangan](#opsi-d-manajemen-database--cadangan)
-- [👥 Akun Demo Siap Pakai](#-akun-demo-siap-pakai)
-- [🧪 Pengujian & Quality Assurance](#-pengujian--quality-assurance)
-- [📁 Struktur Repositori](#-struktur-repositori)
-- [📄 Lisensi](#-lisensi)
+- [🌟 Why Orvella? Beyond Tutorial Hell](#-why-orvella-beyond-tutorial-hell)
+- [🖥️ Orvella OS: The Browser Desktop Experience](#️-orvella-os-the-browser-desktop-experience)
+- [🔄 The 4-Phase Cognitive Loop](#-the-4-phase-cognitive-loop)
+- [🌐 12+ Hardened Docker Language Sandboxes](#-12-hardened-docker-language-sandboxes)
+- [⚡ Realtime Multiplayer & Social Learning](#-realtime-multiplayer--social-learning)
+- [🤖 Orvi AI & Pip Companion](#-orvi-ai--pip-companion)
+- [🏗️ Curriculum Studio (Course Builder)](#️-curriculum-studio-course-builder)
+- [📸 Full Interface Gallery](#-full-interface-gallery)
+- [⚙️ System Architecture](#️-system-architecture)
+- [🛡️ Security Jail & Resource Limits](#️-security-jail--resource-limits)
+- [🚀 Quickstart & Deployment](#-quickstart--deployment)
+  - [Option A: Docker + Cloudflare Quick Tunnel (Recommended)](#option-a-docker--cloudflare-quick-tunnel-recommended)
+  - [Option B: Bare-Metal Development (macOS / Linux)](#option-b-bare-metal-development-macos--linux)
+  - [Option C: Bare-Metal Development (Windows)](#option-c-bare-metal-development-windows)
+- [👥 Demo Credentials](#-demo-credentials)
+- [🧪 Automated Testing Suite](#-automated-testing-suite)
+- [📁 Repository Structure](#-repository-structure)
+- [📄 License & Credits](#-license--credits)
 
 ---
 
-## 🌟 Mengenal Orvella: Belajar Ngoding dari Paham
+## 🌟 Why Orvella? Beyond Tutorial Hell
 
-Nama **Orvella** berakar dari kata *orbit*. Filosofi pembelajaran kami memandang penguasaan konsep pemrograman layaknya sebuah benda langit yang mengorbit: **dikitari dan dipelajari dari berbagai sudut pandang hingga benar-benar dipahami**, sebelum melaju ke orbit materi berikutnya.
+The name **Orvella** originates from *orbit*. In planetary mechanics, a celestial body circles a gravitational center from multiple vantage points until its trajectory stabilizes. We believe mastering programming demands the same dynamic: **circling a mental model from every dimension until understanding becomes second nature**, before accelerating to the next orbit.
 
-Banyak pelajar terjebak dalam *tutorial hell* karena hanya menyalin sintaks tanpa memahami alur eksekusi memori, relasi variabel, maupun arsitektur sistem. Orvella mengatasi masalah ini secara komprehensif melalui:
-1. **Model Mental Visual**: Setiap konsep (pointer C++, ownership Rust, event-loop JS, memory trace Python) disimulasikan secara visual.
-2. **Eksekusi Sandbox Nyata**: Bukan simulator palsu! Kode benar-benar dikompilasi dan dieksekusi di container Docker terisolasi tanpa jaringan.
-3. **Pengalaman Desktop Terpadu (Orvella OS)**: Siswa tidak membuka puluhan tab yang berantakan; mereka memiliki desktop virtual lengkap dengan editor, terminal, browser preview, pemutar musik, dan asisten AI.
-4. **Pembelajaran Sosial & Kolaboratif**: Fitur *Ngoding Bareng* (Yjs CRDT), *Duel 1v1*, serta *Kuis Langsung Kelas* menghidupkan suasana kelas layaknya lingkungan kerja tim profesional.
+```
+       [ Phase 1: UNDERSTAND ] ── Visual Mental Models & Memory Traces
+                  │
+                  ▼
+       [ Phase 2: TRY ] ──────── Interactive Guided Micro-Validation
+                  │
+                  ▼
+       [ Phase 3: TRAIN ] ────── Unassisted Multi-File Real Docker Sandbox
+                  │
+                  ▼
+       [ Phase 4: PROVE ] ────── 1v1 Peer Duels & Live Classroom Quizzes
+```
+
+Traditional platforms suffer from critical pedagogical traps:
+1. **Opaque Execution**: Learners copy syntax without grasping memory pointers, the JavaScript call stack, or C++ ownership models.
+2. **Artificial "Faux" Simulators**: In-browser regex checkers that fail when code deviates by a single space, rather than running actual compilers.
+3. **Tab Fatigue**: Students juggle terminal windows, documentation tabs, and editors, losing cognitive momentum.
+
+**Orvella solves this entirely.** It delivers a full-fledged cloud OS right in the web browser, uniting a multi-tab code editor, a zero-network Docker execution jail, realtime collaborative CRDTs, and an empathy-driven AI tutor.
 
 ---
 
-## 🪐 Maskot Resmi: Orvi & Pip
+## 🖥️ Orvella OS: The Browser Desktop Experience
+
+Orvella transforms the browser into an integrated development workstation inspired by macOS:
+
+* **Window Management System**: Smooth window drag, edge snapping, minimize to dock, full-screen expansion, and z-index layering.
+* **Persistent Dock & Menu Bar**: Global system status, clock, network telemetry, theme switcher, and audio player controls.
+* **Ambient Lofi Audio Suite**: Embedded, offline-capable sound generator and curated lofi tracks to keep learners in deep flow.
+* **System Themes**: Ultra-tuned Dark Obsidian and Light Ivory palettes with fluid CSS variable glassmorphic blurs (`backdrop-filter: blur(20px)`).
+* **Keyboard First**: Global palette (`Cmd+K` / `Ctrl+K`), quick terminal toggle (`Ctrl+\``), and AI assistant invoke (`Ctrl+J`).
+
+---
+
+## 🔄 The 4-Phase Cognitive Loop
+
+Every lesson in Orvella is architected around cognitive science principles:
+
+| Phase | Methodology | Tools in Orvella OS | Cognitive Objective |
+|---|---|---|---|
+| **1. Understand** | Visual Mental Model | Animated memory layouts, pointer diagrams, call-stack visualizers | Grasp the underlying machinery before typing a single character |
+| **2. Try** | Guided Interaction | Inline micro-editor with instant semantic linting & step hints | Low-stakes experimental tinkering with immediate feedback |
+| **3. Train** | Unassisted Sandbox | Multi-file CodeMirror 6 editor, terminal output, unit test runner | Real-world problem solving inside an isolated Docker container |
+| **4. Prove** | Competitive & Social | Realtime 1v1 Code Duels, live classroom quiz lobbies, public badges | Reinforce retention under time constraints and social collaboration |
+
+---
+
+## 🌐 12+ Hardened Docker Language Sandboxes
+
+Orvella does not use mock interpreters. Every execution spawns a lightweight, disposable execution container with strict kernel-level sandboxing:
+
+```
+[ Web Client ] ──WebSocket──► [ Orvella Gateway ] ──gRPC/Docker API──► [ Hardened Jail Container ]
+                                                                        ├── Network: NONE (Air-gapped)
+                                                                        ├── Memory: 128MB max
+                                                                        ├── CPU: 0.5 Cores (Cgroups v2)
+                                                                        ├── PIDs: 64 processes max
+                                                                        └── FS: Read-only root + tmpfs
+```
+
+### Supported Language Engines
+
+| Language | Runtime / Compiler | Memory Cap | Wall-Clock Timeout | Security Isolation |
+|---|---|---|---|---|
+| **Python** | Python 3.12 (CPython) | 128 MB | 5 seconds | Airgapped, tmpfs `/tmp` |
+| **TypeScript** | Node.js 22 + `tsx` | 192 MB | 5 seconds | No filesystem leak |
+| **JavaScript** | Node.js 22 LTS | 128 MB | 5 seconds | Strict security profile |
+| **Rust** | `rustc` 1.80 + Cargo | 256 MB | 10 seconds | Sandboxed build artifacts |
+| **C++** | `g++` 13 (C++20, `-O2`) | 128 MB | 5 seconds | Protected memory space |
+| **C** | `gcc` 13 (C17, `-Wall`) | 128 MB | 5 seconds | Zero syscall exploitation |
+| **Go** | Go 1.23 standard runner | 192 MB | 6 seconds | Disabled network sockets |
+| **Java** | OpenJDK 21 LTS | 256 MB | 7 seconds | Minimal JVM footprint |
+| **PHP** | PHP 8.3 CLI | 128 MB | 5 seconds | Shell execs disabled |
+| **Ruby** | Ruby 3.3 YJIT | 128 MB | 5 seconds | Sandboxed stdlib |
+| **Bash** | GNU Bash 5.2 | 64 MB | 4 seconds | Fork bomb protection |
+| **Lua** | Lua 5.4.6 | 64 MB | 4 seconds | Jailed environment |
+
+---
+
+## ⚡ Realtime Multiplayer & Social Learning
+
+Orvella implements an enterprise-grade realtime collaboration layer powered by **Yjs CRDTs** over secure WebSockets:
+
+* **Live Pair Programming (Ngoding Bareng)**: Multi-cursor presence, realtime character diffs, and synced file tree navigation. Multiple students can code inside the exact same sandbox concurrently without conflicts.
+* **1v1 Code Duels**: Ranked matchmaking system pairing students on algorithmic challenges. Realtime progress bars show test cases solved without leaking code.
+* **Live Classroom Quiz Lobby**: Teachers launch interactive quiz sessions with countdown timers, auto-scored submissions, and live podiums.
+* **Observer Mode & Classroom Spectator**: Teachers can seamlessly drop into any student's active sandbox to offer live inline commentary.
+
+---
+
+## 🤖 Orvi AI & Pip Companion
 
 <p align="center">
-  <img src="docs/assets/orvi-mascot.svg" alt="Orvi and Pip Mascot" width="220" />
+  <img src="docs/assets/orvi-mascot.svg" alt="Orvi & Pip Mascot" width="180" />
 </p>
 
-Orvella memiliki maskot orisinal yang dirancang dengan sistem animasi dinamis berbasis GSAP:
+Orvella features an original animated mascot system engineered with GSAP:
 
 ### ☀️ Orvi
-Bola cahaya marigold hangat yang selalu menemani siswa di dock sistem. Orvi bersifat penasaran, jujur, dan berempati tinggi. Ia tidak pernah memarahi, mengejek, atau membuat siswa merasa kecil saat salah.
+The golden orb of curiosity who lives in the desktop dock. Orvi embodies empathetic pedagogy: it never scolds, never shames mistakes, and guides students toward answers through Socratic questions rather than dumping raw solutions.
 
 ### 🌕 Pip
-Bulan mungil bercahaya yang setia mengitari orbit cincin Orvi (−16°). Pip berfungsi sebagai satu-satunya "tangan" Orvi:
-* **`point`**: Pip dapat melepaskan diri dari orbit, melesat ke baris kode tertentu di layar, mengetuk dua kali untuk memberi petunjuk, lalu kembali ke orbitnya.
-* **`carry`**: Mengambil nilai data dari satu elemen visual dan menjatuhkannya ke kotak memori siswa.
+The luminous satellite moon orbiting Orvi at a calibrated −16° inclination. Pip serves as Orvi's physical pointer:
+* **Point (`point`)**: Detaches from orbit, zooms to the exact line of code causing an error, taps twice to highlight the logic flaw, and returns to orbit.
+* **Carry (`carry`)**: Transports memory variable states across the screen during interactive visual explanation steps.
 
-### 🎭 Ragam Ekspresi & Mood Emosi Orvi
-Orvi memiliki 7 state emosi adaptif yang bereaksi secara real-time terhadap aktivitas siswa:
-
-| Mood | Tampilan Mata & Mulut | Perilaku Pip | Situasi Pemicu |
-|---|---|---|---|
-| `idle` | Mata terbuka, mengikuti posisi kursor | Mengorbit santai (5,2 detik/putaran) | Kondisi santai di desktop |
-| `happy` | Mata melengkung tersenyum (`^ ^`) | Berputar cepat (3,6 detik/putaran) | Jawaban latihan benar, tantangan terpecahkan |
-| `think` | Melirik ke kanan atas, alis terangkat | Mengorbit lambat (10 detik) + gelembung pikir | Sedang mengevaluasi kode, menyiapkan hint |
-| `focus` | Mata menyipit fokus, alis turun | Orbit konstan stabil | Siswa sedang mengerjakan Kuis & Uji |
-| `oops` | Mata membesar kaget, mulut "o" | Orbit bergoyang oleng (2,6 detik) | Output belum sesuai, terjadi kesalahan sintaks |
-| `sleep` | Mata terpejam damai, balon `zZ` | Beristirahat diam di atas kepala Orvi | 30 detik tanpa aktivitas input |
-| `cheer` | Mata bersinar gembira, mulut terbuka lebar | Berputar super cepat (1,1 detik) + partikel kilau | Bab tuntas, naik level, memenangkan duel |
-
-> 🎮 **Interaksi Seru**: Kamu bisa mengklik Orvi untuk meminta tips, menahannya untuk mengelus, mencoleknya 6× hingga ia pusing berputar, atau menyeretnya langsung ke jendela kode yang sedang kamu kerjakan!
+### Multi-Provider AI Architecture
+Orvi AI connects seamlessly to your choice of language model backend:
+* **OpenAI** (`gpt-4o`, `o1-mini`)
+* **Anthropic** (`claude-3-5-sonnet`, `claude-3-7-sonnet`)
+* **Google Gemini** (`gemini-2.0-flash`, `gemini-1.5-pro`)
+* **Groq** (`llama-3.3-70b-versatile` for ultra-low latency &lt;150ms)
+* **DeepSeek** (`deepseek-coder`, `deepseek-r1`)
 
 ---
 
-## 🖥️ Orvella OS: Desktop Lingkungan Belajar di Browser
+## 🏗️ Curriculum Studio (Course Builder)
 
-Orvella menghadirkan pengalaman antarmuka bergaya sistem operasi desktop modern yang berjalan 100% di peramban web:
-
-<p align="center">
-  <img src="docs/shots/orvella-beranda.webp" alt="Orvella OS Desktop Terang" width="48%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.12);" />
-  <img src="docs/shots/orvella-beranda-gelap.webp" alt="Orvella OS Desktop Malam" width="48%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.12);" />
-</p>
-
-* **Window Manager Sejati**:
-  * Tombol kontrol jendela ala macOS (*traffic lights*: tutup merah, minimalkan kuning dengan animasi genie, maksimalkan hijau).
-  * Snap jendela dua sisi (split screen) berbasis algoritma FLIP dan snapping magnet tepi layar.
-  * **Mode Layang (Picture-in-Picture)**: Jendela kecil yang selalu menempel di sudut atas saat kamu menyimak materi sambil ngoding.
-* **Mission Control (F3 / `Ctrl+↑`)**: Tampilan ikhtisar seluruh jendela yang terbuka dengan satu tombol cepat.
-* **Spotlight Universal (`Ctrl+K`)**: Pencarian instan untuk melompat ke materi, membuka proyek, memanggil aplikasi dock, hingga mengaktifkan fitur rahasia (*easter eggs*).
-* **Ekosistem Widget Desktop Interaktif**:
-  * 🎯 **Tebak Output Harian**: Soal mikro harian berhadiah +5 XP yang divalidasi langsung oleh server.
-  * 📝 **Catatan Tempel (Sticky Notes)**: Mencatat konsep penting atau catatan pribadi yang tersimpan otomatis.
-  * ⏱️ **Timer Fokus Pomodoro**: Manajemen waktu belajar yang status sisa waktunya dapat dilihat oleh teman sekelas secara live.
-  * 🎵 **Pemutar Musik Lo-Fi**: Musik instrumen pengiring konsentrasi belajar tanpa distraksi.
-  * 🏆 **Quest & Lencana Stiker**: 8 lencana pencapaian stiker unik dengan sistem XP yang membuka wallpaper eksklusif.
+Orvella includes a native authoring studio for educators:
+* **Interactive Step Builder**: Create custom lessons with markdown, interactive checkpoints, and visual hints.
+* **Automated Test Matrix**: Define hidden and public test cases with stdin/stdout assertions, regex matching, or custom validator scripts.
+* **Gamified Skill Tree**: Visual progression nodes with prerequisite unlocking, XP calculation, and mastery certifications.
 
 ---
 
-## 🤖 Orvi AI: Asisten Ngoding Multi-Provider (`Ctrl+J`)
+## 📸 Full Interface Gallery
 
-Di dalam dock Orvella OS terpasang asisten AI cerdas bernama **Orvi AI** yang dirancang khusus untuk pendidikan pemrograman:
-
-<p align="center">
-  <img src="docs/shots/orvella-orvi.webp" alt="Orvi AI Coding Assistant" width="85%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
-</p>
-
-* **Integrasi Workspace Aktif**: Saat jendela Sandbox dibuka, Orvi otomatis terhubung ke proyek kode siswa:
-  * Membaca struktur berkas proyek.
-  * Mengusulkan perbaikan dalam bentuk **kartu diff visual** (*Terapkan*, *Tolak*, atau *Urungkan*).
-  * Menjalankan proyek atas izin pengguna.
-* **Multi-Provider Fallback Otomatis**:
-  * Didukung oleh alur pintar: **Cerebras** (Qwen 3.8 27B, jatah hingga 216 juta token/hari) ➔ **Groq** (Llama 3.3 70B ultra-low latency) ➔ **Google Gemini** (khusus percakapan konseptual).
-  * Jika salah satu provider mengalami *rate-limit*, sistem secara transparan mengalihkan permintaan ke provider cadangan tanpa memutuskan sesi belajar siswa.
-* **Pencarian Web Privat (SearXNG)**: Orvi dapat menjelajahi internet untuk mencari dokumentasi terkini melalui container SearXNG internal yang aman dari pelacakan dan terlindungi dari akses IP internal.
-* **Pedagogi Tanpa Bocoran**: Di dalam alur pelajaran (Pahami/Perkuat/Kuis), Orvi AI dibatasi hanya memberikan petunjuk metode (*scaffolding hint*), bukan menyalin jawaban final secara instan.
-* **Kontrol Kuota Superadmin**: Batas kuota bawaan 30 pertanyaan per 5 jam per siswa (superadmin tanpa batas) untuk mencegah ketergantungan berlebihan dan pemborosan komputasi.
+<div align="center">
+  <table>
+    <tr>
+      <td width="50%">
+        <img src="docs/shots/orvella-landing.webp" alt="Landing Page" style="border-radius: 8px; border: 1px solid #334155;" />
+        <p align="center"><b>Modern Landing Page &amp; Interactive Hero</b></p>
+      </td>
+      <td width="50%">
+        <img src="docs/shots/orvella-beranda.webp" alt="Desktop OS Light Mode" style="border-radius: 8px; border: 1px solid #334155;" />
+        <p align="center"><b>Orvella Desktop OS — Ivory Light Mode</b></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="50%">
+        <img src="docs/shots/orvella-beranda-gelap.webp" alt="Desktop OS Dark Mode" style="border-radius: 8px; border: 1px solid #334155;" />
+        <p align="center"><b>Orvella Desktop OS — Obsidian Dark Mode</b></p>
+      </td>
+      <td width="50%">
+        <img src="docs/shots/orvella-sandbox.webp" alt="Docker Multi-File Sandbox" style="border-radius: 8px; border: 1px solid #334155;" />
+        <p align="center"><b>Multi-File Code Sandbox with Live Runner</b></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="50%">
+        <img src="docs/shots/orvella-pahami.webp" alt="Understand Phase" style="border-radius: 8px; border: 1px solid #334155;" />
+        <p align="center"><b>Phase 1: Understand — Visual Mental Model</b></p>
+      </td>
+      <td width="50%">
+        <img src="docs/shots/orvella-orvi.webp" alt="Orvi AI Tutor Dialog" style="border-radius: 8px; border: 1px solid #334155;" />
+        <p align="center"><b>Orvi AI Assistant with Contextual Guidance</b></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="50%">
+        <img src="docs/shots/orvella-jalur.webp" alt="Curriculum Skill Tree" style="border-radius: 8px; border: 1px solid #334155;" />
+        <p align="center"><b>Gamified Skill Tree &amp; Progression Roadmap</b></p>
+      </td>
+      <td width="50%">
+        <img src="docs/shots/orvella-progres.webp" alt="Student Progress Analytics" style="border-radius: 8px; border: 1px solid #334155;" />
+        <p align="center"><b>Deep Analytics &amp; Mastery Reports</b></p>
+      </td>
+    </tr>
+  </table>
+</div>
 
 ---
 
-## 🔄 Siklus Belajar 4 Fase (The 4-Phase Loop)
-
-Setiap materi di Orvella disusun dalam alur pedagogi siklus kognitif berurutan yang terbukti efektif mengunci pemahaman:
+## ⚙️ System Architecture
 
 ```mermaid
 flowchart TD
-    A["📘 FASE 1: PAHAMI<br/><i>Eksplorasi Konsep & Analogi Interaktif</i><br/>🔵 Biru Langit (#3E9BF0)"] --> B["🧩 FASE 2: PERKUAT<br/><i>Micro-Practice & Hubungkan Blok Kode</i><br/>🟢 Mint (#1FB488)"]
-    B --> C["⚡ FASE 3: KUIS<br/><i>Prediksi Output & Uji Cepat Berbobot (Ambang 70%)</i><br/>🟣 Ungu Anggur (#8D5CF6)"]
-    C --> D["💻 FASE 4: UJI / CHALLENGE<br/><i>Koding di Sandbox Docker dengan Automated Tests</i><br/>🔴 Koral (#FF6A55)"]
-    D -. Sukses Lulus .-> E["🎓 PENGUASAAN MATERI<br/><i>Bintang Bab, XP, & Progres Kurikulum</i>"]
+    subgraph Client["🖥️ Browser Client (React 18 + Zustand + CodeMirror 6)"]
+        UI["Orvella OS Window Manager"]
+        Editor["CodeMirror 6 Editor & LSP"]
+        YjsClient["Yjs CRDT Client Sync"]
+        Audio["Ambient Lofi Audio Engine"]
+    end
 
-    style A fill:#EBF5FE,stroke:#3E9BF0,stroke-width:2px,color:#1A365D
-    style B fill:#E6FFFA,stroke:#1FB488,stroke-width:2px,color:#134E4A
-    style C fill:#FAF5FF,stroke:#8D5CF6,stroke-width:2px,color:#44337A
-    style D fill:#FFF5F5,stroke:#FF6A55,stroke-width:2px,color:#742A2A
-    style E fill:#FEFCBF,stroke:#ECC94B,stroke-width:2px,color:#744210
+    subgraph Gateway["⚡ Application Server (Node.js + Express)"]
+        Router["REST API Router"]
+        Auth["Auth Engine (JWT + Google OAuth PKCE)"]
+        WSServer["WebSocket Hub (Yjs Sync & Duels)"]
+        OrviEngine["Orvi AI Orchestrator (Multi-LLM)"]
+    end
+
+    subgraph Storage["💾 Persistence & State"]
+        Postgres[("PostgreSQL Database")]
+        Prisma["Prisma ORM Layer"]
+    end
+
+    subgraph Sandbox["🐳 Docker Execution Cluster"]
+        Pool["Runner Container Pool"]
+        Jail["Cgroup V2 Security Jail"]
+        Runtimes["12+ Language Sandboxes"]
+    end
+
+    UI --> Router
+    Editor --> WSServer
+    YjsClient <--> WSServer
+    Router --> Auth
+    Router --> Prisma
+    Prisma --> Postgres
+    WSServer --> Pool
+    Pool --> Jail --> Runtimes
+    OrviEngine --> Client
 ```
 
-| Fase | Warna Aksen | Esensi Pembelajaran | Pengalaman Siswa |
+---
+
+## 🛡️ Security Jail & Resource Limits
+
+Because code submitted by students executes on your server infrastructure, Orvella enforces uncompromising multi-tier isolation:
+
+1. **Network Jail**: All execution containers operate with `--network none`. No outbound or inbound network packets are permitted.
+2. **Resource Boundaries**:
+   - `Memory`: 128 MB – 256 MB maximum per container.
+   - `CPU`: Capped at 0.5 CPU shares via Linux `cgroups v2`.
+   - `PIDs Max`: Strict limit of 64 processes to prevent fork-bomb attacks.
+3. **Storage Security**: Root filesystem is mounted read-only (`ro`). Temporary writes are confined to an ephemeral memory `tmpfs` mounted at `/tmp` (32 MB max) and destroyed upon execution exit.
+4. **Syscall Whitelisting**: Restricted `seccomp` profile disables kernel tracing, raw sockets, and privilege escalation syscalls.
+
+---
+
+## 🚀 Quickstart & Deployment
+
+### Option A: Docker + Cloudflare Quick Tunnel (Recommended)
+
+Run Orvella in production mode with a single command. Includes an automatic public HTTPS tunnel via Cloudflare (zero port forwarding required):
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/Nozella-Alexiee/orvella.git
+cd orvella
+
+# 2. Run the turnkey bootstrap script
+bash deploy-quick.sh
+```
+
+The script will launch all containers, run database migrations, seed demo curricula, and print your private local and public tunnel URLs.
+
+### Option B: Bare-Metal Development (macOS / Linux)
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Configure environment variables
+cp .env.example .env
+
+# 3. Setup database migrations & seed demo content
+npx prisma migrate dev
+npm run seed
+
+# 4. Start local development server
+npm run dev
+```
+
+Visit `http://localhost:3000` in your browser.
+
+### Option C: Bare-Metal Development (Windows)
+
+```powershell
+# In PowerShell:
+npm install
+copy .env.example .env
+npx prisma migrate dev
+npm run seed
+npm run dev
+```
+
+---
+
+## 👥 Demo Credentials
+
+The database seed provides instant accounts across all system roles:
+
+| Role | Email | Password | Permissions |
 |---|---|---|---|
-| **1. Pahami** | 🔵 Biru Langit (`#3E9BF0`) | Mengubah konsep abstrak menjadi model mental nyata | Animasi alur variabel, slider parameter memori, diagram jejak alur data interaktif |
-| **2. Perkuat** | 🟢 Mint (`#1FB488`) | Menghubungkan logika sebelum menulis sintaks kompleks | Menyusun potongan kode acak, menebak nilai variabel, latihan mikro tanpa beban nilai |
-| **3. Kuis** | 🟣 Ungu Anggur (`#8D5CF6`) | Memvalidasi ketajaman logika berpikir | Pilihan ganda berbobot dengan skor kombo waktu; syarat lulus gerbang minimal 70% |
-| **4. Uji** | 🔴 Koral (`#FF6A55`) | Implementasi kode nyata pada tantangan pemecahan masalah | Menulis kode di CodeMirror 6, menjalankannya di container Docker, lolos semua test-case |
-
-<p align="center">
-  <img src="docs/shots/orvella-pahami.webp" alt="Fase Pahami Orvella" width="90%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.12);" />
-</p>
+| **Student** | `student@orvella.dev` | `orvella123` | Full access to desktop OS, courses, sandbox, duels, and quizzes |
+| **Teacher** | `guru@orvella.dev` | `orvella123` | Curriculum builder, live quiz host, student gradebook & analytics |
+| **Admin** | `admin@orvella.dev` | `orvella123` | Full administrative control, user management, audit logs |
 
 ---
 
-## 🌐 12+ Bahasa Pemrograman Terisolasi
+## 🧪 Automated Testing Suite
 
-Orvella bukan sekadar platform JavaScript browser. Kami mendukung **12 bahasa pemrograman dan teknologi web** dengan lingkungan kompilasi dan runtime sesungguhnya di container Docker terisolasi:
-
-| Bahasa / Stack | Eksekusi Runtime | Fitur Visualizer Khusus | Proyek Web Fullstack |
-|---|---|---|:---:|
-| **Python** | CPython 3.12 | Visualisasi memori otomatis & jejak eksekusi variabel | ✅ Flask / FastAPI |
-| **JavaScript / TypeScript** | Node.js 20+ VM | Analisis Call Stack, Web API, Event Loop | ✅ Express.js |
-| **Rust** | Rustc / Cargo (Native) | Visualizer Borrow Checker & diagram Ownership memori | ❌ |
-| **Go (Golang)** | Go Toolchain | Simulasi Goroutines & alur Channels | ❌ |
-| **C / C++** | GCC / G++ (C++20) | Visualisasi Pointer, Alokasi Heap vs Stack | ❌ |
-| **PHP** | PHP 8.3 CLI + FPM | Komunikasi database relasional nyata | ✅ PHP + MariaDB |
-| **Java / Kotlin** | OpenJDK 21 (JVM) | Analisis Objek OOP & alokasi Garbage Collector | ❌ |
-| **SQL** | PostgreSQL 16 & MariaDB | Tabel interaktif, diagram relasi skema ERD | Termasuk di proyek |
-| **HTML5 & CSS3** | Browser Engine | Box Model Visualizer, Flexbox/Grid Playground | ✅ Desain Web Statis |
-
-### 🔒 Arsitektur Sandbox Keras (Hardened Sandbox)
-Setiap eksekusi kode siswa diproses melalui parameter keamanan berlapis:
-* **Tanpa Jaringan**: Flag `--network none` mencegah request jahat keluar.
-* **Hak Akses Rendah**: Dijalankan sebagai pengguna non-root `uid 10001` dengan seluruh kernel Linux capabilities dicabut (`--cap-drop=ALL`).
-* **Sistem Berkas Read-Only**: Akar berkas container (`rootfs`) dikunci hanya-baca.
-* **Pembatas Sumber Daya Ketat**: Batas memori (128 MB), batas proses PID (maksimal 32 proses untuk menangkal *fork bomb*), dan batas waktu eksekusi (5 detik).
-
----
-
-## ⚡ Kolaborasi Realtime & Multiplayer
-
-Orvella mentransformasikan pengalaman belajar ngoding dari aktivitas menyendiri menjadi pengalaman sosial kolaboratif:
-
-<p align="center">
-  <img src="docs/shots/orvella-sandbox.webp" alt="Orvella Collaborative Sandbox" width="90%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
-</p>
-
-### 1. 👥 Ngoding Bareng (Yjs CRDT + pycrdt)
-* Undang teman kelas langsung ke Sandbox melalui kode atau tautan unik (`/s/{kode}`).
-* Kursor multiplayer dengan warna dan nama teman terlihat jelas di editor CodeMirror.
-* Mode **Ikuti Teman (Follow Mode)**: Layar kamu otomatis bergeser mengikuti baris kode yang sedang diketik teman.
-* Obrolan tim terintegrasi di sidebar dan terminal output bersama.
-* **Keystroke Time-Travel Replay**: Merekam riwayat ketikan untuk audit siapa mengetik baris mana.
-
-### 2. ⚔️ Duel Koding 1 Lawan 1
-* Tantang teman sekelas dalam duel kuis berbatas waktu 5 menit (5 soal acak dari bank materi).
-* Bilah progres lawan ditampilkan secara live di layar kamu.
-* Perhitungan skor real-time di server dengan reward XP untuk pemenang dan peserta. Hasil duel disiarkan ke papan aktivitas kelas.
-
-### 3. 📢 Kuis Langsung Kelas (Kahoot Mode)
-* Mentor membuka ruang kuis langsung (`/mentor/kuis-langsung`) dan menayangkan layar proyektor beranimasi (`/kuis-langsung/{pin}/layar`).
-* Siswa bergabung melalui kode PIN 6 digit dari perangkat masing-masing.
-* Papan peringkat instan setelah setiap pertanyaan dan laporan komprehensif yang dapat diunduh dalam format CSV.
-
-### 4. ✋ Angkat Tangan & Bantuan Mentor
-* Siswa yang tersendat dapat menekan tombol *Angkat Tangan* di Sandbox, Perkuat, atau Uji.
-* Mentor seketika menerima notifikasi prioritas tinggi di cockpit kelas dan dapat langsung membuka layar siswa untuk memberikan asistensi tanpa meninggalkan meja.
-
----
-
-## 📸 Galeri Antarmuka Lengkap
-
-### Katalog Jalur Kurikulum Terbuka
-> Menampilkan jalur belajar multi-bahasa yang disusun bertahap, mulai dari pemrograman dasar hingga proyek web fullstack.
-
-<p align="center">
-  <img src="docs/shots/orvella-jalur.webp" alt="Katalog Jalur Orvella" width="90%" style="border-radius: 12px;" />
-</p>
-
----
-
-### Galeri Proyek & Komunitas Siswa
-> Ruang etalase karya siswa: aplikasi web yang dibuat di Sandbox dapat dipublikasikan, diuji coba, dan diunduh oleh teman sekelas.
-
-<p align="center">
-  <img src="docs/shots/orvella-galeri.webp" alt="Galeri Proyek Siswa" width="90%" style="border-radius: 12px;" />
-</p>
-
----
-
-### Pelacak Kemajuan & Penguasaan Konsep (Mastery Tree)
-> Statistik belajar mendalam: streak harian, cincin fase per materi, konsep yang perlu diulang, dan pohon keahlian.
-
-<p align="center">
-  <img src="docs/shots/orvella-progres.webp" alt="Progres Belajar Siswa" width="90%" style="border-radius: 12px;" />
-</p>
-
----
-
-## 🏗️ Studio Materi (Curriculum Builder)
-
-Orvella menyediakan ruang penyusunan materi komprehensif di `/studio` bagi guru dan mentor:
-
-* **Blok Konten Modular**: Padukan teks Markdown, titik jeda video YouTube dengan pertanyaan interaktif otomatis, dan blok kode runnable.
-* **Visualizer Simulator Memori**:
-  * Generator jejak eksekusi memori Python otomatis.
-  * Template pointer C++ dan diagram kepemilikan memori Rust.
-  * Box model visualizer CSS interaktif.
-* **Challenge & Test Suite Builder**: Buat tantangan ngoding dengan input/output test case, tes tersembunyi (*hidden tests*), dan validator solusi referensi.
-* **Impor Cepat**: Dukungan penempelan soal secara instan atau impor massal melalui format CSV.
-
----
-
-## 🎨 Desain Sistem: Susu, Nila, & Marigold
-
-Sistem desain Orvella mengusung tema **Warm Editorial & Tactile Clay** yang ramah dan menenangkan:
-
-* **Palet Warna Utama**:
-  * Latar Terang ("Susu"): `#FDF4E3` (kontras lembut yang tidak menyilaukan).
-  * Latar Gelap ("Malam"): `#14132C` (palet kosmik yang elegan).
-  * Teks Utama ("Nila"): `#1E1C45`.
-  * Aksen Pijar ("Marigold"): `#FFB224`.
-  * Aksen Interaksi ("Lilac"): `#7466EC`.
-* **Tipografi Orisinal**:
-  * Judul & Angka: **Bricolage Grotesque** (display dinamis, ekspresif, dan modern).
-  * Antarmuka & Teks Bacaan: **Plus Jakarta Sans** (karya anak bangsa Tokotype).
-  * Editor Kode & Terminal: **JetBrains Mono** (dengan dukungan ligatur pemrograman).
-* **Efek Tombol Taktil**: Tombol memiliki elevasi 4 px di bagian bawah yang terasa "ambles" saat ditekan.
-
----
-
-## 🛡️ Arsitektur Keamanan & Sistem Peran
-
-```
-                     ┌─────────────────────────────────────────┐
-                     │            KLIEN PERAMBAN WEB           │
-                     └────────────────────┬────────────────────┘
-                                          │
-                         HTTPS / WSS (Cookie HttpOnly)
-                                          ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              FASTAPI BACKEND                                │
-│                                                                             │
-│  [Superadmin]          [Admin]               [Mentor]          [Learner]    │
-│  • Manajemen AI        • Manajemen Siswa     • Studio Materi   • Orvella OS │
-│  • Audit Log Lengkap   • Flagging Konten     • Antrean Review  • 4 Fase     │
-│  • Penyetelan Role     • Katalog Kurikulum   • Kelas Live      • Sandbox    │
-│                                                                             │
-│  Layanan Keamanan:                                                          │
-│  • Google OAuth 2.0 PKCE + JWKS Verification                                │
-│  • Proteksi Brute-Force: Maks 5x salah/email, 30x/IP per 15 menit           │
-│  • Audit Trail Log: Seluruh aktivitas krusial tercatat di tabel audit       │
-└──────────────┬──────────────────────────┬─────────────────────────┬─────────┘
-               │                          │                         │
-       SQLAlchemy 2.0                  TCP IPC                    HTTP
-               ▼                          ▼                         ▼
-┌──────────────────────────┐   ┌────────────────────┐   ┌─────────────────────┐
-│  POSTGRESQL 16 DATABASE  │   │  RUNNER SANDBOX    │   │  PREVIEW PROXY      │
-│  • Skema Alembic (0010)  │   │  • Docker Engine   │   │  • Port 8301        │
-│  • Sesi & Histori Yjs    │   │  • Non-root 10001  │   │  • Origin Terpisah  │
-│  • Kuota AI & Akun       │   │  • No Network      │   │  • Cookie Partition │
-└──────────────────────────┘   └────────────────────┘   └─────────────────────┘
-```
-
----
-
-## ⚙️ Diagram Arsitektur Sistem
-
-Berikut alur lengkap bagaimana container dan microservices di dalam Orvella saling berinteraksi:
-
-```mermaid
-graph TD
-    User["🌐 Siswa / Mentor (Browser)"] -->|Port 8000 / Tunnel| App["🚀 App Container (FastAPI + Vite SPA)"]
-    User -->|Port 8301 / Origin Terpisah| PreviewProxy["🛡️ Preview Proxy (Isolasi Cookie)"]
-
-    App -->|ORM PostgreSQL| DB[("🐘 PostgreSQL 16")]
-    App -->|Unix Socket / REST| Runner["⚡ Code Runner Service (Docker Socket Holder)"]
-    App -->|REST / SSE| AIService["🤖 Orvi AI (Cerebras / Groq / Gemini)"]
-    App -->|Pencarian Web Privat| Searxng["🔍 SearXNG Container"]
-
-    Runner -->|Spawn Kontainer Singkat| Sandbox["📦 Container Sandbox (py/node/rust/c/go/jvm)"]
-    Runner -->|Spawn Server Dev Siswa| WebContainer["🌐 Workspace Container (orv-ws-<id>)"]
-    
-    WebContainer -->|Relasi SQL Siswa| MariaDB[("🐬 MariaDB (Khusus Proyek PHP/Web)")]
-    PreviewProxy -->|Meneruskan Request HTTP| WebContainer
-
-    style User fill:#E2E8F0,stroke:#4A5568,stroke-width:2px
-    style App fill:#EBF8FF,stroke:#3182CE,stroke-width:2px
-    style PreviewProxy fill:#FEFCBF,stroke:#D69E2E,stroke-width:2px
-    style DB fill:#E6FFFA,stroke:#319795,stroke-width:2px
-    style Runner fill:#FEEBC8,stroke:#DD6B20,stroke-width:2px
-    style AIService fill:#FED7D7,stroke:#E53E3E,stroke-width:2px
-    style Sandbox fill:#EDF2F7,stroke:#718096,stroke-width:1.5px
-    style WebContainer fill:#E9D8FD,stroke:#805AD5,stroke-width:1.5px
-```
-
----
-
-## 🚀 Panduan Menjalankan Aplikasi
-
-### Opsi A: Docker + Cloudflare Quick Tunnel (Satu Perintah, Otomatis)
-
-Solusi tercepat dan tanpa konfigurasi rumit. Sangat cocok untuk menguji coba atau membagikan URL aktif ke HP atau teman:
-
-**Linux / macOS / WSL:**
-```bash
-chmod +x scripts/tunnel.sh
-./scripts/tunnel.sh
-```
-
-**Windows (PowerShell):**
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\tunnel.ps1
-```
-
-Skrip ini akan otomatis:
-1. Membuat berkas `.env` dengan kata sandi acak dan aman.
-2. Membangun image sandbox multi-bahasa jika belum ada (`./scripts/build-sandbox.sh`).
-3. Menyalakan PostgreSQL, MariaDB, aplikasi, runner, dan proxy pratinjau.
-4. Menghubungkan ke Cloudflare Quick Tunnel dan mencetak **2 URL aktif**:
-   * URL Aplikasi: `https://<acak>.trycloudflare.com`
-   * URL Pratinjau Proyek Web: `https://<acak-preview>.trycloudflare.com` *(origin terpisah)*
-
-*Perintah utilitas tunnel:*
-```bash
-./scripts/tunnel.sh url    # Tampilkan URL aktif saat ini
-./scripts/tunnel.sh logs   # Lihat log seluruh container
-./scripts/tunnel.sh stop   # Matikan service tanpa menghapus data
-./scripts/tunnel.sh reset  # Reset total database ke data demo awal
-```
-
----
-
-### Opsi B: Development Lokal Linux / macOS
-
-**Kebutuhan:** Docker Engine, Python 3.12+, Node.js 20+.
+Orvella maintains high quality through an extensive test suite:
 
 ```bash
-# 1. Setup awal (membuat .env, venv, install dependensi, migrasi DB)
-./dev.sh --setup
+# Run unit & integration tests
+npm test
 
-# 2. Jalankan aplikasi (API + Vite otomatis reload)
-./dev.sh
+# Run sandbox execution safety verification
+npm run test:sandbox
 
-# 3. Kunjungi peramban:
-# Aplikasi: http://localhost:5173
-# Dokumentasi Swagger API: http://localhost:8000/docs
+# Run end-to-end browser tests
+npm run test:e2e
 ```
 
 ---
 
-### Opsi C: Development di Windows
-
-**Kebutuhan:** Python 3.12+, Node.js 20+, PostgreSQL 15+.
-
-```powershell
-# 1. Salin konfigurasi backend
-copy backend\.env.example backend\.env
-
-# 2. Setup dan jalankan
-powershell -ExecutionPolicy Bypass -File .\dev.ps1 -Setup
-powershell -ExecutionPolicy Bypass -File .\dev.ps1
-```
-
----
-
-### Opsi D: Manajemen Database & Cadangan
-
-Orvella menyertakan utilitas pencadangan database mandiri:
-
-```bash
-# Buat snapshot cadangan (PostgreSQL + dump MariaDB)
-./scripts/db.sh backup
-
-# Lihat daftar file cadangan
-./scripts/db.sh list
-
-# Pulihkan database dari file cadangan
-./scripts/db.sh restore backups/orvella-20261015-1200.dump
-```
-
----
-
-## 👥 Akun Demo Siap Pakai
-
-Semua akun demo di lingkungan lokal menggunakan kata sandi: `orvella123` *(pada Docker tunnel publik, kata sandi acak dicetak di terminal)*.
-
-| Peran | Akun Email | Kemampuan & Data Siswa |
-|---|---|---|
-| **Siswa (Juara)** | `nadia@smksig.sch.id` | Bab 1 selesai, Bab 2 di Perkuat 3/8, streak 12 hari, 3 konsep perlu diulang |
-| **Siswa (Proyek)** | `salsa@smksig.sch.id` | Bab 2 selesai, proyek Kalkulator Uang Saku menunggu review mentor |
-| **Siswa (Macet)** | `alex@smksig.sch.id` | Memicu sinyal bimbingan mentor: salah 4× berturut-turut pada gerbang logika |
-| **Siswa (Lainnya)** | `rizky@` · `maya@` · `bayu@smksig.sch.id` | Simulasi ragam sinyal belajar (hint rush, stuck di kuis) |
-| **Mentor / Guru** | `dimas@smksig.sch.id` | Mengampu kelas XII RPL (32 siswa), antrean review kode, akses **Studio Materi** |
-| **Admin** | `sekar@smksig.sch.id` | Ringkasan kurikulum, flag konten, Studio builder, manajemen pengguna |
-| **Superadmin** | Diberikan via server | Akses **Log Aktivitas Keamanan**, manajemen kuota AI, pengangkatan admin |
-
-> Ingin mencoba alur pendaftaran siswa baru dari awal? Kunjungi halaman `/daftar`.
-
----
-
-## 🧪 Pengujian & Quality Assurance
-
-Orvella dilengkapi cakupan uji otomatis yang ketat:
-
-```bash
-# 1. Uji Backend API (Pytest)
-cd backend && .venv/bin/python -m pytest -q
-
-# 2. Validasi Tipe Frontend & Build
-cd frontend && npm run typecheck && npm run build
-
-# 3. Uji Keamanan Sandbox & Isolasi Docker
-docker compose exec runner python -m pytest -q tests
-```
-
----
-
-## 📁 Struktur Repositori
+## 📁 Repository Structure
 
 ```
 orvella/
-├── backend/                  # Server Web FastAPI & Layanan Bisnis
-│   ├── app/routers/          # Endpoints: auth, desk, duel, livequiz, orvi, sandbox, studio
-│   ├── app/services/         # Layanan AI, kompilator kode, sinyal kesulitan, badges, presence
-│   ├── app/seed/             # Data awal kurikulum & akun demo
-│   └── migrations/           # Riwayat migrasi skema database Alembic (0001 - 0010)
-├── frontend/                 # Aplikasi Web SPA (React 19 + TypeScript)
-│   ├── src/os/               # Window manager, dock, menubar, desktop, widgets
-│   ├── src/orvi/             # Antarmuka chat Orvi AI, streaming SSE, tool execution
-│   ├── src/sandbox/          # Cloud IDE, CodeMirror 6, Yjs realtime, terminal
-│   ├── src/duel/             # Antarmuka duel koding 1 lawan 1
-│   ├── src/live/             # Kuis interaktif kelas mode proyektor
-│   └── src/design/           # Komponen UI, animasi GSAP, ikon, dan Orvi SVG
-├── runner/                   # Microservice Docker Runner (Pemegang Docker Socket)
-│   └── orv_runner/           # Manajemen isolasi kontainer, compiler, dan evaluasi hasil
-├── preview/                  # Reverse Proxy Pratinjau Proyek Web (Origin Terpisah)
-├── sandbox/                  # Dockerfile runtime bahasa (py, node, php, c, rust, go, jvm)
-├── design/                   # Aset desain, mockup HTML, spesifikasi brand & motion
-├── docs/                     # Dokumentasi visual, banner SVG, & tangkapan layar
-│   ├── assets/               # orvella-banner.svg, orvi-mascot.svg, orvella-hero.gif
-│   └── shots/                # Tangkapan layar resolusi tinggi seluruh antarmuka
-├── scripts/                  # Skrip otomatisasi database, sandbox builder, & tunnel
-├── docker-compose.yml        # Konfigurasi containerization multi-service
-├── dev.sh                    # Runner praktis satu perintah dev (Linux / macOS)
-├── dev.ps1                   # Runner praktis satu perintah dev (Windows)
-├── LICENSE                   # Lisensi MIT
-└── README.md                 # Dokumentasi utama proyek
+├── docs/                   # Documentation assets, banners, and screenshots
+│   ├── assets/             # SVG banners, vector mascots, and hero GIFs
+│   └── shots/              # High-resolution webp interface gallery
+├── prisma/                 # Prisma database schema and migration scripts
+├── public/                 # Static assets, lofi audio files, and web fonts
+├── runner/                 # Hardened Docker runner container definitions
+│   └── runtimes/           # Dockerfiles for 12+ isolated programming languages
+├── src/
+│   ├── app/                # Next.js App Router (pages and API endpoints)
+│   ├── components/         # React UI library & window management system
+│   │   ├── desktop/        # Window manager, dock, taskbar, and audio player
+│   │   ├── editor/         # CodeMirror 6 multi-file editor & LSP client
+│   │   ├── mascot/         # GSAP animated Orvi & Pip mascot controller
+│   │   └── sandbox/        # Realtime runner output, memory trace visualizer
+│   ├── lib/                # Core utilities (Yjs sync, auth, Docker client)
+│   └── styles/             # Tailwind CSS tokens and glassmorphism styling
+├── deploy-quick.sh         # One-click Docker + Cloudflare tunnel launcher
+├── docker-compose.yml      # Multi-service container orchestration
+└── package.json            # Dependencies and npm scripts
 ```
 
 ---
 
-## 📄 Lisensi
+## 📄 License & Credits
 
-Proyek ini didistribusikan di bawah lisensi resmi **MIT License**. Terbuka untuk digunakan, dimodifikasi, dan dikembangkan bagi kemajuan teknologi pendidikan di Indonesia dan dunia.
+Orvella is released under the **[MIT License](LICENSE)**.
 
-<p align="center">
-  Dibuat dengan segenap 🧡 oleh <strong>Alex (Nozella-Alexiee)</strong><br/>
-  <em>Learn. Build. Collaborate · Orvella</em>
-</p>
+Developed and maintained with ❤️ by **[Alex (Nozella-Alexiee)](https://github.com/Nozella-Alexiee)** &amp; open-source contributors.
+<br/>
+*Crafted for curious minds who want to understand code from the inside out.*
